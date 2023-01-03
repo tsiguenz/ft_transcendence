@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+    backend:
+        container_name: "backend"
+        build: ./backend
+        command: npm run start:dev
+        env_file:
+            - .env
+        ports:
+            - 3000:3000
+        volumes:
+            - ./backend:/usr/src/app
+        networks:
+            - transcendence-network
+#        depends_on:
+#              - db
+#        restart: unless-stopped
+
+#    db:
+#        container_name: "db"
+#        image: postgres:latest
+#        networks:
+#            - nesjs-network
+#        ports:
+#            - 5432:5432
+#        volumes:
+#            - ./db:/var/lib/postgresql/data
+#        env_file:
+#            - .env
+networks:
+  transcendence-network:
