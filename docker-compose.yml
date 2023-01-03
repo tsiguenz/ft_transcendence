@@ -1,31 +1,50 @@
 version: '3.8'
 services:
+
     backend:
         container_name: "backend"
         build: ./backend
         command: npm run start:dev
+        volumes:
+            - ./backend:/usr/src/app
+        ports:
+            - 3000:3000
+        networks:
+            - transcendence-network
+        env_file:
+            - .env
+        depends_on:
+              - db
+        restart: always
+
+    db:
+        container_name: "db"
+        image: postgres:latest
+        networks:
+            - transcendence-network
+        volumes:
+            - db_vol:/var/lib/postgresql/data
+        env_file:
+            - .env
+        restart: always
+
+    pgadmin:
+        container_name: pgadmin
+        image: dpage/pgadmin4:latest
         env_file:
             - .env
         ports:
-            - 3000:3000
-        volumes:
-            - ./backend:/usr/src/app
+            - "5050:80"
         networks:
             - transcendence-network
-#        depends_on:
-#              - db
-#        restart: unless-stopped
+        depends_on:
+              - db
+        restart: always
 
-#    db:
-#        container_name: "db"
-#        image: postgres:latest
-#        networks:
-#            - nesjs-network
-#        ports:
-#            - 5432:5432
-#        volumes:
-#            - ./db:/var/lib/postgresql/data
-#        env_file:
-#            - .env
+# Cannot use bind volume because we don't have permissions,
+# postgres official image use the postgres user.
+volumes:
+    db_vol:
+
 networks:
-  transcendence-network:
+    transcendence-network:

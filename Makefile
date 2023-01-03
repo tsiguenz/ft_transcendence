@@ -4,12 +4,12 @@ all:
 stop:
 	-docker compose stop
 
-clean: stop
-	-docker compose down --volumes --remove-orphans
+down:
+	-docker compose down
 
-fclean: clean
+rma: down
 	-docker system prune -af --volumes 2> /dev/null
 
-re: stop all
+re: down all
 
-.PHONY: all stop clean fclean re
+.PHONY: all stop down rma re
