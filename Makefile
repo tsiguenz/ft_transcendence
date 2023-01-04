@@ -5,7 +5,7 @@ stop:
 	-docker compose stop
 
 down:
-	-docker compose down
+	-docker compose down --volumes
 
 rma: down
 	-docker system prune -af --volumes 2> /dev/null

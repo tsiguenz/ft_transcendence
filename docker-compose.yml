@@ -14,16 +14,16 @@ services:
         env_file:
             - .env
         depends_on:
-              - db
+              - database
         restart: always
 
-    db:
-        container_name: "db"
-        image: postgres:latest
+    database:
+        container_name: "database"
+        build: ./database
         networks:
             - transcendence-network
         volumes:
-            - db_vol:/var/lib/postgresql/data
+            - database_volume:/var/lib/postgresql/data
         env_file:
             - .env
         restart: always
@@ -38,13 +38,13 @@ services:
         networks:
             - transcendence-network
         depends_on:
-              - db
+              - database
         restart: always
 
 # Cannot use bind volume because we don't have permissions,
 # postgres official image use the postgres user.
 volumes:
-    db_vol:
+    database_volume:
 
 networks:
     transcendence-network:
