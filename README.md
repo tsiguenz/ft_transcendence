@@ -1,4 +1,4 @@
-## ft_transcendence (42 project)
+# ft_transcendence (42 project)
 
 This project is about create a website where we can play [pong](https://en.wikipedia.org/wiki/Pong) with some friends.
 We used [nestjs](https://nestjs.com/), (angular/vuejs?), [postgresql](https://www.postgresql.org/), [pgadmin](https://www.pgadmin.org/), [nginx](https://www.nginx.com/) and [docker](https://www.docker.com/).
@@ -26,7 +26,7 @@ Delete all the dockers elements (volumes/network/containers/images/cache):
 Rebuilt (<=> make down + make):
 ```$ make re```
 
-## Info
+## Infos
 
 - **backend**: localhost:3000
 - **pgadmin**: localhost:5050
