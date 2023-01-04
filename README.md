@@ -1,16 +1,32 @@
-## Environment
+## ft_transcendence (42 project)
 
-This is an exemple of .env file needed at the root of the project:
+This project is about create a website where we can play [pong](https://en.wikipedia.org/wiki/Pong) with some friends.
+We used [nestjs](https://nestjs.com/), (angular/vuejs?), [postgresql](https://www.postgresql.org/), [pgadmin](https://www.pgadmin.org/), [nginx](https://www.nginx.com/) and [docker](https://www.docker.com/).
+To run the project you need to modify the sample.env and rename it to '.env'.
 
-```
-POSTGRES_USER=root
-POSTGRES_PASSWORD=root
-POSTGRES_DB=root
+---
 
-DB_NAME=pong
-DB_USER=pong
-DB_PASSWORD=ping
+## Usage
 
-PGADMIN_DEFAULT_EMAIL=admin@admin.com
-PGADMIN_DEFAULT_PASSWORD=admin
-```
+Clone the project:
+```$ git clone git@github.com:tsiguenz/ft_transcendence.git && cd ft_transcendence```
+
+Build:
+```$ make```
+
+Stop the containers:
+```$ make stop```
+
+Delete the containers/volumes:
+```$ make down```
+
+Delete all the dockers elements (volumes/network/containers/images/cache):
+```$ make rma```
+
+Rebuilt (<=> make down + make):
+```$ make re```
+
+## Info
+
+- **backend**: localhost:3000
+- **pgadmin**: localhost:5050
