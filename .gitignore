@@ -18,7 +18,6 @@ yarn-error.log
 /packages/**/LICENSE
 *.tsbuildinfo
 
-todo.txt
 .env
 sample.env
 .obsidian/

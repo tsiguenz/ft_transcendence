@@ -26,7 +26,31 @@ Delete all the dockers elements (volumes/network/containers/images/cache):
 Rebuilt (<=> make down + make):
 ```$ make re```
 
-## Infos
+---
 
-- **backend**: localhost:3000
-- **pgadmin**: localhost:5050
+## Project architecture
+
+Dev environment (in progress):
+
+```mermaid
+
+flowchart BT
+	host[HOST]
+	back(nestjs\nbackend)
+	db(posgres\ndatabase)
+	pgadmin(pgadmin\nDBMS)
+	vol_back[(backend)]
+	vol_db[(database)]
+
+    pgadmin .- 80:5050 .-> host
+    back .- 3030:3000 .-> host
+	subgraph Docker network
+		db & pgadmin & back
+	end
+	subgraph Docker volume
+		vol_db <--> db
+	end
+	vol_back <--> back
+	vol_back <--> host
+
+```

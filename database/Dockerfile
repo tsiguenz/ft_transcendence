@@ -1,3 +1,3 @@
-FROM postgres:latest
+FROM postgres:alpine
 
 COPY initdb.sh /docker-entrypoint-initdb.d/
