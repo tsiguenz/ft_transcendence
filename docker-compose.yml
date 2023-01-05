@@ -4,9 +4,10 @@ services:
     backend:
         container_name: "backend"
         build: ./backend
+#        command: tail -f
         command: npm run start:dev
         volumes:
-            - ./backend:/usr/src/app
+            - ./backend:/usr/src/app/transcendence
         ports:
             - 3000:3000
         networks:

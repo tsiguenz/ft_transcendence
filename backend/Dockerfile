@@ -2,7 +2,8 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-RUN npm install -g @nestjs/cli
-RUN npm install --save @nestjs/config
+COPY package*.json .
 
-CMD ["npm", "run", "start"]
+RUN npm install --only=development
+
+WORKDIR /usr/src/app/transcendence
