@@ -20,5 +20,6 @@ yarn-error.log
 
 todo.txt
 .env
+sample.env
 .obsidian/
 db/
