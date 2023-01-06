@@ -1,8 +1,8 @@
 FROM node:current-alpine3.17
 
-ENV PATH="${PATH}:/node_modules/@nestjs/cli/bin/"
+ENV PATH="${PATH}:/node_modules/.bin/"
 
-COPY backend/package*.json .
+COPY frontend/package*.json .
 
 RUN npm install --only=development
 

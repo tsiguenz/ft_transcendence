@@ -1,4 +1,5 @@
 - generate the 42api and test it
 - prepare the database diagram
-- integrate frontend and connect it to backend
+- connect backend to database
+- connect frontend to backend
 - create nginx container (with https?)

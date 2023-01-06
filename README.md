@@ -37,20 +37,25 @@ Dev environment (in progress):
 flowchart BT
 	host[HOST]
 	back(nestjs\nbackend)
+	front(vuejs\nfrontend)
 	db(posgres\ndatabase)
 	pgadmin(pgadmin\nDBMS)
 	vol_back[(backend)]
+	vol_front[(frontend)]
 	vol_db[(database)]
 
     pgadmin .- 80:5050 .-> host
     back .- 3030:3000 .-> host
+    front .- 5173:8080 .-> host
 	subgraph Docker network
-		db & pgadmin & back
+		db & pgadmin & back & front
 	end
 	subgraph Docker volume
 		vol_db <--> db
 	end
 	vol_back <--> back
 	vol_back <--> host
+	vol_front <--> front
+	vol_front <--> host
 
 ```

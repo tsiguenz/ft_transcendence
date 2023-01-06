@@ -7,9 +7,8 @@ services:
             dockerfile: docker/Dockerfile_backend
         image: backend_image
         command: npm run start:dev
-#        command: tail -f
         volumes:
-            - ./backend:/usr/src/app/transcendence
+            - ./backend:/usr/src/app
         ports:
             - 3000:3000
         networks:
@@ -18,6 +17,25 @@ services:
             - .env
         depends_on:
               - database
+        restart: always
+
+    frontend:
+        container_name: "frontend"
+        build: 
+            dockerfile: docker/Dockerfile_frontend
+        image: frontend_image
+        command: npm run serve
+        volumes:
+            - ./frontend:/usr/src/app
+        ports:
+            - 8080:5173
+        networks:
+            - transcendence-network
+        env_file:
+            - .env
+        depends_on:
+              - database
+              - backend
         restart: always
 
     database:
@@ -39,7 +57,7 @@ services:
         env_file:
             - .env
         ports:
-            - "5050:80"
+            - 5050:80
         networks:
             - transcendence-network
         depends_on:
