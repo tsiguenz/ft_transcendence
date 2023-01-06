@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  cacheDir: "/node_modules/.cacheDir",
   plugins: [vue()],
   resolve: {
     alias: {
