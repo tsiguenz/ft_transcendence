@@ -3,8 +3,11 @@ services:
 
     backend:
         container_name: "backend"
-        build: ./backend
+        build: 
+            dockerfile: docker/Dockerfile_backend
+        image: backend_image
         command: npm run start:dev
+#        command: tail -f
         volumes:
             - ./backend:/usr/src/app/transcendence
         ports:
@@ -19,7 +22,9 @@ services:
 
     database:
         container_name: "database"
-        build: ./database
+        build: 
+            dockerfile: docker/Dockerfile_database
+        image: database_image
         networks:
             - transcendence-network
         volumes:
