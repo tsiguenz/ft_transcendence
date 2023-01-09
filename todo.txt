@@ -2,4 +2,4 @@
 - prepare the database diagram
 - connect backend to database
 - connect frontend to backend
-- create nginx container (with https?)
+- configure vite

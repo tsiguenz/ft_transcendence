@@ -10,7 +10,7 @@ defineProps<{
     <h1 class="red">HELLO WORLD</h1>
     <h3>
       You’ve successfully created a project with
-      <a href="https://cdn.intra42.com/" target="_blank" rel="noopener">Vite</a> +
+      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
 	<a href="https://profile.intra.42.fr/" class="red">INTRA 42 POUR LES BG DE LA STREET</a> +
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
     </h3>
