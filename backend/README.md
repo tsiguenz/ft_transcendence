@@ -23,16 +23,20 @@ api/channels
 |d_users|
 |-------|
 |*int id|
-|varchar name|
+|string name|
 |blob avatar|
+|int ladder_points|
 |boolean 2fa|
-|varchar profile_link|
+|boolean OAuth|
+|string password|
+|string profile_link|
 
 |d_channels|
 |----------|
 |*int id|
-|+int is_owner|
-|varchar password|
+|+int owner|
+|boolean is_public|
+|string password|
 
 ### Fact tables
 
@@ -45,11 +49,15 @@ api/channels
 |int p2_score|
 |+int winner|
 |+int looser|
+|int watchers|
+|date time_played|
 |boolean is_finished|
 
-|f_rooms| # change the name
+<!-- TODO: change name -->
+|f_rooms|
 |-------|
 |*int id|
+|+int room_id|
 |+int user|
 |boolean is_admin|
 |boolean is_ban|
@@ -60,7 +68,7 @@ api/channels
 |f_messages|
 |----------|
 |*int id|
-|varchar content|
+|string content|
 |+int from|
 |+int to|
 |date date?|

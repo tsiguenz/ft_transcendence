@@ -13,10 +13,3 @@ psql -v ON_ERROR_STOP=1 --username $POSTGRES_USER --dbname $DB_NAME <<-EOSQL
 	GRANT ALL ON SCHEMA public TO $DB_USER;
 	DROP DATABASE root;
 EOSQL
-
-# create tables
-psql -v ON_ERROR_STOP=1 --username $DB_USER --dbname $DB_NAME <<-EOSQL
-	CREATE TABLE users (
-	    name            varchar(80)
-	);
-EOSQL
