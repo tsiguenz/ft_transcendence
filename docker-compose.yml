@@ -6,7 +6,8 @@ services:
         build: 
             dockerfile: docker/Dockerfile_backend
         image: backend_image
-        command: npm run start:dev
+        command: /backend_startup.sh
+#        command: tail -f
         volumes:
             - ./backend:/usr/src/app
         ports:

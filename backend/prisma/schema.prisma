@@ -18,17 +18,17 @@ model User {
 	twofa			Boolean @default(false)
 	OAuth			Boolean	@default(false)
 	password		String?
-	profile_link	String
-	gamesWin		Game[]	@relation("GamesWin")
-	gamesLoose		Game[]	@relation("GamesLoose")
+//	profile_link	String
+//	gamesWin		Game[]	@relation("GamesWin")
+//	gamesLoose		Game[]	@relation("GamesLoose")
 }
 
-model Game {
-	id	Int	@id @default(autoincrement())
-	winner				User	@relation(name: "GamesWin", fields: [winnerId], references: [id])
-	winnerId			Int
-	looser  			User	@relation(name: "GamesLoose", fields: [looserId], references: [id])
-	looserId			Int
-	winnerScore	Int		@default(0)
-	looserScore	Int		@default(0)
-}
+//model Game {
+//	id	Int	@id @default(autoincrement())
+//	winner				User	@relation(name: "GamesWin", fields: [winnerId], references: [id])
+//	winnerId			Int
+//	looser  			User	@relation(name: "GamesLoose", fields: [looserId], references: [id])
+//	looserId			Int
+//	winnerScore	Int		@default(0)
+//	looserScore	Int		@default(0)
+//}

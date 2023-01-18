@@ -2,6 +2,10 @@ FROM node:current-alpine3.17
 
 COPY backend/package*.json .
 
+COPY docker/backend_startup.sh .
+
+RUN chmod +x backend_startup.sh
+
 RUN npm install --only=development
 
 WORKDIR /usr/src/app
