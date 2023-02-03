@@ -6,12 +6,13 @@ services:
         build: 
             dockerfile: docker/Dockerfile_backend
         image: backend_image
-        command: /backend_startup.sh
+#        command: /backend_startup.sh
 #        command: tail -f
         volumes:
-            - ./backend:/usr/src/app
+            - ./backend:/app
         ports:
             - 3000:3000
+            - 5555:5555
         networks:
             - transcendence-network
         env_file:

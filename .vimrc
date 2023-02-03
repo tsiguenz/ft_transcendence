@@ -2,7 +2,7 @@ set number
 set relativenumber
 syntax on
 colorscheme ron
-set colorcolumn=80
+set colorcolumn=0
 set tabstop=4
 set shiftwidth=4
 inoremap jj <Esc>

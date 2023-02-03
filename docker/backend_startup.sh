@@ -2,4 +2,4 @@
 
 set -e
 npx prisma migrate deploy
-npm start
+npm run start:dev
