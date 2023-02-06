@@ -6,12 +6,14 @@ services:
         build: 
             dockerfile: docker/Dockerfile_backend
         image: backend_image
-#        command: /backend_startup.sh
+        command: /app/backend_startup.sh
 #        command: tail -f
         volumes:
             - ./backend:/app
         ports:
+            # api
             - 3000:3000
+            # prisma studio
             - 5555:5555
         networks:
             - transcendence-network

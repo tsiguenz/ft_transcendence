@@ -23,3 +23,6 @@ yarn-error.log
 sample.env
 .obsidian/
 migrations/
+log
+dist/
+*.nfs*

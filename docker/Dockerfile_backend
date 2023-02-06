@@ -1,13 +1,9 @@
 FROM node:current-alpine3.17
 
-COPY backend/package*.json .
-
-COPY docker/backend_startup.sh .
-
-#RUN chmod +x backend_startup.sh
-
-RUN npm install --only=development
-
 WORKDIR /app
 
-CMD npm run start:dev
+COPY docker/backend_startup.sh /app
+
+RUN chmod +x backend_startup.sh
+
+CMD npm run start:dev > log 2> log

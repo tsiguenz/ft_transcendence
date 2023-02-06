@@ -18,8 +18,8 @@ model User {
 	avatar			Bytes? 
 	twofa			Boolean @default(false)
 	OAuth			Boolean	@default(false)
-	password		String?
-//	profileLink	String
+	hash			String
+//	profileLink		String
 //	gamesWin		Game[]	@relation("GamesWin")
 //	gamesLoose		Game[]	@relation("GamesLoose")
 }
