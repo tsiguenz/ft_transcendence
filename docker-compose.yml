@@ -6,7 +6,6 @@ services:
         build: 
             dockerfile: docker/Dockerfile_backend
         image: backend_image
-        command: /app/backend_startup.sh
         volumes:
             - ./backend:/app
         ports:

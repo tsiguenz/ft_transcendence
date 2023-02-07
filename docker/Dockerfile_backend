@@ -5,9 +5,10 @@ WORKDIR /app
 RUN apt update \
 	&& apt install musl-dev -y
 
-RUN mv /lib/aarch64-linux-musl/libc.so /lib/libc.musl-aarch64.so.1 || mv /lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 COPY docker/backend_startup.sh /app
 
 RUN chmod +x backend_startup.sh
+
+ENTRYPOINT ["/app/backend_startup.sh"]
 
 CMD npm run start:dev
