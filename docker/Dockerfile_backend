@@ -5,10 +5,10 @@ WORKDIR /app
 RUN apt update \
 	&& apt install musl-dev -y
 
-COPY docker/backend_startup.sh /app
+COPY docker/backend_startup.sh /
 
-RUN chmod +x backend_startup.sh
+RUN chmod +x /backend_startup.sh
 
-ENTRYPOINT ["/app/backend_startup.sh"]
+ENTRYPOINT ["/backend_startup.sh"]
 
 CMD npm run start:dev
