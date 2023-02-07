@@ -1,9 +1,13 @@
-FROM node:current-alpine3.17
+FROM node:lts
 
 WORKDIR /app
 
+RUN apt update \
+	&& apt install musl-dev -y
+
+RUN mv /lib/aarch64-linux-musl/libc.so /lib/libc.musl-aarch64.so.1
 COPY docker/backend_startup.sh /app
 
 RUN chmod +x backend_startup.sh
 
-CMD npm run start:dev > log 2> log
+CMD npm run start:dev

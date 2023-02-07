@@ -7,7 +7,6 @@ services:
             dockerfile: docker/Dockerfile_backend
         image: backend_image
         command: /app/backend_startup.sh
-#        command: tail -f
         volumes:
             - ./backend:/app
         ports:
@@ -20,7 +19,8 @@ services:
         env_file:
             - .env
         depends_on:
-              - database
+              database:
+                condition: service_healthy
         restart: always
 
     frontend:
@@ -43,6 +43,10 @@ services:
         restart: always
 
     database:
+        healthcheck:
+            test: "psql -U ${POSTGRES_USER} -W ${POSTGRES_PASSWORD} -d ${DB_NAME} -c 'select 1;'"
+            interval: 2s
+            retries: 120
         container_name: "database"
         build: 
             dockerfile: docker/Dockerfile_database
