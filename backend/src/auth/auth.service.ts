@@ -20,6 +20,11 @@ export class AuthService {
     }
 
     signin() {
-        return { msg: 'I am signin !' };
+		const	user = this.prisma.user.findUnique({
+			where: {
+					pseudo: 'tsiguenz',
+			},
+		})
+        return user;
     }
 }
