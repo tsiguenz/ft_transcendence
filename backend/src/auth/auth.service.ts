@@ -7,24 +7,30 @@ import * as argon from 'argon2';
 export class AuthService {
 	constructor(private prisma: PrismaService) { }
 
-    async	signup(dto: AuthDto) {
-		const	hash = await argon.hash(dto.password);
-		const	user = await this.prisma.user.create({
-			data: {
-				email:	dto.email,
-				pseudo: dto.pseudo,
-						hash,
-			},
-		});
-        return user;
-    }
+  async	signup(dto: AuthDto) {
+  const	hash = await argon.hash(dto.password);
+  const	user = await this.prisma.user.create({
+    data: {
+      email:	dto.email,
+      pseudo: dto.pseudo,
+      hash:   hash,
+    },
+  });
+      return user;
+  }
 
-    signin() {
-		const	user = this.prisma.user.findUnique({
-			where: {
-					pseudo: 'tsiguenz',
-			},
-		})
-        return user;
-    }
+  signin() {
+    return "I'm signin";
+  }
+
+  async getUser(query: any) {
+    const	user = await this.prisma.user.findUnique({
+      where: {
+        pseudo: query.nickname,
+      },
+    })
+    if (!(user.hasOwnProperty('pseudo')))
+      return { error: "User does not exist", };
+    return user;
+  }
 }
