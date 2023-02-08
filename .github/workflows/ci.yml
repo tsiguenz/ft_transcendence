@@ -1,0 +1,17 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  ci_job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.14.x
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm --prefix backend/ ci
+      - name: Run tests
+        run: npm --prefix backend/ run test
