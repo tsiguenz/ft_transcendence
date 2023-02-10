@@ -1,0 +1,13 @@
+code --install-extension aaron-bond.better-comments
+code --install-extension AbhijoyBasak.nestjs-files
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension DSKWRK.vscode-generate-getter-setter
+code --install-extension esbenp.prettier-vscode
+code --install-extension GitHub.copilot
+code --install-extension kisstkondoros.vscode-codemetrics
+code --install-extension mikestead.dotenv
+code --install-extension pmneo.tsimporter
+code --install-extension Prisma.prisma
+code --install-extension rvest.vs-code-prettier-eslint
+code --install-extension stringham.move-ts
+code --install-extension Vue.vscode-typescript-vue-plugin
