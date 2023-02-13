@@ -17,4 +17,8 @@ export class AuthController {
   getUser(@Query() query: any) {
     return this.authService.getUser(query);
   }
+  @Get('get-all-users')
+  getAllUsers() {
+    return this.authService.getAllUsers();
+  }
 }

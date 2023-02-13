@@ -54,6 +54,17 @@ export class AuthService {
     return this.createToken(user);
   }
 
+  async createToken(user: any): Promise<string> {
+    const payload = {
+      nickname: user.nickname,
+      sub: user.id
+    };
+    return await this.jwt.signAsync(payload, {
+      expiresIn: '1d',
+      secret: this.config.get('JWT_SECRET')
+    });
+  }
+
   async getUser(query: any) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -68,14 +79,9 @@ export class AuthService {
     }
   }
 
-  async createToken(user: any): Promise<string> {
-    const payload = {
-      nickname: user.nickname,
-      sub: user.id
-    };
-    return await this.jwt.signAsync(payload, {
-      expiresIn: '1d',
-      secret: this.config.get('JWT_SECRET')
-    });
+  async getAllUsers() {
+    const users = await this.prisma.user.findMany();
+    users.forEach((user) => delete user.hash);
+    return users;
   }
 }
