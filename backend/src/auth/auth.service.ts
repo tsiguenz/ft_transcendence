@@ -27,7 +27,7 @@ export class AuthService {
           hash: hash
         }
       });
-      return this.createToken(user);
+      return this.createToken(user.id, user.nickname);
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
@@ -51,25 +51,29 @@ export class AuthService {
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
-    return this.createToken(user);
+    return this.createToken(user.id, user.nickname);
   }
 
-  async createToken(user: any): Promise<string> {
+  async createToken(
+    userId: number,
+    nickname: string
+  ): Promise<{ access_token: string }> {
     const payload = {
-      nickname: user.nickname,
-      sub: user.id
+      nickname: nickname,
+      sub: userId
     };
-    return await this.jwt.signAsync(payload, {
+    const token = await this.jwt.signAsync(payload, {
       expiresIn: '1d',
       secret: this.config.get('JWT_SECRET')
     });
+    return { access_token: token };
   }
 
-  async getUser(query: any) {
+  async getUser(nickname: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
-          nickname: query.nickname
+          nickname: nickname
         }
       });
       delete user.hash;
