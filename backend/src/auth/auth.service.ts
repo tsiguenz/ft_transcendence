@@ -6,7 +6,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
-import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
@@ -19,6 +18,15 @@ export class AuthService {
   ) {}
 
   async signup(dto: AuthDto) {
+    // Check if user exist to avoid auto increment id
+    const user = await this.prisma.user.findUnique({
+      where: {
+        nickname: dto.nickname
+      }
+    });
+    if (user) {
+      throw new ForbiddenException('Nickname already exists');
+    }
     const hash = await argon.hash(dto.password);
     try {
       const user = await this.prisma.user.create({
@@ -29,11 +37,6 @@ export class AuthService {
       });
       return this.createToken(user.id, user.nickname);
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new ForbiddenException('Nickname already exists');
-        }
-      }
       throw e;
     }
   }
