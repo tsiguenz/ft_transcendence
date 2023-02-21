@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import './assets/main.css'
+//Vue.prototype.$http = axios;
 
 createApp(App).mount('#app')
