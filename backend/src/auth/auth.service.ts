@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   signin() {
-    return "I'm signin";
+    return { msg: "I'm signed in" };
   }
 
   async getUser(query: any) {
