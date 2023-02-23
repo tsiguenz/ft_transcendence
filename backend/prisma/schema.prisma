@@ -2,34 +2,57 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-	provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-	provider = "postgresql"
-	url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GameType {
+  LADDER
+  CUSTOM
 }
 
 model User {
-	id				Int		@default(autoincrement()) @id
-	email			String
-	pseudo			String	@unique
-	ladderPoints	Int		@default(500)
-	avatar			Bytes? 
-	twofa			Boolean @default(false)
-	OAuth			Boolean	@default(false)
-	hash			String
-//	profileLink		String
-//	gamesWin		Game[]	@relation("GamesWin")
-//	gamesLoose		Game[]	@relation("GamesLoose")
+  // TODO: change by uuid?
+  id            Int       @default(autoincrement()) @id
+  nickname      String    @unique
+  ladderPoints  Int       @default(0)
+  avatar        Bytes? 
+  twofa         Boolean   @default(false)
+  OAuth         Boolean   @default(false)
+  hash          String
+  gamesWin      Game[]    @relation("winner")
+  gamesLoose    Game[]    @relation("looser")
+  createdAt     DateTime  @default(now())
+  @@map("users")
 }
 
 model Game {
-	id	Int	@id @default(autoincrement())
-//	winner				User	@relation(name: "GamesWin", fields: [winnerId], references: [id])
-//	winnerId			Int
-//	looser  			User	@relation(name: "GamesLoose", fields: [looserId], references: [id])
-//	looserId			Int
-//	winnerScore	Int		@default(0)
-//	looserScore	Int		@default(0)
+  // TODO: change by uuid?
+  id                    Int       @id @default(autoincrement())
+  type                  GameType
+  winnerId              Int
+  winner                User      @relation("winner", fields: [winnerId], references: [id])
+  looserId              Int
+  looser                User      @relation("looser", fields: [looserId], references: [id])
+  previousWinnerRating  Int
+  previousLooserRating  Int
+  winnerScore           Int       @default(0)
+  looserScore           Int       @default(0)
+  duration              DateTime 
+  createdAt             DateTime  @default(now())
+  @@map("games")
 }
+
+// model Message {
+//   id        Int      @id @default(autoincrement())
+//   content   String
+//   authorId  Int
+//   author    User     @relation(fields: [authorId], references: [id])
+//   chatRoomId Int
+// //  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
+//   createdAt DateTime @default(now())
+// }
