@@ -1,5 +1,5 @@
 <template>
-  <h1>LadderBoard</h1>
+  <h1>Leaderboard</h1>
   <br />
   <v-table density="compact">
     <thead>
@@ -21,6 +21,7 @@
 
 <script>
 import axios from 'axios';
+import * as constants from '@/constants.ts';
 
 export default {
   data() {
@@ -32,10 +33,11 @@ export default {
   async created() {
     try {
       const response = await axios.get(
-        'http://localhost:3000/api/auth/get-all-users'
+        constants.API_URL + '/auth/get-all-users'
       );
       this.users = response.data;
     } catch (error) {
+      // TODO: Handle error
       console.log(error);
     }
   }

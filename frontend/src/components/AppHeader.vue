@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-tabs bg-color="white" center-active>
+    <v-tabs bg-color="dark" center-active>
       <v-tab to="/">Home</v-tab>
       <v-tab to="/leaderboard">Leaderboard</v-tab>
       <v-tab to="/game">Game</v-tab>
