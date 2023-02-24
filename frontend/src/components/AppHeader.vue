@@ -5,6 +5,8 @@
       <v-tab to="/leaderboard">Leaderboard</v-tab>
       <v-tab to="/game">Game</v-tab>
       <v-tab to="/account">Account</v-tab>
+      <v-tab to="/signin">Signin</v-tab>
+      <v-tab to="/signup">Signup</v-tab>
       <v-tab to="/about">About</v-tab>
     </v-tabs>
   </v-card>

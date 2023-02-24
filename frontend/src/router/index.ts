@@ -9,9 +9,14 @@ const routes = createRouter({
       component: () => import('../views/Home.vue')
     },
     {
-      path: '/auth',
-      name: 'Auth',
-      component: () => import('../views/Authentification.vue')
+      path: '/signin',
+      name: 'Signin',
+      component: () => import('../views/Signin.vue')
+    },
+    {
+      path: '/signup',
+      name: 'Signup',
+      component: () => import('../views/Signup.vue')
     },
     {
       path: '/game',
