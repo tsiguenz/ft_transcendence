@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 
-// TODO: change hardcoded variable url
 @Injectable()
 export class PrismaService extends PrismaClient {
 	constructor() {
