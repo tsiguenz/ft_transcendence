@@ -1,17 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { VueCookieNext } from 'vue-cookie-next';
 
-const routes = createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
+      path: '/home',
       name: 'Home',
       component: () => import('../views/Home.vue')
     },
     {
-      path: '/auth',
-      name: 'Auth',
-      component: () => import('../views/Authentification.vue')
+      path: '/signin',
+      name: 'Signin',
+      component: () => import('../views/Signin.vue')
+    },
+    {
+      path: '/signup',
+      name: 'Signup',
+      component: () => import('../views/Signup.vue')
     },
     {
       path: '/game',
@@ -24,16 +30,31 @@ const routes = createRouter({
       component: () => import('../views/Leaderboard.vue')
     },
     {
-      path: '/account',
-      name: 'Account',
-      component: () => import('../views/Account.vue')
+      path: '/profile',
+      name: 'Profile',
+      component: () => import('../views/Profile.vue')
     },
     {
-      path: '/about',
-      name: 'About',
-      component: () => import('../views/About.vue')
+      path: '/logout',
+      name: 'Logout',
+      component: () => import('../views/Logout.vue')
     }
   ]
 });
 
-export default routes;
+router.beforeEach(async (to) => {
+  if (to.path == '/') {
+    router.push('/home');
+    return;
+  }
+  // TODO: When change between two pages who redirect to /signin page, the page is not reloaded
+  if (
+    !VueCookieNext.isCookieAvailable('jwt') &&
+    !(to.path == '/signin' || to.path == '/signup' || to.path == '/home')
+  ) {
+    router.push('/signin');
+    return;
+  }
+});
+
+export default router;
