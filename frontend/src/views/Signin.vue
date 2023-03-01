@@ -21,7 +21,6 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import router from '@/router';
 
 export default {
   data() {
@@ -41,7 +40,7 @@ export default {
         });
         alert('You are now connected !');
         this.$cookie.setCookie('jwt', response.data.access_token);
-        router.push('/');
+        this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error (it return an error in the console)
         alert(error.response.data.message);

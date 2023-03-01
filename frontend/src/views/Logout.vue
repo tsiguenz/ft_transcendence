@@ -7,7 +7,7 @@ export default {
   },
   mounted() {
     this.logout();
-    this.$router.push('/');
+    this.$router.push('/home');
   },
   methods: {
     logout() {

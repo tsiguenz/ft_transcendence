@@ -32,7 +32,7 @@ export default {
         this.user = response.data;
       } catch (error) {
         // TODO: Handle error
-        console.log(error);
+        this.$router.push('/logout');
       }
     }
   }
