@@ -33,7 +33,6 @@ export default {
   methods: {
     async signin() {
       // TODO: clean the input to protect injection
-      // TODO: do something with jwt
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
@@ -43,7 +42,7 @@ export default {
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-        // TODO: Handle error (it return an error in the console)
+        // TODO: Handle error with a snackbar
         alert(error.response.data.message);
       }
     }

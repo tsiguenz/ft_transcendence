@@ -27,7 +27,6 @@ services:
         build: 
             dockerfile: docker/Dockerfile_frontend
         image: frontend_image
-        command: npm run serve
         volumes:
             - ./frontend:/usr/src/app
         ports:
