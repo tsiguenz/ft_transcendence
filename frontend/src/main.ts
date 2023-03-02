@@ -6,8 +6,12 @@ import 'vuetify/dist/vuetify.min.css';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
+import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import { VueCookieNext } from 'vue-cookie-next';
 
 const app = createApp(App);
+const pinia = createPinia();
 const vuetify = createVuetify({
   theme: { defaultTheme: 'dark' },
   components,
@@ -21,6 +25,10 @@ const vuetify = createVuetify({
   }
 });
 
+pinia.use(piniaPluginPersistedstate);
+app.use(VueCookieNext);
+VueCookieNext.config({ expire: '7d' });
 app.use(vuetify);
+app.use(pinia);
 app.use(router);
 app.mount('#app');

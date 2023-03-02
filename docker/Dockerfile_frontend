@@ -6,4 +6,5 @@ COPY frontend/package*.json .
 
 RUN npm install --only=development
 
+# TODO: npm install on launch
 WORKDIR /usr/src/app

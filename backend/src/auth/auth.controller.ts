@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Query,
-  HttpCode,
-  HttpStatus
-} from '@nestjs/common';
-import { ApiParam, ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 
@@ -22,8 +14,7 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        pseudo: { type: 'string', description: 'A unique nickname' },
-        email: { type: 'string', description: 'A unique and valid email' },
+        nickname: { type: 'string', description: 'A unique nickname' },
         password: {
           type: 'string',
           description: 'A strong password (Currently not enforced)'
@@ -42,28 +33,15 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        pseudo: { type: 'string', description: 'Nickname of an existing user' },
+        nickname: {
+          type: 'string',
+          description: 'Nickname of an existing user'
+        },
         password: { type: 'string', description: 'Password of the user' }
       }
     }
   })
   signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
-  }
-
-  @ApiParam({
-    name: 'nickname',
-    type: String,
-    required: true,
-    description: "Nickname of the user you're searching"
-  })
-  @Get('get-user')
-  getUser(@Query('nickname') nickname: string) {
-    return this.authService.getUser(nickname);
-  }
-
-  @Get('get-all-users')
-  getAllUsers() {
-    return this.authService.getAllUsers();
   }
 }
