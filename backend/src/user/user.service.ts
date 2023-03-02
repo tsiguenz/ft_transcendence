@@ -19,8 +19,32 @@ export class UserService {
   }
 
   async getAllUsers() {
+    console.log('get all users');
     const users = await this.prisma.user.findMany();
     users.forEach((user) => delete user.hash);
     return users;
+  }
+
+  async turnOn2fa(nickname: string) {
+    try {
+      await this.prisma.user.update({
+        where: { nickname: nickname },
+        data: { twoFactorEnable: true }
+      });
+      console.log('2fa turned on');
+    } catch (e) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  async turnOff2fa(nickname: string) {
+    try {
+      await this.prisma.user.update({
+        where: { nickname: nickname },
+        data: { twoFactorEnable: false }
+      });
+    } catch (e) {
+      throw new NotFoundException('User not found');
+    }
   }
 }

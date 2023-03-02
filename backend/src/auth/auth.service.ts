@@ -1,13 +1,11 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +33,7 @@ export class AuthService {
           hash: hash
         }
       });
-      return this.createToken(user.id, user.nickname);
+      return this.createJwt(user.id, user.nickname);
     } catch (e) {
       throw e;
     }
@@ -54,10 +52,10 @@ export class AuthService {
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
-    return this.createToken(user.id, user.nickname);
+    return this.createJwt(user.id, user.nickname);
   }
 
-  async createToken(
+  async createJwt(
     userId: number,
     nickname: string
   ): Promise<{ access_token: string }> {
@@ -72,23 +70,25 @@ export class AuthService {
     return { access_token: token };
   }
 
-  async getUser(nickname: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          nickname: nickname
-        }
-      });
-      delete user.hash;
-      return user;
-    } catch (e) {
-      throw new NotFoundException('User not found');
-    }
+  async generate2faSecret(nickname: string) {
+    const secret = authenticator.generateSecret();
+    const otpauthUrl = authenticator.keyuri(
+      nickname,
+      'ft_transcendence',
+      secret
+    );
+    await this.prisma.user.update({
+      where: { nickname: nickname },
+      data: { twoFactorSecret: secret }
+    });
+    return { secret, otpauthUrl };
   }
 
-  async getAllUsers() {
-    const users = await this.prisma.user.findMany();
-    users.forEach((user) => delete user.hash);
-    return users;
+  async generateQrCodeDataURL(otpAuthUrl: string) {
+    return toDataURL(otpAuthUrl);
+  }
+
+  async is2faCodeValid(Code: string, Secret: string) {
+    return authenticator.verify({ token: Code, secret: Secret });
   }
 }
