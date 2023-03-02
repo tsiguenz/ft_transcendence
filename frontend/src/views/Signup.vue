@@ -40,7 +40,6 @@ export default {
   methods: {
     async signup() {
       // TODO: clean the input to protect injection
-      // TODO: do something with jwt
       if (this.password !== this.passwordVerify) {
         alert('Passwords do not match !');
         return;
@@ -54,7 +53,7 @@ export default {
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-        // TODO: Handle error (it return an error in the console)
+        // TODO: Handle error with a snackbar
         alert(error.response.data.message);
       }
     }
