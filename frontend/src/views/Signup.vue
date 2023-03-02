@@ -20,6 +20,7 @@
       type="password"
       variant="outlined"
       required
+      @keydown.enter.prevent="signup"
     ></v-text-field>
     <v-btn @click="signup">Sign Up</v-btn>
   </v-form>
