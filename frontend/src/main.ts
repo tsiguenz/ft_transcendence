@@ -11,6 +11,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { VueCookieNext } from 'vue-cookie-next';
 
 const app = createApp(App);
+const pinia = createPinia();
 const vuetify = createVuetify({
   theme: { defaultTheme: 'dark' },
   components,
@@ -28,5 +29,6 @@ pinia.use(piniaPluginPersistedstate);
 app.use(VueCookieNext);
 VueCookieNext.config({ expire: '7d' });
 app.use(vuetify);
+app.use(pinia);
 app.use(router);
 app.mount('#app');
