@@ -13,6 +13,7 @@
       type="password"
       variant="outlined"
       required
+      @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
   </v-form>
