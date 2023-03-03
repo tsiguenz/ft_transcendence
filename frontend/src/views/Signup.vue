@@ -6,6 +6,7 @@
       label="Nickname"
       variant="outlined"
       required
+      :rules="[rules.nicknameCharacters]"
     ></v-text-field>
     <v-text-field
       v-model="password"
@@ -20,6 +21,7 @@
       type="password"
       variant="outlined"
       required
+      :rules="[rules.passwordCheck]"
       @keydown.enter.prevent="signup"
     ></v-text-field>
     <v-btn @click="signup">Sign Up</v-btn>
@@ -35,7 +37,11 @@ export default {
     return {
       nickname: '',
       password: '',
-      passwordVerify: ''
+      passwordVerify: '',
+      rules: {
+	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || "La chaîne de caractères ne doit contenir que des caractères alphanumériques et le caractère \"-\"",
+	passwordCheck: (v) => v === this.password || "Passwords do not match !",
+      }
     };
   },
   methods: {
@@ -58,6 +64,6 @@ export default {
         alert(error.response.data.message);
       }
     }
-  }
-};
+  },
+}
 </script>
