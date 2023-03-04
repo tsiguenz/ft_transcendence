@@ -47,7 +47,6 @@ router.beforeEach(async (to) => {
     router.push('/home');
     return;
   }
-  // TODO: When change between two pages who redirect to /signin page, the page is not reloaded
   if (
     !VueCookieNext.isCookieAvailable('jwt') &&
     !(to.path == '/signin' || to.path == '/signup' || to.path == '/home')

@@ -31,33 +31,33 @@ export class UsersService {
   }
 
   getPayloadFromReq(req: Request) {
-    console.log('req:', req.headers.authorization);
     const token = req.headers.authorization.substr(7);
     const payload = this.jwt.decode(token);
     return payload;
   }
 
-  async getProfile(nickname: string, req: Request) {
-    try {
-      const payload = this.getPayloadFromReq(req);
-      const getNicknameFromJwt = payload['nickname'];
-      if (nickname == getNicknameFromJwt) {
-        const userProfile = await this.prisma.user.findUnique({
-          where: {
-            nickname: nickname
-          }
-        });
-        // TODO: create dto or interface for user profile
-        delete userProfile.hash;
-        delete userProfile.twoFactorSecret;
-        return userProfile;
-      }
-      return { message: 'You are not authorized to access this profile' };
-    } catch (e) {
-      return { message: 'User does not exist' };
-    }
-  }
+  //  async getProfile(nickname: string, req: Request) {
+  //    try {
+  //      const payload = this.getPayloadFromReq(req);
+  //      const getNicknameFromJwt = payload['nickname'];
+  //      if (nickname == getNicknameFromJwt) {
+  //        const userProfile = await this.prisma.user.findUnique({
+  //          where: {
+  //            nickname: nickname
+  //          }
+  //        });
+  //        // TODO: create dto or interface for user profile
+  //        delete userProfile.hash;
+  //        delete userProfile.twoFactorSecret;
+  //        return userProfile;
+  //      }
+  //      return { message: 'You are not authorized to access this profile' };
+  //    } catch (e) {
+  //      return { message: 'User does not exist' };
+  //    }
+  //  }
 
+  // TODO: remove after test 2fa
   async turnOn2fa(req: Request) {
     try {
       const payload = this.getPayloadFromReq(req);
@@ -73,6 +73,7 @@ export class UsersService {
     }
   }
 
+  // TODO: remove after test 2fa
   async turnOff2fa(req: Request) {
     try {
       const payload = this.getPayloadFromReq(req);
