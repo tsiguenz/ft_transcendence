@@ -2,29 +2,29 @@
   <br />
   <v-form>
     <v-text-field
-      v-model="nickname"
-      label="Nickname"
-      variant="outlined"
+      v-model='nickname'
+      label='Nickname'
+      variant='outlined'
       required
-      :rules="[rules.nicknameCharacters]"
+      :rules='[rules.nicknameCharacters]'
     ></v-text-field>
     <v-text-field
-      v-model="password"
-      label="Password"
-      type="password"
-      variant="outlined"
+      v-model='password'
+      label='Password'
+      type='password'
+      variant='outlined'
       required
     ></v-text-field>
     <v-text-field
-      v-model="passwordVerify"
-      label="Verify password"
-      type="password"
-      variant="outlined"
+      v-model='passwordVerify'
+      label='Verify password'
+      type='password'
+      variant='outlined'
       required
-      :rules="[rules.passwordCheck]"
-      @keydown.enter.prevent="signup"
+      :rules='[rules.passwordCheck]'
+      @keydown.enter.prevent='signup'
     ></v-text-field>
-    <v-btn @click="signup">Sign Up</v-btn>
+    <v-btn @click='signup'>Sign Up</v-btn>
   </v-form>
 </template>
 
@@ -39,8 +39,8 @@ export default {
       password: '',
       passwordVerify: '',
       rules: {
-	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || "La chaîne de caractères ne doit contenir que des caractères alphanumériques et le caractère \"-\"",
-	passwordCheck: (v) => v === this.password || "Passwords do not match !",
+	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+	passwordCheck: (v) => v === this.password || 'Passwords do not match !',
       }
     };
   },
@@ -49,6 +49,10 @@ export default {
       // TODO: clean the input to protect injection
       if (this.password !== this.passwordVerify) {
         alert('Passwords do not match !');
+        return;
+      }
+      if (!/^[a-zA-Z0-9-]{0,8}$/.test(this.nickname)) {
+        alert('Invalid character in nickname');
         return;
       }
       try {
