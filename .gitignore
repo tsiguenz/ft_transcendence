@@ -21,7 +21,6 @@ yarn-error.log
 
 .env
 .obsidian/
-migrations/
 log
 dist/
 *.nfs*
