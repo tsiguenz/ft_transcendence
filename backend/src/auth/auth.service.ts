@@ -8,6 +8,7 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,9 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService
   ) {}
+
+   private logger: Logger = new Logger('AuthService');
+
 
   async signup(dto: AuthDto) {
     // Check if user exist to avoid auto increment id
@@ -84,6 +88,12 @@ export class AuthService {
     } catch (e) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  async verifyJwt(token: string) {
+    const decoded = await this.jwt.verifyAsync(token, this.config.get('JWT_SECRET'));
+    this.logger.log(`Decoded JWT: [${decoded}]`);
+    return decoded;
   }
 
   async getAllUsers() {

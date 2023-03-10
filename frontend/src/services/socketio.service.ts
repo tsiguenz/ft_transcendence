@@ -1,20 +1,17 @@
 import { io, Socket } from 'socket.io-client';
-import { SOCKET_URL } from '../constants';
+import { CHAT_SOCKET_URL } from '../constants';
 import type { ServerToClientEvents, ClientToServerEvents } from '@/types/Socket';
 
 class SocketioService {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   constructor() {}
 
-  setupSocketConnection() {
-    this.socket = io(SOCKET_URL);
-    this.socket.emit('msgToServer', 'Hello there from Vue.');
+  setupSocketConnection(jwt: string) {
+    this.socket = io(CHAT_SOCKET_URL, { auth: { token: jwt } } );
   }
 
   disconnect() {
-    if (this.socket) {
-        this.socket.disconnect();
-    }
+    if (this.socket) { this.socket.disconnect(); }
   }
 
   sendMessage(event: string, message: string) {
