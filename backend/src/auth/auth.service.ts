@@ -91,8 +91,7 @@ export class AuthService {
   }
 
   async verifyJwt(token: string) {
-    const decoded = await this.jwt.verifyAsync(token, this.config.get('JWT_SECRET'));
-    this.logger.log(`Decoded JWT: [${decoded}]`);
+    const decoded = await this.jwt.verify(token, { secret: this.config.get('JWT_SECRET') });
     return decoded;
   }
 
