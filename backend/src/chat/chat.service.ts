@@ -20,7 +20,7 @@ export class ChatService {
 		});
 	}
 
-	// TODO: SHould be in a user service, somewhere
+	// TODO: Should be in a user service, somewhere
 	async getUser(userId: number) {
 		return await this.prisma.user.findUnique({ where: { id: userId } });
 	}
