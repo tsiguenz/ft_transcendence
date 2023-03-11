@@ -6,7 +6,6 @@ import {
  OnGatewayConnection,
  OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
@@ -14,22 +13,17 @@ import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
- constructor(private prisma: PrismaService, private auth: AuthService, private chat: ChatService) {}
+ constructor(private auth: AuthService, private chat: ChatService) {}
 
  @WebSocketServer() server: Server;
  private logger: Logger = new Logger('ChatGateway');
 
  @SubscribeMessage('msgToServer')
  async handleMessage(client: Socket, payload: string) {
-  const user = await this.prisma.user.findUnique({
-    where: { id: client['decoded'].sub }
-  });
-  await this.prisma.message.create({
-    data: {
-      authorId: user.id,
-      content: payload,
-    }
-  });
+  try { await this.chat.saveMessage(client['decoded'].sub, payload); }
+  catch (error) { this.logger.warn('HandleMessage error'); }
+
+  let user = await this.chat.getUser(client['decoded'].sub);
   client.broadcast.emit('msgToClient', { author: user.nickname, data: payload });
  }
 
@@ -46,12 +40,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   this.logger.log(`Client disconnected: ${client.id}`);
  }
 
+ // TODO: Refactor this huge function
+ // Should it do all of this?
+ // Couldn't we extract parts of it in more appropriates services/modules?
+ // Is this connection handler really secure?
+ // We should decouple  Prisma and the ChatGetway
  async handleConnection(client: Socket, ...args: any[]) {
   this.logger.log(`Client connected: ${client.id}`);
   if (client.handshake.auth && client.handshake.auth.token) {
     try {
       client['decoded'] = await this.auth.verifyJwt(client.handshake.auth.token)
-      this.logger.log(`DECODED: ${JSON.stringify(client['decoded'])}`);
     } catch (error) {
       let message = "Unexpected error";
       if (error instanceof Error) { message = error.message; }
@@ -63,7 +61,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     client.disconnect();
     return;
   }
-  const user = await this.prisma.user.findUnique({ where: { id: client['decoded'].sub } });
+  const user = await this.chat.getUser(client['decoded'].sub);
   if (!user) { client.disconnect(); }
   else {
     let messages = await this.chat.getMessages();
