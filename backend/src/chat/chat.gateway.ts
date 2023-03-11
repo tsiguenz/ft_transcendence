@@ -57,9 +57,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (error instanceof Error) { message = error.message; }
       this.logger.log(`AUTHENTICATION ERROR [${message}]`);
       client.disconnect();
+      return;
     }
   } else {
     client.disconnect();
+    return;
   }
   const user = await this.prisma.user.findUnique({ where: { id: client['decoded'].sub } });
   if (!user) { client.disconnect(); }
