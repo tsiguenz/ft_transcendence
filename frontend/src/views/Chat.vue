@@ -2,7 +2,7 @@
   <h1>Chat</h1>
   <v-sheet width="300" class="mx-auto">
     <div v-for="message in messages">
-      {{ message.data }}
+      From [{{ message.author }}]: {{ message.data }}
     </div>
     <v-form @submit.prevent>
       <v-text-field
@@ -44,7 +44,7 @@ export default {
       if (this.message == '') { return; }
       SocketioService.sendMessage("msgToServer", this.message);
       // SocketioService.sendMessage("testChannel", this.message);
-      this.messages.push({ data: this.message });
+      this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     }
   }

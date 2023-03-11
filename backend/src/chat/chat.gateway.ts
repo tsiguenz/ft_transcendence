@@ -8,12 +8,13 @@ import {
 } from '@nestjs/websockets';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
+import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
- constructor(private prisma: PrismaService, private auth: AuthService) {}
+ constructor(private prisma: PrismaService, private auth: AuthService, private chat: ChatService) {}
 
  @WebSocketServer() server: Server;
  private logger: Logger = new Logger('ChatGateway');
@@ -29,12 +30,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       content: payload,
     }
   });
-  client.broadcast.emit('msgToClient', { data: `From [${user.nickname}]: ${payload}` });
+  client.broadcast.emit('msgToClient', { author: user.nickname, data: payload });
  }
 
  @SubscribeMessage('testChannel')
  handleTest(client: Socket, payload: string) {
-  this.server.emit('msgToClient', { data: "From server: " + payload });
+  this.server.emit('msgToClient', { author: 'SERVER', data: payload });
  }
 
  afterInit(server: Server) {
@@ -62,5 +63,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
   const user = await this.prisma.user.findUnique({ where: { id: client['decoded'].sub } });
   if (!user) { client.disconnect(); }
+  else {
+    let messages = await this.chat.getMessages();
+    for (let id in messages) {
+      client.emit('msgToClient', { author: messages[id].author.nickname, data: messages[id].content });
+    }
+  }
  }
 }
