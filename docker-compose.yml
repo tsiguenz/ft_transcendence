@@ -42,7 +42,7 @@ services:
 
     database:
         healthcheck:
-            test: "psql -U ${POSTGRES_USER} -W ${POSTGRES_PASSWORD} -d ${DB_NAME} -c 'select 1;'"
+            test: "PGPASSWORD=root psql -U root -w -d pong -c 'select 1;'"
             interval: 2s
             retries: 120
         container_name: "database"
