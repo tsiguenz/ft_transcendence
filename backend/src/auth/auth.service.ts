@@ -15,9 +15,8 @@ export class AuthService {
     private config: ConfigService
   ) {}
 
-  async signup(dto: AuthDto) {
-    // Check if user exist to avoid auto increment id
-    const user = await this.prisma.user.findUnique({
+  async	signup(dto: AuthDto) {
+    const	user = await this.prisma.user.findUnique({
       where: {
         nickname: dto.nickname
       }
