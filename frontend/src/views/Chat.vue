@@ -16,8 +16,10 @@
 
 <script>
 import axios from 'axios';
-import * as constants from '@/constants.ts';
+import * as constants from '@/constants';
 import SocketioService from '../services/socketio.service';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   data() {
@@ -32,12 +34,17 @@ export default {
   },
   mounted() {
     SocketioService.subscribe("msgToClient", (message) => {
-      console.log("Server: " + message);
+      if (message.author === this.sessionStore.nickname) {
+        message.author = 'Me';
+      }
       this.messages.push(message);
     });
   },
   beforeUnmount() {
     SocketioService.disconnect();
+  },
+  computed: {
+    ...mapStores(useSessionStore),
   },
   methods: {
     sendMessage() {

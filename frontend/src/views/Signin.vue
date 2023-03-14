@@ -22,6 +22,8 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   data() {
@@ -29,6 +31,9 @@ export default {
       nickname: '',
       password: ''
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore),
   },
   methods: {
     async signin() {
@@ -38,6 +43,7 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
+        this.sessionStore.signin(this.nickname);
         alert('You are now connected !');
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
