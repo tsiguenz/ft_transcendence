@@ -1,4 +1,7 @@
 all:
+	-docker compose up --build
+
+detach:
 	-docker compose up -d --build
 
 stop:
@@ -12,4 +15,4 @@ rma: down
 
 re: down all
 
-.PHONY: all stop down rma re
+.PHONY: all detach stop down rma re
