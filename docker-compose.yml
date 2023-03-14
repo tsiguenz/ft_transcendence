@@ -43,7 +43,7 @@ services:
     database:
         healthcheck:
             test: "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -w -d ${DB_NAME} -c 'select 1;'"
-            interval: 30s
+            interval: 2s
             retries: 120
             timeout: 10s
         container_name: "database"
