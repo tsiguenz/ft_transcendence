@@ -1,5 +1,18 @@
+/*
+  Warnings:
+
+  - You are about to drop the `Game` table. If the table is not empty, all the data it contains will be lost.
+  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
+
+*/
 -- CreateEnum
 CREATE TYPE "GameType" AS ENUM ('LADDER', 'CUSTOM');
+
+-- DropTable
+DROP TABLE "Game";
+
+-- DropTable
+DROP TABLE "User";
 
 -- CreateTable
 CREATE TABLE "users" (

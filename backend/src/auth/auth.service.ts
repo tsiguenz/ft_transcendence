@@ -8,6 +8,7 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -83,6 +84,11 @@ export class AuthService {
     } catch (e) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  async verifyJwt(token: string) {
+    const decoded = await this.jwt.verify(token, { secret: this.config.get('JWT_SECRET') });
+    return decoded;
   }
 
   async getAllUsers() {

@@ -29,6 +29,8 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   data() {
@@ -37,6 +39,9 @@ export default {
       password: '',
       passwordVerify: ''
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore),
   },
   methods: {
     async signup() {
@@ -52,6 +57,7 @@ export default {
         });
         alert('Account created !');
         this.$cookie.setCookie('jwt', response.data.access_token);
+        this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar

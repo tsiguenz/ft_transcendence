@@ -26,6 +26,7 @@ model User {
   hash          String
   gamesWin      Game[]    @relation("winner")
   gamesLoose    Game[]    @relation("looser")
+  messages      Message[] @relation("author")
   createdAt     DateTime  @default(now())
   @@map("users")
 }
@@ -47,12 +48,13 @@ model Game {
   @@map("games")
 }
 
-// model Message {
-//   id        Int      @id @default(autoincrement())
-//   content   String
-//   authorId  Int
-//   author    User     @relation(fields: [authorId], references: [id])
-//   chatRoomId Int
-// //  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
-//   createdAt DateTime @default(now())
-// }
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  authorId  Int
+  author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
+  // chatRoomId Int
+//  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
+  createdAt DateTime @default(now())
+  @@map("messages")
+}
