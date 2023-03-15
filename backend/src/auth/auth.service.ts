@@ -4,9 +4,6 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
-import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -69,29 +66,6 @@ export class AuthService {
     });
     return { access_token: token };
   }
-
-  async generate2faSecret(nickname: string) {
-    const secret = authenticator.generateSecret();
-    const otpauthUrl = authenticator.keyuri(
-      nickname,
-      'ft_transcendence',
-      secret
-    );
-    await this.prisma.user.update({
-      where: { nickname: nickname },
-      data: { twoFactorSecret: secret }
-    });
-    return { secret, otpauthUrl };
-  }
-
-  async generateQrCodeDataURL(otpAuthUrl: string) {
-    return toDataURL(otpAuthUrl);
-  }
-
-  async is2faCodeValid(Code: string, Secret: string) {
-    return authenticator.verify({ token: Code, secret: Secret });
-  }
-
   async verifyJwt(token: string) {
     const decoded = await this.jwt.verify(token, {
       secret: this.config.get('JWT_SECRET')
