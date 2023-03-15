@@ -5,6 +5,7 @@
       v-model="nickname"
       label="Nickname"
       variant="outlined"
+      autocomplete="username"
       required
     ></v-text-field>
     <v-text-field
@@ -12,6 +13,7 @@
       label="Password"
       type="password"
       variant="outlined"
+      autocomplete="current-password"
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
@@ -33,7 +35,7 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore),
+    ...mapStores(useSessionStore)
   },
   methods: {
     async signin() {

@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Patch, Req, UseGuards } from '@nestjs/common';
+import { Controller, Body, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
@@ -9,8 +9,9 @@ import { EditProfileDto } from './dto';
 @Controller('api/profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
-  @ApiBearerAuth()
+
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Get()
   getProfile(@Req() req: Request) {
     return this.profileService.getProfile(req);
@@ -18,7 +19,7 @@ export class ProfileController {
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
-  @Patch()
+  @Put()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
     schema: {
@@ -38,8 +39,6 @@ export class ProfileController {
     }
   })
   editProfile(@Body() dto: EditProfileDto, @Req() req: Request) {
-    console.table(dto);
-    console.log(typeof dto.twoFactorEnable);
     return this.profileService.editProfile(dto, req);
   }
 }
