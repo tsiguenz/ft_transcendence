@@ -11,4 +11,6 @@ fi
 
 npm install --only=development
 npx prisma migrate deploy
+npx prisma generate
+
 exec "$@"

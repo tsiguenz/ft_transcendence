@@ -9,9 +9,13 @@ export const useSessionStore = defineStore('session', {
     };
   },
   actions: {
-    signup({ nickname }) {
+    signin(nickname) {
       this.loggedIn = true;
       this.nickname = nickname;
+    },
+    logout() {
+      this.loggedIn = false;
+      this.nickname = null;
     }
   }
 });

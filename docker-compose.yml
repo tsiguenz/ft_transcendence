@@ -9,7 +9,8 @@ services:
         volumes:
             - ./backend:/app
         ports:
-            # api - 3000:3000
+            # api
+            - 3000:3000
             # prisma studio
             - 5555:5555
         networks:

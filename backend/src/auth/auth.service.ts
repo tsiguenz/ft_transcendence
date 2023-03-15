@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -89,5 +90,12 @@ export class AuthService {
 
   async is2faCodeValid(Code: string, Secret: string) {
     return authenticator.verify({ token: Code, secret: Secret });
+  }
+
+  async verifyJwt(token: string) {
+    const decoded = await this.jwt.verify(token, {
+      secret: this.config.get('JWT_SECRET')
+    });
+    return decoded;
   }
 }
