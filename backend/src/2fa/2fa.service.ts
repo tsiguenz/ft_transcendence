@@ -24,7 +24,7 @@ export class TwoFaService {
   }
 
   async generateQrCodeDataURL(otpAuthUrl: string) {
-    return qrcode.toDataURL(otpAuthUrl);
+    return { qrcode: await qrcode.toDataURL(otpAuthUrl) };
   }
 
   async verifyTwoFa(req: Request, token: string) {

@@ -42,7 +42,9 @@ export class ProfileService {
         },
         data: {
           nickname: dto.nickname,
-          twoFactorEnable: dto.twoFactorEnable
+          twoFactorEnable: dto.twoFactorEnable,
+          // TODO: is good ?
+          twoFactorSecret: ''
           // TODO: handle avatar
           // avatar: dto.avatar
         }

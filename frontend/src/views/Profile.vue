@@ -30,6 +30,12 @@
 
     <v-btn @click="editProfile"> submit </v-btn>
   </v-form>
+
+  <!-- TODO: print the actual qrcode ? -->
+  <v-btn v-if="twoFaIsEnable()" @click="generate2faQrcode"
+    >generate new 2fa qrcode</v-btn
+  >
+  <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <!-- TODO: add delete account and logout -->
 </template>
 
@@ -42,7 +48,8 @@ export default {
     return {
       user: {},
       newNickname: '',
-      newTwoFactorEnable: false
+      newTwoFactorEnable: false,
+      qrcode: ''
     };
   },
   mounted() {
@@ -85,6 +92,25 @@ export default {
       } catch (error) {
         alert(error.response.data.message);
       }
+    },
+    async generate2faQrcode() {
+      const jwt = this.$cookie.getCookie('jwt');
+      try {
+        const response = await axios.get(
+          constants.API_URL + '/2fa/generate-qrcode',
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
+          }
+        );
+        this.qrcode = response.data.qrcode;
+      } catch (error) {
+        alert(error.response.data.message);
+      }
+    },
+    twoFaIsEnable() {
+      return this.user.twoFactorEnable;
     }
   }
 };
