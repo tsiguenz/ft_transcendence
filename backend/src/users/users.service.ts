@@ -46,38 +46,4 @@ export class UsersService {
     }
     return rawToken.substr(7);
   }
-
-  // TODO: remove after test 2fa
-  async turnOn2fa(req: Request) {
-    try {
-      const token = this.getTokenFromReq(req);
-      const payload = this.getPayloadFromToken(token);
-      const nickname = payload['nickname'];
-      // TODO: set 2fa secret if not set
-      await this.prisma.user.update({
-        where: { nickname: nickname },
-        data: { twoFactorEnable: true }
-      });
-      return { message: '2fa turned on' };
-    } catch (e) {
-      return { message: 'You are not authorized to access this profile' };
-    }
-  }
-
-  // TODO: remove after test 2fa
-  async turnOff2fa(req: Request) {
-    try {
-      const token = this.getTokenFromReq(req);
-      const payload = this.getPayloadFromToken(token);
-      const nickname = payload['nickname'];
-      await this.prisma.user.update({
-        where: { nickname: nickname },
-        data: { twoFactorEnable: false }
-      });
-      return { message: '2fa turned off' };
-    } catch (e) {
-      console.log(e);
-      return { message: 'You are not authorized to access this profile' };
-    }
-  }
 }
