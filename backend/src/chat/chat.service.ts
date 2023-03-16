@@ -14,6 +14,7 @@ export class ChatService {
 		if (!user) { throw new Error('User not found'); }
 		await this.prisma.message.create({
 			data: {
+				chatRoomId: 1,
 				authorId: user.id,
 				content: message,
 			}

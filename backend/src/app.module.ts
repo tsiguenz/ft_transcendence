@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
+import { ChatroomModule } from './chatroom/chatroom.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { ChatService } from './chat/chat.service';
     }),
     AuthModule,
     UserModule,
-    PrismaModule
+    PrismaModule,
+    ChatroomModule
   ],
   controllers: [],
   providers: [ChatGateway, ChatService]

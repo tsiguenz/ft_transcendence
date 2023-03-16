@@ -27,6 +27,8 @@ model User {
   gamesWin      Game[]    @relation("winner")
   gamesLoose    Game[]    @relation("looser")
   messages      Message[] @relation("author")
+  chatrooms     ChatRoomUser[]
+
   createdAt     DateTime  @default(now())
   @@map("users")
 }
@@ -53,8 +55,29 @@ model Message {
   content   String
   authorId  Int
   author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
-  // chatRoomId Int
-//  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
+  chatRoomId Int
+  chatRoom  ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id])
   createdAt DateTime @default(now())
   @@map("messages")
+}
+
+model ChatRoomUser {
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  chatRoom    ChatRoom  @relation(fields: [chatRoomId], references: [id])
+  chatRoomId  Int
+
+  createdAt DateTime    @default(now())
+  @@id([userId, chatRoomId])
+  @@map("chatrooms_users")
+}
+
+model ChatRoom {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  messages  Message[]   @relation("chatRoom")
+  users     ChatRoomUser[]
+  createdAt DateTime    @default(now())
+
+  @@map("chatrooms")
 }
