@@ -31,12 +31,15 @@
     <v-btn @click="editProfile"> submit </v-btn>
   </v-form>
 
-  <!-- TODO: print the actual qrcode ? -->
+  <!-- TODO: 
+  When edit profile set the 2fa, print the qrcode and ask for a code to prevent
+  bad usage.
+  -->
   <v-btn v-if="twoFaIsEnable()" @click="generate2faQrcode"
     >generate new 2fa qrcode</v-btn
   >
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
-  <!-- TODO: add delete account and logout -->
+  <!-- TODO: add delete account and logout logic -->
 </template>
 
 <script>

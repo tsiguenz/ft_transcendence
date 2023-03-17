@@ -6,6 +6,7 @@
       label="Nickname"
       variant="outlined"
       autocomplete="username"
+      @keydown.enter.prevent="signin"
       required
     ></v-text-field>
     <v-text-field
@@ -15,6 +16,12 @@
       variant="outlined"
       autocomplete="current-password"
       required
+      @keydown.enter.prevent="signin"
+    ></v-text-field>
+    <v-text-field
+      v-model="twoFactorCode"
+      label="2fa code (optional)"
+      variant="outlined"
       @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
@@ -31,7 +38,8 @@ export default {
   data() {
     return {
       nickname: '',
-      password: ''
+      password: '',
+      twoFactorCode: ''
     };
   },
   computed: {
@@ -43,7 +51,8 @@ export default {
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
-          password: this.password
+          password: this.password,
+          twoFactorCode: this.twoFactorCode
         });
         this.sessionStore.signin(this.nickname);
         alert('You are now connected !');

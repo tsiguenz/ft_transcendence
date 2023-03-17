@@ -4,13 +4,15 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { TwoFaService } from '../2fa/2fa.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private config: ConfigService
+    private config: ConfigService,
+    private twoFa: TwoFaService
   ) {}
 
   async signup(dto: AuthDto) {
@@ -48,6 +50,15 @@ export class AuthService {
     const valid = await argon.verify(user.hash, dto.password);
     if (!valid) {
       throw new ForbiddenException('Invalid password');
+    }
+    if (user.twoFactorEnable) {
+      if (!dto.twoFactorCode) {
+        throw new ForbiddenException('Two factor code required');
+      }
+      const valid = await this.twoFa.verifyTwoFa(user, dto.twoFactorCode);
+      if (!valid) {
+        throw new ForbiddenException('Invalid two factor code');
+      }
     }
     return this.createJwt(user.id, user.nickname);
   }
