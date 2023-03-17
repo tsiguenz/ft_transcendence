@@ -10,11 +10,9 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-          UserService,
-          PrismaService,
-        ],
-    }).overrideProvider(PrismaService)
+      providers: [UserService, PrismaService]
+    })
+      .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaClient>())
       .compile();
 
@@ -29,13 +27,13 @@ describe('UserService', () => {
   it('getAllUsers returns users', () => {
     const testUsers = [
       {
-        "id": 1,
-        "nickname": "lucien",
-        "ladderPoints": 0,
-        "avatar": null,
-        "twofa": false,
-        "OAuth": false,
-        "createdAt": "2023-03-03T18:29:00.857Z"
+        id: 1,
+        nickname: 'lucien',
+        ladderPoints: 0,
+        avatar: null,
+        twofa: false,
+        OAuth: false,
+        createdAt: '2023-03-03T18:29:00.857Z'
       }
     ];
 

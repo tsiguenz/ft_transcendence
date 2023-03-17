@@ -19,6 +19,7 @@ export default {
     return {};
   },
   methods: {
+    // TODO: verify the jwt
     isLog() {
       return this.$cookie.isCookieAvailable('jwt');
     }
