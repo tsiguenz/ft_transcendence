@@ -26,6 +26,7 @@ model User {
   gamesWin            Game[]    @relation("winner")
   gamesLoose          Game[]    @relation("looser")
   messages            Message[] @relation("author")
+  chatrooms           ChatRoomUser[]
   createdAt           DateTime  @default(now())
   @@map("users")
 }

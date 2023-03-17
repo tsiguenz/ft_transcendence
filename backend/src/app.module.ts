@@ -16,7 +16,7 @@ import { TwoFaModule } from './2fa/2fa.module';
       isGlobal: true
     }),
     AuthModule,
-    ChatroomModule
+    ChatroomModule,
     UsersModule,
     PrismaModule,
     UsersModule,

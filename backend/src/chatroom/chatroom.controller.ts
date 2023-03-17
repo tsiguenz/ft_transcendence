@@ -1,15 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ChatroomService } from './chatroom.service';
-import { CreateChatroomDto } from './dto/create-chatroom.dto';
-import { UpdateChatroomDto } from './dto/update-chatroom.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
-@Controller('chatroom')
+import { Request } from 'express';
+import { JwtGuard } from '../auth/guard';
+import { ChatroomService } from './chatroom.service';
+import { CreateChatroomDto, UpdateChatroomDto } from './dto';
+
+@Controller('chatrooms')
 export class ChatroomController {
   constructor(private readonly chatroomService: ChatroomService) {}
 
+  @ApiBearerAuth()
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Chatroom name' }
+      }
+    }
+  })
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createChatroomDto: CreateChatroomDto) {
-    return this.chatroomService.create(createChatroomDto);
+  async create(@Body() createChatroomDto: CreateChatroomDto, @Req() req: Request) {
+    return await this.chatroomService.create(Number.parseInt(req.user['id']), createChatroomDto);
   }
 
   @Get()
