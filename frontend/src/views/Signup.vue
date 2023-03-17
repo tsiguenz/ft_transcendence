@@ -1,7 +1,7 @@
 <template>
   <br />
   <v-form>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model='nickname'
       label='Nickname'
       variant='outlined'
@@ -9,7 +9,7 @@
       required
       :rules='[rules.nicknameCharacters]'
     ></v-text-field>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model='password'
       label='Password'
       type='password'
@@ -17,7 +17,7 @@
       autocomplete="new-password"
       required
     ></v-text-field>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model='passwordVerify'
       label='Verify password'
       type='password'
@@ -25,15 +25,6 @@
       required
       :rules='[rules.passwordCheck]'
       @keydown.enter.prevent='signup'
-    ></v-text-field>
-    <v-text-field
-      v-model="passwordVerify"
-      label="Verify password"
-      type="password"
-      variant="outlined"
-      autocomplete="new-password"
-      required
-      @keydown.enter.prevent="signup"
     ></v-text-field>
     <v-btn @click="signup">Sign Up</v-btn>
   </v-form>
