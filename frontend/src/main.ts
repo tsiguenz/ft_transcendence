@@ -9,6 +9,7 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi';
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { VueCookieNext } from 'vue-cookie-next';
+import axios from 'axios';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -23,6 +24,14 @@ const vuetify = createVuetify({
       mdi
     }
   }
+});
+
+
+axios.interceptors.request.use(config => {
+  const token = this.$cookie.getCookie('jwt');
+  if (!token) { return; }
+  config.headers["Authorization"] = `Bearer ${token}`;
+  return config;
 });
 
 pinia.use(piniaPluginPersistedstate);

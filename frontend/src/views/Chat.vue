@@ -75,12 +75,16 @@ export default {
       // TODO: clean the input to protect injection
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.post(constants.API_URL + '/chatrooms', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
+        const response = await axios.post(constants.API_URL + '/chatrooms',
+          {
+            name: this.newChatroomName,
           },
-          name: this.newChatroomName,
-        });
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
+          }
+        );
         this.chatrooms.push({ name: "response.name" });
       } catch (error) {
         alert(error.response.data.message);
