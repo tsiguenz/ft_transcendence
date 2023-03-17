@@ -16,22 +16,21 @@ enum GameType {
 }
 
 model User {
-  // TODO: change by uuid?
-  id            Int       @default(autoincrement()) @id
-  nickname      String    @unique
-  ladderPoints  Int       @default(0)
-  avatar        Bytes? 
-  twofa         Boolean   @default(false)
-  OAuth         Boolean   @default(false)
-  hash          String
-  gamesWin      Game[]    @relation("winner")
-  gamesLoose    Game[]    @relation("looser")
-  createdAt     DateTime  @default(now())
+  id                  Int       @default(autoincrement()) @id
+  nickname            String    @unique
+  ladderPoints        Int       @default(0)
+  avatar              Bytes? 
+  twoFactorEnable     Boolean   @default(false)
+  twoFactorSecret     String?
+  hash                String
+  gamesWin            Game[]    @relation("winner")
+  gamesLoose          Game[]    @relation("looser")
+  messages            Message[] @relation("author")
+  createdAt           DateTime  @default(now())
   @@map("users")
 }
 
 model Game {
-  // TODO: change by uuid?
   id                    Int       @id @default(autoincrement())
   type                  GameType
   winnerId              Int
@@ -47,12 +46,13 @@ model Game {
   @@map("games")
 }
 
-// model Message {
-//   id        Int      @id @default(autoincrement())
-//   content   String
-//   authorId  Int
-//   author    User     @relation(fields: [authorId], references: [id])
-//   chatRoomId Int
-// //  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
-//   createdAt DateTime @default(now())
-// }
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  authorId  Int
+  author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
+  // chatRoomId Int
+//  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
+  createdAt DateTime @default(now())
+  @@map("messages")
+}

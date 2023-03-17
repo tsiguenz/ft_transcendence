@@ -3,6 +3,7 @@
     <v-tabs bg-color="dark" center-active>
       <v-tab to="/home">Home</v-tab>
       <v-tab v-if="isLog()" to="/game">Game</v-tab>
+      <v-tab v-if="isLog()" to="/chat">Chat</v-tab>
       <v-tab v-if="isLog()" to="/leaderboard">Leaderboard</v-tab>
       <v-tab v-if="isLog()" to="/profile">Profile</v-tab>
       <v-tab v-if="!isLog()" to="/signin">Signin</v-tab>
@@ -18,6 +19,7 @@ export default {
     return {};
   },
   methods: {
+    // TODO: verify the jwt
     isLog() {
       return this.$cookie.isCookieAvailable('jwt');
     }

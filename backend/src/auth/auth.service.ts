@@ -1,24 +1,21 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { TwoFaService } from '../2fa/2fa.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private config: ConfigService
+    private config: ConfigService,
+    private twoFa: TwoFaService
   ) {}
 
   async signup(dto: AuthDto) {
-    // Check if user exist to avoid auto increment id
     const user = await this.prisma.user.findUnique({
       where: {
         nickname: dto.nickname
@@ -35,7 +32,7 @@ export class AuthService {
           hash: hash
         }
       });
-      return this.createToken(user.id, user.nickname);
+      return this.createJwt(user.id, user.nickname);
     } catch (e) {
       throw e;
     }
@@ -54,10 +51,19 @@ export class AuthService {
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
-    return this.createToken(user.id, user.nickname);
+    if (user.twoFactorEnable) {
+      if (!dto.twoFactorCode) {
+        throw new ForbiddenException('Two factor code required');
+      }
+      const valid = await this.twoFa.verifyTwoFa(user, dto.twoFactorCode);
+      if (!valid) {
+        throw new ForbiddenException('Invalid two factor code');
+      }
+    }
+    return this.createJwt(user.id, user.nickname);
   }
 
-  async createToken(
+  async createJwt(
     userId: number,
     nickname: string
   ): Promise<{ access_token: string }> {
@@ -71,24 +77,10 @@ export class AuthService {
     });
     return { access_token: token };
   }
-
-  async getUser(nickname: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          nickname: nickname
-        }
-      });
-      delete user.hash;
-      return user;
-    } catch (e) {
-      throw new NotFoundException('User not found');
-    }
-  }
-
-  async getAllUsers() {
-    const users = await this.prisma.user.findMany();
-    users.forEach((user) => delete user.hash);
-    return users;
+  async verifyJwt(token: string) {
+    const decoded = await this.jwt.verify(token, {
+      secret: this.config.get('JWT_SECRET')
+    });
+    return decoded;
   }
 }

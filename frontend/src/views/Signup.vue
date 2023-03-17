@@ -5,6 +5,7 @@
       v-model='nickname'
       label='Nickname'
       variant='outlined'
+      autocomplete="username"
       required
       :rules='[rules.nicknameCharacters]'
     ></v-text-field>
@@ -13,6 +14,7 @@
       label='Password'
       type='password'
       variant='outlined'
+      autocomplete="new-password"
       required
     ></v-text-field>
     <v-text-field
@@ -24,13 +26,24 @@
       :rules='[rules.passwordCheck]'
       @keydown.enter.prevent='signup'
     ></v-text-field>
-    <v-btn @click='signup'>Sign Up</v-btn>
+    <v-text-field
+      v-model="passwordVerify"
+      label="Verify password"
+      type="password"
+      variant="outlined"
+      autocomplete="new-password"
+      required
+      @keydown.enter.prevent="signup"
+    ></v-text-field>
+    <v-btn @click="signup">Sign Up</v-btn>
   </v-form>
 </template>
 
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   data() {
@@ -43,6 +56,9 @@ export default {
 	passwordCheck: (v) => v === this.password || 'Passwords do not match !',
       }
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore)
   },
   methods: {
     async signup() {
@@ -62,6 +78,7 @@ export default {
         });
         alert('Account created !');
         this.$cookie.setCookie('jwt', response.data.access_token);
+        this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
