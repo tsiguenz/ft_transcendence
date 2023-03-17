@@ -8,6 +8,7 @@
       autocomplete="username"
       required
       :rules='[rules.nicknameCharacters]'
+      @keydown.enter.prevent='signup'
     ></v-text-field>
     <v-text-field class="mb-5"
       v-model='password'
@@ -16,6 +17,7 @@
       variant='outlined'
       autocomplete="new-password"
       required
+      @keydown.enter.prevent='signup'
     ></v-text-field>
     <v-text-field class="mb-5"
       v-model='passwordVerify'
