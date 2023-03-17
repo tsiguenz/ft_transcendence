@@ -56,7 +56,7 @@ router.beforeEach(async (to) => {
   // TODO: When change between two pages who redirect to /signin page, the page is not reloaded
   if (
     !VueCookieNext.isCookieAvailable('jwt') &&
-    !(UNAUTHENTICATED_ROUTES.includes(to.path))
+    !UNAUTHENTICATED_ROUTES.includes(to.path)
   ) {
     router.push('/signin');
     return;

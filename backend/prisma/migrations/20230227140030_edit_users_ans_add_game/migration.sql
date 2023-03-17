@@ -20,8 +20,8 @@ CREATE TABLE "users" (
     "nickname" TEXT NOT NULL,
     "ladderPoints" INTEGER NOT NULL DEFAULT 0,
     "avatar" BYTEA,
-    "twofa" BOOLEAN NOT NULL DEFAULT false,
-    "OAuth" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorEnable" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorSecret" TEXT,
     "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
