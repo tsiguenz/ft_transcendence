@@ -16,23 +16,21 @@ enum GameType {
 }
 
 model User {
-  // TODO: change by uuid?
-  id            Int       @default(autoincrement()) @id
-  nickname      String    @unique
-  ladderPoints  Int       @default(0)
-  avatar        Bytes? 
-  twofa         Boolean   @default(false)
-  OAuth         Boolean   @default(false)
-  hash          String
-  gamesWin      Game[]    @relation("winner")
-  gamesLoose    Game[]    @relation("looser")
-  messages      Message[] @relation("author")
-  createdAt     DateTime  @default(now())
+  id                  Int       @default(autoincrement()) @id
+  nickname            String    @unique
+  ladderPoints        Int       @default(0)
+  avatar              Bytes? 
+  twoFactorEnable     Boolean   @default(false)
+  twoFactorSecret     String?
+  hash                String
+  gamesWin            Game[]    @relation("winner")
+  gamesLoose          Game[]    @relation("looser")
+  messages            Message[] @relation("author")
+  createdAt           DateTime  @default(now())
   @@map("users")
 }
 
 model Game {
-  // TODO: change by uuid?
   id                    Int       @id @default(autoincrement())
   type                  GameType
   winnerId              Int

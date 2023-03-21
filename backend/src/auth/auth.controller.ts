@@ -37,7 +37,11 @@ export class AuthController {
           type: 'string',
           description: 'Nickname of an existing user'
         },
-        password: { type: 'string', description: 'Password of the user' }
+        password: { type: 'string', description: 'Password of the user' },
+        twoFactorCode: {
+          type: 'string',
+          description: 'Two factor code (if enabled)'
+        }
       }
     }
   })

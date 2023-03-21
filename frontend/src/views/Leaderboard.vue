@@ -32,9 +32,7 @@ export default {
 
   async created() {
     try {
-      const response = await axios.get(
-        constants.API_URL + '/user/get-all-users'
-      );
+      const response = await axios.get(constants.API_URL + '/users');
       this.users = response.data;
     } catch (error) {
       // TODO: Handle error

@@ -1,18 +1,28 @@
 <template>
   <br />
   <v-form>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model="nickname"
       label="Nickname"
       variant="outlined"
+      autocomplete="username"
+      @keydown.enter.prevent="signin"
       required
+      :rules='[rules.nicknameCharacters]'
     ></v-text-field>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model="password"
       label="Password"
       type="password"
       variant="outlined"
+      autocomplete="current-password"
       required
+      @keydown.enter.prevent="signin"
+    ></v-text-field>
+    <v-text-field class="mb-5"
+      v-model="twoFactorCode"
+      label="2fa code (optional)"
+      variant="outlined"
       @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
@@ -29,11 +39,15 @@ export default {
   data() {
     return {
       nickname: '',
-      password: ''
+      password: '',
+      twoFactorCode: '',
+      rules: {
+	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+      }
     };
   },
   computed: {
-    ...mapStores(useSessionStore),
+    ...mapStores(useSessionStore)
   },
   methods: {
     async signin() {
@@ -41,7 +55,8 @@ export default {
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
-          password: this.password
+          password: this.password,
+          twoFactorCode: this.twoFactorCode
         });
         this.sessionStore.signin(this.nickname);
         alert('You are now connected !');
