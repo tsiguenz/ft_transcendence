@@ -26,6 +26,27 @@ export class UsersService {
     }
   }
 
+  async getUserById(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId
+        },
+        select: {
+          // TODO: id is necessary?
+          id: true,
+          nickname: true,
+          ladderPoints: true,
+          avatar: true,
+          createdAt: true
+        }
+      });
+      return user;
+    } catch (e) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
       select: {
