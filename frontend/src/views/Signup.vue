@@ -1,29 +1,32 @@
 <template>
   <br />
   <v-form>
-    <v-text-field
-      v-model="nickname"
-      label="Nickname"
-      variant="outlined"
+    <v-text-field class="mb-5"
+      v-model='nickname'
+      label='Nickname'
+      variant='outlined'
       autocomplete="username"
       required
+      :rules='[rules.nicknameCharacters]'
+      @keydown.enter.prevent='signup'
     ></v-text-field>
-    <v-text-field
-      v-model="password"
-      label="Password"
-      type="password"
-      variant="outlined"
+    <v-text-field class="mb-5"
+      v-model='password'
+      label='Password'
+      type='password'
+      variant='outlined'
       autocomplete="new-password"
       required
+      @keydown.enter.prevent='signup'
     ></v-text-field>
-    <v-text-field
-      v-model="passwordVerify"
-      label="Verify password"
-      type="password"
-      variant="outlined"
-      autocomplete="new-password"
+    <v-text-field class="mb-5"
+      v-model='passwordVerify'
+      label='Verify password'
+      type='password'
+      variant='outlined'
       required
-      @keydown.enter.prevent="signup"
+      :rules='[rules.passwordCheck]'
+      @keydown.enter.prevent='signup'
     ></v-text-field>
     <v-btn @click="signup">Sign Up</v-btn>
   </v-form>
@@ -40,7 +43,11 @@ export default {
     return {
       nickname: '',
       password: '',
-      passwordVerify: ''
+      passwordVerify: '',
+      rules: {
+	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+	passwordCheck: (v) => v === this.password || 'Passwords do not match !',
+      }
     };
   },
   computed: {
@@ -51,6 +58,10 @@ export default {
       // TODO: clean the input to protect injection
       if (this.password !== this.passwordVerify) {
         alert('Passwords do not match !');
+        return;
+      }
+      if (!/^[a-zA-Z0-9-]{0,8}$/.test(this.nickname)) {
+        alert('Invalid character in nickname');
         return;
       }
       try {
@@ -67,6 +78,6 @@ export default {
         alert(error.response.data.message);
       }
     }
-  }
-};
+  },
+}
 </script>

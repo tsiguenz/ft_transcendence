@@ -1,15 +1,16 @@
 <template>
   <br />
   <v-form>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model="nickname"
       label="Nickname"
       variant="outlined"
       autocomplete="username"
       @keydown.enter.prevent="signin"
       required
+      :rules='[rules.nicknameCharacters]'
     ></v-text-field>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model="password"
       label="Password"
       type="password"
@@ -18,7 +19,7 @@
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field
+    <v-text-field class="mb-5"
       v-model="twoFactorCode"
       label="2fa code (optional)"
       variant="outlined"
@@ -39,7 +40,10 @@ export default {
     return {
       nickname: '',
       password: '',
-      twoFactorCode: ''
+      twoFactorCode: '',
+      rules: {
+	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+      }
     };
   },
   computed: {
