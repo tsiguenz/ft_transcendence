@@ -55,7 +55,10 @@ export class AuthService {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
       }
-      const valid = await this.twoFa.verifyTwoFa(user, dto.twoFactorCode);
+      const valid = await this.twoFa.verifyTwoFa(
+        user.twoFactorSecret,
+        dto.twoFactorCode
+      );
       if (!valid) {
         throw new ForbiddenException('Invalid two factor code');
       }

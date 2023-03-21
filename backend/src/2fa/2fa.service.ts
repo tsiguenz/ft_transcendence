@@ -28,9 +28,9 @@ export class TwoFaService {
     return { qrcode: await qrcode.toDataURL(otpAuthUrl) };
   }
 
-  async verifyTwoFa(user: User, token: string) {
+  async verifyTwoFa(twoFactorSecret: string, token: string) {
     return speakeasy.totp.verify({
-      secret: user.twoFactorSecret,
+      secret: twoFactorSecret,
       encoding: 'ascii',
       token: token
     });

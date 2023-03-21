@@ -10,7 +10,7 @@
   <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
-  <v-form>
+  <v-form v-if="!qrcode">
     <v-text-field
       v-model="newNickname"
       label="Nickname"
@@ -28,17 +28,20 @@
 
     <br />
 
-    <v-btn @click="editProfile"> submit </v-btn>
+    <v-btn v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
   </v-form>
 
-  <!-- TODO: 
-  When edit profile set the 2fa, print the qrcode and ask for a code to prevent
-  bad usage.
-  -->
-  <v-btn v-if="twoFaIsEnable()" @click="generate2faQrcode"
-    >generate new 2fa qrcode</v-btn
-  >
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
+  <v-form v-if="qrcode">
+    <v-text-field
+      v-model="twoFactorCode"
+      label="2fa code"
+      required
+    ></v-text-field>
+    <v-btn v-if="qrcode" @click="editProfile"
+      >Validate edit profile with 2fa code</v-btn
+    >
+  </v-form>
   <!-- TODO: add delete account and logout logic -->
 </template>
 
@@ -52,6 +55,7 @@ export default {
       user: {},
       newNickname: '',
       newTwoFactorEnable: false,
+      twoFactorCode: '',
       qrcode: ''
     };
   },
@@ -76,13 +80,14 @@ export default {
       }
     },
     async editProfile() {
-      const jwt = this.$cookie.getCookie('jwt');
       try {
+        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.put(
           constants.API_URL + '/profile',
           {
             nickname: this.newNickname,
-            twoFactorEnable: this.newTwoFactorEnable
+            twoFactorEnable: this.newTwoFactorEnable,
+            twoFactorCode: this.twoFactorCode
           },
           {
             headers: {
@@ -94,6 +99,13 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         alert(error.response.data.message);
+      }
+    },
+    async dispatchEditProfile() {
+      if (this.newTwoFactorEnable) {
+        this.generate2faQrcode();
+      } else {
+        this.editProfile();
       }
     },
     async generate2faQrcode() {
