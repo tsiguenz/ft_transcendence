@@ -14,12 +14,11 @@ export class ProfileController {
   @ApiBearerAuth()
   @Get()
   getProfile(@Req() req: Request) {
-    return this.profileService.getProfile(req);
+    return this.profileService.getProfile(req.user['id']);
   }
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
-  @Put()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
     schema: {
@@ -31,14 +30,11 @@ export class ProfileController {
           description: 'Enable or disable two factor authentication'
         }
         // TODO: handle avatar
-        //        avatar: {
-        //          type: 'string',
-        //          description: 'The new avatar'
-        //        }
       }
     }
   })
+  @Put()
   editProfile(@Body() dto: EditProfileDto, @Req() req: Request) {
-    return this.profileService.editProfile(dto, req);
+    return this.profileService.editProfile(dto, req.user['id']);
   }
 }
