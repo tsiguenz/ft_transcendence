@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatroomService } from '../chatroom/chatroom.service';
 
 @Injectable()
 export class ChatService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService, private chatroom: ChatroomService) {}
 
 	async getMessages() {
 		return await this.prisma.message.findMany({ include: { author: true } });
@@ -11,10 +12,12 @@ export class ChatService {
 
 	async saveMessage(userId: number, message: string) {
 		const user = await this.prisma.user.findUnique({ where: { id: userId } });
+		const chatroom = await this.chatroom.findOrCreateDefaultChatroom();
 		if (!user) { throw new Error('User not found'); }
+
 		await this.prisma.message.create({
 			data: {
-				chatRoomId: 1,
+				chatRoomId: chatroom.id,
 				authorId: user.id,
 				content: message,
 			}

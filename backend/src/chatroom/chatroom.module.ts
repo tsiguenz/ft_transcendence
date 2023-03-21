@@ -8,6 +8,7 @@ import { JwtStrategy } from '../auth/strategy';
 @Module({
   imports: [PrismaModule, JwtModule.register({})],
   controllers: [ChatroomController],
-  providers: [ChatroomService, JwtStrategy]
+  providers: [ChatroomService, JwtStrategy],
+  exports: [ChatroomService]
 })
 export class ChatroomModule {}

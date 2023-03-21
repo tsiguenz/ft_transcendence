@@ -4,6 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ChatroomService {
+  private static DEFAULT_CHATROOM = 'general';
+
   constructor(private prisma: PrismaService) {}
   async create(userId: number, dto: CreateChatroomDto) {
     try {
@@ -33,5 +35,13 @@ export class ChatroomService {
 
   remove(id: number) {
     return `This action removes a #${id} chatroom`;
+  }
+
+  async findOrCreateDefaultChatroom() {
+    let defaultChatroom = await this.prisma.chatRoom.findUnique({ where: { name: ChatroomService.DEFAULT_CHATROOM } });
+    if (!defaultChatroom) {
+      defaultChatroom = await this.prisma.chatRoom.create({ data: { name: ChatroomService.DEFAULT_CHATROOM } });
+    }
+    return defaultChatroom;
   }
 }
