@@ -6,8 +6,15 @@ import { ChatroomService } from '../chatroom/chatroom.service';
 export class ChatService {
 	constructor(private prisma: PrismaService, private chatroom: ChatroomService) {}
 
-	async getMessages() {
-		return await this.prisma.message.findMany({ include: { author: true } });
+	async getMessages(chatroomId: number) {
+		return await this.prisma.message.findMany({
+			where: {
+				chatRoom: {
+					id: chatroomId,
+				}
+			},
+			include: { author: true }
+		});
 	}
 
 	async saveMessage(userId: number, message: string) {

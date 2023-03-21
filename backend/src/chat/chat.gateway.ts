@@ -10,12 +10,13 @@ import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { ChatroomService } from '../chatroom/chatroom.service';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private auth: AuthService, private chat: ChatService) {}
+  constructor(private auth: AuthService, private chat: ChatService, private chatroom: ChatroomService) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
@@ -77,7 +78,8 @@ export class ChatGateway
     if (!user) {
       client.disconnect();
     } else {
-      const messages = await this.chat.getMessages();
+      const chatroom = await this.chatroom.findOrCreateDefaultChatroom();
+      const messages = await this.chat.getMessages(chatroom.id);
       for (const id in messages) {
         client.emit('msgToClient', {
           author: messages[id].author.nickname,
