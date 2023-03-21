@@ -23,7 +23,6 @@ export class ChatroomController {
   @UseGuards(JwtGuard)
   @Post()
   async create(@Body() createChatroomDto: CreateChatroomDto, @Req() req: Request) {
-    console.warn("CALLED");
     return await this.chatroomService.create(Number.parseInt(req.user['id']), createChatroomDto);
   }
 

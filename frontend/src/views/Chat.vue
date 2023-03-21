@@ -80,7 +80,7 @@ export default {
             name: this.newChatroomName,
           }
         );
-        this.chatrooms.push({ name: "response.name" });
+        this.chatrooms.push({ name: response.data.name });
       } catch (error) {
         alert(error.response.data.message);
       }

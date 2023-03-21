@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -6,12 +6,17 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ChatroomService {
   constructor(private prisma: PrismaService) {}
   async create(userId: number, dto: CreateChatroomDto) {
-    await this.prisma.chatRoom.create({
-      data: {
-        name: dto.name,
-        users: { create: [{ user: { connect: { id: userId } } }] }
-      }
-    });
+    try {
+      const chatroom = await this.prisma.chatRoom.create({
+        data: {
+          name: dto.name,
+          users: { create: [{ user: { connect: { id: userId } } }] }
+        }
+      });
+      return chatroom;
+    } catch (e) {
+      throw new NotFoundException('Could not create chatroom');
+    }
   }
 
   findAll() {
