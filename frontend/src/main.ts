@@ -27,13 +27,6 @@ const vuetify = createVuetify({
 });
 
 
-axios.interceptors.request.use(config => {
-  const token = this.$cookie.getCookie('jwt');
-  if (!token) { return; }
-  config.headers["Authorization"] = `Bearer ${token}`;
-  return config;
-});
-
 pinia.use(piniaPluginPersistedstate);
 app.use(VueCookieNext);
 VueCookieNext.config({ expire: '7d' });
@@ -41,3 +34,15 @@ app.use(vuetify);
 app.use(pinia);
 app.use(router);
 app.mount('#app');
+
+axios.interceptors.request.use(config => {
+  const jwt = VueCookieNext.getCookie('jwt');
+  if (jwt) {
+      config.headers.Authorization = `Bearer ${jwt}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+);

@@ -78,11 +78,6 @@ export default {
         const response = await axios.post(constants.API_URL + '/chatrooms',
           {
             name: this.newChatroomName,
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
           }
         );
         this.chatrooms.push({ name: "response.name" });

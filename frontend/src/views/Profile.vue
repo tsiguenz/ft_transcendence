@@ -62,11 +62,7 @@ export default {
     async getProfile() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + '/profile', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
-          }
-        });
+        const response = await axios.get(constants.API_URL + '/profile');
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
@@ -83,11 +79,6 @@ export default {
           {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
           }
         );
         alert(response.data.message);
@@ -100,13 +91,7 @@ export default {
       const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.get(
-          constants.API_URL + '/2fa/generate-qrcode',
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
-        );
+          constants.API_URL + '/2fa/generate-qrcode');
         this.qrcode = response.data.qrcode;
       } catch (error) {
         alert(error.response.data.message);
