@@ -1,23 +1,42 @@
 <template>
   <h1>Chat</h1>
-  <v-card>
-    <v-card-text>
-      <v-list ref="chat" height="100" class="overflow-y-auto">
-        <div v-for="item in messages">
-          From [{{ item.author }}]: {{item.data }}
-        </div>
-      </v-list>
-    </v-card-text>
-    <v-card-actions>
-      <v-form @submit.prevent>
+	<v-container fuild>
+		<v-row justify="space-between" align="start">
+			<v-col cols="3">
+			  <v-card height="1000">
+				HERE CHANS
+			  </v-card>
+			</v-col>
+			<v-col cols="9">
+			  <v-card>
+			      <v-list ref="chat" height="1000" class="overflow-y-auto">
+			        <div v-for="item in messages">
+			          From [{{ item.author }}]: {{item.data }}
+			        </div>
+			      </v-list>
+			  </v-card>
+			</v-col>
+		</v-row>
+		<v-row justify="space-between" align="start">
+			<v-col cols="3">
         <v-text-field
-          v-model="message"
-          label="Message"
-          v-on:keyup.enter="sendMessage"
-        ></v-text-field>
-      </v-form>
-    </v-card-actions>
-  </v-card>
+	          v-model="chans"
+	          label="Create chan"
+	        ></v-text-field>
+			</v-col>
+			<v-col cols="9">
+			  <v-card>
+			      <v-form @submit.prevent>
+			        <v-text-field
+			          v-model="message"
+			          label="Message"
+			          v-on:keyup.enter="sendMessage"
+			        ></v-text-field>
+			      </v-form>
+			  </v-card>
+			</v-col>
+		</v-row>
+	</v-container>
 </template>
 
 <script>
