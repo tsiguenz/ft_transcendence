@@ -19,8 +19,8 @@ export class ChatroomService {
     }
   }
 
-  findAll() {
-    return `This action returns all chatroom`;
+  async findAll() {
+    return await this.prisma.chatRoom.findMany();
   }
 
   findOne(id: number) {

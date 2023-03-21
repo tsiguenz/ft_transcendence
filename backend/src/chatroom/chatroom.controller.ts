@@ -7,6 +7,7 @@ import { ChatroomService } from './chatroom.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 
 @Controller('api/chatrooms')
+@ApiTags('chatrooms')
 export class ChatroomController {
   constructor(private readonly chatroomService: ChatroomService) {}
 
@@ -26,9 +27,11 @@ export class ChatroomController {
     return await this.chatroomService.create(Number.parseInt(req.user['id']), createChatroomDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Get()
-  findAll() {
-    return this.chatroomService.findAll();
+  async findAll() {
+    return await this.chatroomService.findAll();
   }
 
   @Get(':id')

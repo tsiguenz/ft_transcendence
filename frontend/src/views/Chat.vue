@@ -51,12 +51,8 @@ export default {
     SocketioService.setupSocketConnection(this.$cookie.getCookie('jwt'));
   },
   mounted() {
-    SocketioService.subscribe("msgToClient", (message) => {
-      if (message.author === this.sessionStore.nickname) {
-        message.author = 'Me';
-      }
-      this.messages.push(message);
-    });
+    SocketioService.subscribe("msgToClient", (message) => { this.chatMessageCallback(message) });
+    this.loadChatrooms();
   },
   beforeUnmount() {
     SocketioService.disconnect();
@@ -71,10 +67,21 @@ export default {
       this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     },
+    async loadChatrooms() {
+      const chatrooms = await this.getChatrooms();
+      this.chatrooms.push(...chatrooms);
+    },
+    async getChatrooms() {
+      try {
+        const response = await axios.get(constants.API_URL + '/chatrooms');
+        return response.data;
+      } catch (error) {
+        alert(error.response.data.message);
+      }
+    },
     async newChatroom() {
       // TODO: clean the input to protect injection
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.post(constants.API_URL + '/chatrooms',
           {
             name: this.newChatroomName,
@@ -85,6 +92,12 @@ export default {
         alert(error.response.data.message);
       }
       this.newChatroomName = '';
+    },
+    chatMessageCallback(message) {
+      if (message.author === this.sessionStore.nickname) {
+        message.author = 'Me';
+      }
+      this.messages.push(message);
     }
   }
 };

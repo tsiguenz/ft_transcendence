@@ -61,7 +61,6 @@ export default {
   methods: {
     async getProfile() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.get(constants.API_URL + '/profile');
         this.user = response.data;
         this.newNickname = this.user.nickname;
@@ -72,7 +71,6 @@ export default {
       }
     },
     async editProfile() {
-      const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.put(
           constants.API_URL + '/profile',
@@ -88,7 +86,6 @@ export default {
       }
     },
     async generate2faQrcode() {
-      const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.get(
           constants.API_URL + '/2fa/generate-qrcode');
