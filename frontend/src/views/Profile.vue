@@ -13,7 +13,9 @@
     <v-text-field
       v-model="newNickname"
       label="Nickname"
+      :rules="[rules.nicknameCharacters]"
       required
+      @keydown.enter.prevent="dispatchEditProfile"
     ></v-text-field>
 
     <input
@@ -36,6 +38,7 @@
       v-model="twoFactorCode"
       label="2fa code"
       required
+      @keydown.enter.prevent="editProfile"
     ></v-text-field>
     <v-btn v-if="qrcode" @click="editProfile"
       >Validate edit profile with 2fa code</v-btn
@@ -55,7 +58,12 @@ export default {
       newNickname: '',
       newTwoFactorEnable: false,
       twoFactorCode: '',
-      qrcode: ''
+      qrcode: '',
+      rules: {
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and be less than 8 characters long"
+      }
     };
   },
   mounted() {
@@ -101,7 +109,7 @@ export default {
       }
     },
     async dispatchEditProfile() {
-      if (this.newTwoFactorEnable) {
+      if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
         this.generate2faQrcode();
       } else {
         this.editProfile();
@@ -122,9 +130,6 @@ export default {
       } catch (error) {
         alert(error.response.data.message);
       }
-    },
-    twoFaIsEnable() {
-      return this.user.twoFactorEnable;
     }
   }
 };

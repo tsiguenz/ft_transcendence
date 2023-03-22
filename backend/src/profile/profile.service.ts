@@ -37,16 +37,19 @@ export class ProfileService {
   }
 
   // TODO: refactor this function
+  // TODO: change the jwt when user change nickname
   async editProfile(dto: EditProfileDto, userId: number) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId
       },
       select: {
+        twoFactorEnable: true,
         twoFactorSecret: true
       }
     });
-    if (dto.twoFactorEnable) {
+    // check when user enable two factor
+    if (dto.twoFactorEnable && !user.twoFactorEnable) {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
       }
