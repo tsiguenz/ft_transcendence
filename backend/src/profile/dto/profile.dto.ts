@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsBoolean, IsString } from 'class-validator';
+import { IsNotEmpty, IsBoolean, IsString, ValidateIf } from 'class-validator';
 import { ToBoolean } from 'src/helpers/to-boolean.decorator';
 
 export class EditProfileDto {
@@ -9,6 +9,10 @@ export class EditProfileDto {
   @ToBoolean()
   @IsBoolean()
   twoFactorEnable: boolean;
+
+  @ValidateIf((o) => o === '')
+  @IsString()
+  twoFactorCode: string;
 
   // TODO: handle avatar
   //  @IsBuffer

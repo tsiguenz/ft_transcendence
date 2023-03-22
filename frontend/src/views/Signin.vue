@@ -2,6 +2,7 @@
   <br />
   <v-form>
     <v-text-field
+      v-if="!askFor2fa()"
       v-model="nickname"
       class="mb-5"
       label="Nickname"
@@ -12,6 +13,7 @@
       @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-text-field
+      v-if="!askFor2fa()"
       v-model="password"
       class="mb-5"
       label="Password"
@@ -22,9 +24,10 @@
       @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-text-field
+      v-if="askFor2fa()"
       v-model="twoFactorCode"
       class="mb-5"
-      label="2fa code (optional)"
+      label="2fa code"
       variant="outlined"
       @keydown.enter.prevent="signin"
     ></v-text-field>
@@ -44,6 +47,7 @@ export default {
       nickname: '',
       password: '',
       twoFactorCode: '',
+      errorMessage: '',
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
@@ -68,8 +72,15 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
-        alert(error.response.data.message);
+        this.errorMessage = error.response.data.message;
+        if (!this.askFor2fa()) {
+          alert(error.response.data.message);
+        }
+        this.twoFactorCode = '';
       }
+    },
+    askFor2fa() {
+      return this.errorMessage === 'Two factor code required';
     }
   }
 };
