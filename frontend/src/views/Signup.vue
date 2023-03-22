@@ -1,32 +1,35 @@
 <template>
   <br />
   <v-form>
-    <v-text-field class="mb-5"
-      v-model='nickname'
-      label='Nickname'
-      variant='outlined'
+    <v-text-field
+      v-model="nickname"
+      class="mb-5"
+      label="Nickname"
+      variant="outlined"
       autocomplete="username"
       required
-      :rules='[rules.nicknameCharacters]'
-      @keydown.enter.prevent='signup'
+      :rules="[rules.nicknameCharacters]"
+      @keydown.enter.prevent="signup"
     ></v-text-field>
-    <v-text-field class="mb-5"
-      v-model='password'
-      label='Password'
-      type='password'
-      variant='outlined'
+    <v-text-field
+      v-model="password"
+      class="mb-5"
+      label="Password"
+      type="password"
+      variant="outlined"
       autocomplete="new-password"
       required
-      @keydown.enter.prevent='signup'
+      @keydown.enter.prevent="signup"
     ></v-text-field>
-    <v-text-field class="mb-5"
-      v-model='passwordVerify'
-      label='Verify password'
-      type='password'
-      variant='outlined'
+    <v-text-field
+      v-model="passwordVerify"
+      class="mb-5"
+      label="Verify password"
+      type="password"
+      variant="outlined"
       required
-      :rules='[rules.passwordCheck]'
-      @keydown.enter.prevent='signup'
+      :rules="[rules.passwordCheck]"
+      @keydown.enter.prevent="signup"
     ></v-text-field>
     <v-btn @click="signup">Sign Up</v-btn>
   </v-form>
@@ -45,8 +48,10 @@ export default {
       password: '',
       passwordVerify: '',
       rules: {
-	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
-	passwordCheck: (v) => v === this.password || 'Passwords do not match !',
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and be less than 8 characters long",
+        passwordCheck: (v) => v === this.password || 'Passwords do not match !'
       }
     };
   },
@@ -55,7 +60,6 @@ export default {
   },
   methods: {
     async signup() {
-      // TODO: clean the input to protect injection
       if (this.password !== this.passwordVerify) {
         alert('Passwords do not match !');
         return;
@@ -78,6 +82,6 @@ export default {
         alert(error.response.data.message);
       }
     }
-  },
-}
+  }
+};
 </script>

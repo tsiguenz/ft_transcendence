@@ -53,7 +53,6 @@ router.beforeEach(async (to) => {
     return;
   }
   const UNAUTHENTICATED_ROUTES = ['/signin', '/signup', '/home'];
-  // TODO: When change between two pages who redirect to /signin page, the page is not reloaded
   if (
     !VueCookieNext.isCookieAvailable('jwt') &&
     !UNAUTHENTICATED_ROUTES.includes(to.path)
