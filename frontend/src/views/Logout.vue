@@ -21,9 +21,6 @@ export default {
         this.$cookie.removeCookie('jwt');
         this.sessionStore.logout();
       }
-    },
-    isLog() {
-      return this.$cookie.isCookieAvailable('jwt') ? true : false;
     }
   }
 };
