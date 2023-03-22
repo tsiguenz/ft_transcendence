@@ -25,8 +25,8 @@ export class ChatroomService {
     return await this.prisma.chatRoom.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chatroom`;
+  async findOne(id: number) {
+    return await this.prisma.chatRoom.findUnique({ where: { id } });
   }
 
   update(id: number, updateChatroomDto: UpdateChatroomDto) {
@@ -35,6 +35,16 @@ export class ChatroomService {
 
   remove(id: number) {
     return `This action removes a #${id} chatroom`;
+  }
+
+  async join(userId: number, chatroomId: number) {
+    // Check if user is able to join chatroom
+    // Aff user to chatroom users
+  }
+
+  async leave(userId: number, chatroomId: number) {
+    // Check if user is able to leave chatroom
+    // Aff user to chatroom users
   }
 
   async findOrCreateDefaultChatroom() {

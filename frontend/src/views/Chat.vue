@@ -45,6 +45,7 @@ export default {
       messages: [],
       newChatroomName: '',
       chatrooms: [],
+      currentChatroomId: 0,
     };
   },
   created() {
@@ -52,7 +53,9 @@ export default {
   },
   mounted() {
     SocketioService.subscribe("msgToClient", (message) => { this.chatMessageCallback(message) });
-    this.loadChatrooms();
+    this.loadChatrooms().then((chatrooms) => {
+      this.currentChatroomId = this.chatrooms[0].id
+    });
   },
   beforeUnmount() {
     SocketioService.disconnect();
@@ -63,7 +66,7 @@ export default {
   methods: {
     sendMessage() {
       if (this.message == '') { return; }
-      SocketioService.sendMessage("msgToServer", this.message);
+      SocketioService.sendMessage("msgToServer", { chatroomId: this.currentChatroomId, message: this.message });
       this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     },

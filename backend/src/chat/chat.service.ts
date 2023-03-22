@@ -17,9 +17,9 @@ export class ChatService {
 		});
 	}
 
-	async saveMessage(userId: number, message: string) {
+	async saveMessage(userId: number, chatRoomId: number, message: string) {
 		const user = await this.prisma.user.findUnique({ where: { id: userId } });
-		const chatroom = await this.chatroom.findOrCreateDefaultChatroom();
+		const chatroom = await this.chatroom.findOne(chatRoomId);
 		if (!user) { throw new Error('User not found'); }
 
 		await this.prisma.message.create({
