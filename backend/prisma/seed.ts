@@ -37,8 +37,17 @@ async function populateUsers() {
   });
 }
 
+async function populateChatrooms() {
+  await prisma.chatRoom.create({
+    data: {
+      name: 'general',
+    }
+  });
+}
+
 async function main() {
   await populateUsers();
+  await populateChatrooms();
   // await populateMessages();
   // await populateGames();
 }
