@@ -13,7 +13,7 @@ export default {
     this.$router.push('/home');
   },
   computed: {
-    ...mapStores(useSessionStore),
+    ...mapStores(useSessionStore)
   },
   methods: {
     logout() {

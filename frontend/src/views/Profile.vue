@@ -44,10 +44,10 @@
       >Validate edit profile with 2fa code</v-btn
     >
   </v-form>
-	
+
   <!-- TODO: add delete account and logout logic -->
-	<v-btn to="/logout">Logout</v-btn>
-	<v-btn @click="deleteAccount">Delete Account</v-btn>
+  <v-btn to="/logout">Logout</v-btn>
+  <v-btn @click="deleteAccount">Delete Account</v-btn>
 </template>
 
 <script>
@@ -134,7 +134,7 @@ export default {
         alert(error.response.data.message);
       }
     },
-		async deleteAccount(){
+    async deleteAccount() {
       const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.delete(
@@ -145,12 +145,12 @@ export default {
             }
           }
         );
-				alert('Account is delete');
-				this.$router.push('/logout');
+        alert('Account is delete');
+        this.$router.push('/logout');
       } catch (error) {
         alert(error.response.data.message);
       }
-		}
+    }
   }
 };
 </script>

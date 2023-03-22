@@ -42,7 +42,7 @@ export default {
     } catch (error) {
       // TODO: Handle error
       console.log(error);
-			this.$router.push('/logout');
+      this.$router.push('/logout');
     }
   }
 };

@@ -28,17 +28,17 @@ export class UsersController {
   getAllUsers() {
     return this.usersService.getAllUsers();
   }
+
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
     type: String,
     required: true,
-    description: "Nickname of the user you're deleting"
+    description: 'Nickname of the user you are deleting'
   })
   @Delete(':nickname')
   deleteUser(@Param('nickname') nickname: string, @Req() req: Request) {
     return this.usersService.deleteUser(nickname, req.user['nickname']);
-	
   }
 }
