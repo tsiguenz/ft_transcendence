@@ -34,7 +34,7 @@ export class ProfileService {
     }
   }
 
-  async editProfile(dto: EditProfileDto, userId) {
+  async editProfile(dto: EditProfileDto, userId: number) {
     try {
       await this.prisma.user.update({
         where: {
