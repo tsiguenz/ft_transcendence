@@ -2,7 +2,6 @@
   <h1>Profile infos</h1>
   <p>Id: {{ user.id }}</p>
   <p>Nickname: {{ user.nickname }}</p>
-  <p>Ladder points: {{ user.ladderPoints }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
   <p>Avatar: {{ user.avatar }}</p>

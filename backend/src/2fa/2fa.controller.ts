@@ -8,11 +8,11 @@ import { JwtGuard } from '../auth/guard';
 @Controller('api/2fa')
 export class TwoFaController {
   constructor(private readonly twoFaService: TwoFaService) {}
-  @ApiBearerAuth()
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Get('generate-qrcode')
   async generateQrCode(@Req() req: Request) {
-    const secret = await this.twoFaService.createSecret(req);
+    const secret = await this.twoFaService.createSecret(req.user['id']);
     return this.twoFaService.generateQrCodeDataURL(secret.otpauth_url);
   }
 }

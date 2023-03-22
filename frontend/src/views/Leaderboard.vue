@@ -32,7 +32,12 @@ export default {
 
   async created() {
     try {
-      const response = await axios.get(constants.API_URL + '/users');
+      const jwt = this.$cookie.getCookie('jwt');
+      const response = await axios.get(constants.API_URL + '/users', {
+        headers: {
+          Authorization: 'Bearer ' + jwt
+        }
+      });
       this.users = response.data;
     } catch (error) {
       // TODO: Handle error

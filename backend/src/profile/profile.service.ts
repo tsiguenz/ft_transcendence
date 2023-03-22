@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { Request } from 'express';
 import { EditProfileDto } from './dto';
 import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { TwoFaService } from '../2fa/2fa.service';
@@ -15,18 +14,20 @@ export class ProfileService {
     private users: UsersService,
     private twoFa: TwoFaService
   ) {}
-  async getProfile(req: Request) {
+  async getProfile(userId: number) {
     try {
-      const payload = this.users.getPayloadFromReq(req);
-      const nickname = payload['nickname'];
       const userProfile = await this.prisma.user.findUnique({
         where: {
-          nickname: nickname
+          id: userId
+        },
+        select: {
+          id: true,
+          nickname: true,
+          avatar: true,
+          createdAt: true,
+          twoFactorEnable: true
         }
       });
-      // TODO: create dto or interface for user profile
-      delete userProfile.hash;
-      delete userProfile.twoFactorSecret;
       return userProfile;
     } catch (e) {
       throw new UnauthorizedException(
@@ -36,8 +37,7 @@ export class ProfileService {
   }
 
   // TODO: refactor this function
-  async editProfile(dto: EditProfileDto, req: Request) {
-    const userId = req.user['id'];
+  async editProfile(dto: EditProfileDto, userId: number) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId

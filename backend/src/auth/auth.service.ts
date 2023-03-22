@@ -66,10 +66,7 @@ export class AuthService {
     return this.createJwt(user.id, user.nickname);
   }
 
-  async createJwt(
-    userId: number,
-    nickname: string
-  ): Promise<{ access_token: string }> {
+  async createJwt(userId: number, nickname: string) {
     const payload = {
       nickname: nickname,
       sub: userId
