@@ -10,12 +10,17 @@ import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private auth: AuthService, private chat: ChatService) {}
+  constructor(
+    private auth: AuthService,
+    private chat: ChatService,
+    private users: UsersService
+  ) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
@@ -28,7 +33,7 @@ export class ChatGateway
       this.logger.warn('HandleMessage error');
     }
 
-    const user = await this.chat.getUser(client['decoded'].sub);
+    const user = await this.users.getUserById(client['decoded'].sub);
     client.broadcast.emit('msgToClient', {
       author: user.nickname,
       data: payload
@@ -73,7 +78,7 @@ export class ChatGateway
       client.disconnect();
       return;
     }
-    const user = await this.chat.getUser(client['decoded'].sub);
+    const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
       client.disconnect();
     } else {

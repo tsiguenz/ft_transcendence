@@ -55,7 +55,10 @@ export class AuthService {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
       }
-      const valid = await this.twoFa.verifyTwoFa(user, dto.twoFactorCode);
+      const valid = await this.twoFa.verifyTwoFa(
+        user.twoFactorSecret,
+        dto.twoFactorCode
+      );
       if (!valid) {
         throw new ForbiddenException('Invalid two factor code');
       }
@@ -63,10 +66,7 @@ export class AuthService {
     return this.createJwt(user.id, user.nickname);
   }
 
-  async createJwt(
-    userId: number,
-    nickname: string
-  ): Promise<{ access_token: string }> {
+  async createJwt(userId: number, nickname: string) {
     const payload = {
       nickname: nickname,
       sub: userId
