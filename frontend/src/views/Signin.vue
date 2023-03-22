@@ -1,17 +1,19 @@
 <template>
   <br />
   <v-form>
-    <v-text-field class="mb-5"
+    <v-text-field
       v-model="nickname"
+      class="mb-5"
       label="Nickname"
       variant="outlined"
       autocomplete="username"
-      @keydown.enter.prevent="signin"
+      :rules="[rules.nicknameCharacters]"
       required
-      :rules='[rules.nicknameCharacters]'
+      @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field class="mb-5"
+    <v-text-field
       v-model="password"
+      class="mb-5"
       label="Password"
       type="password"
       variant="outlined"
@@ -19,8 +21,9 @@
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field class="mb-5"
+    <v-text-field
       v-model="twoFactorCode"
+      class="mb-5"
       label="2fa code (optional)"
       variant="outlined"
       @keydown.enter.prevent="signin"
@@ -42,7 +45,9 @@ export default {
       password: '',
       twoFactorCode: '',
       rules: {
-	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and be less than 8 characters long"
       }
     };
   },
@@ -51,7 +56,6 @@ export default {
   },
   methods: {
     async signin() {
-      // TODO: clean the input to protect injection
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
