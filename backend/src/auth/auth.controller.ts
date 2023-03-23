@@ -1,7 +1,16 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards
+} from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
+import { FortyTwoGuard } from './guard';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -47,5 +56,12 @@ export class AuthController {
   })
   signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
+  }
+
+  @Get('42')
+  @UseGuards(FortyTwoGuard)
+  async fortyTwoAuth() {
+    console.log('fortyTwoAuth');
+    return;
   }
 }
