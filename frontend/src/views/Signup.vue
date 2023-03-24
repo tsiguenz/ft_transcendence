@@ -1,6 +1,6 @@
 <template>
   <br />
-  <v-form>
+  <v-form v-model="isFormValid">
     <v-text-field
       v-model="nickname"
       class="mb-5"
@@ -31,7 +31,7 @@
       :rules="[rules.passwordCheck]"
       @keydown.enter.prevent="signup"
     ></v-text-field>
-    <v-btn @click="signup">Sign Up</v-btn>
+    <v-btn :disabled="!isFormValid" @click="signup">Sign Up</v-btn>
   </v-form>
 </template>
 
@@ -47,10 +47,11 @@ export default {
       nickname: '',
       password: '',
       passwordVerify: '',
+			isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
-          "Must contain only alphanumeric, '-' and be less than 8 characters long",
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) && v !== '' ||
+          "Must contain only alphanumeric, '-' and have a length between 1 and 8",
         passwordCheck: (v) => v === this.password || 'Passwords do not match !'
       }
     };

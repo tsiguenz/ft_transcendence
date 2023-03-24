@@ -9,7 +9,7 @@
   <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
-  <v-form v-if="!qrcode">
+  <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
       v-model="newNickname"
       label="Nickname"
@@ -29,7 +29,7 @@
 
     <br />
 
-    <v-btn v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
+    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
   </v-form>
 
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
@@ -62,10 +62,11 @@ export default {
       newTwoFactorEnable: false,
       twoFactorCode: '',
       qrcode: '',
+			isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
-          "Must contain only alphanumeric, '-' and be less than 8 characters long"
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) && v !== '' ||
+          "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
   },
@@ -112,6 +113,10 @@ export default {
       }
     },
     async dispatchEditProfile() {
+      if (!/^[a-zA-Z0-9-]{0,8}$/.test(this.newNickname)) {
+        alert('Invalid character in nickname');
+        return;
+      }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
         this.generate2faQrcode();
       } else {
