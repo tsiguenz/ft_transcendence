@@ -6,11 +6,14 @@ import { ChatroomService } from '../chatroom/chatroom.service';
 export class ChatService {
 	constructor(private prisma: PrismaService, private chatroom: ChatroomService) {}
 
-	async getMessages(chatroomId: number) {
+	async getMessages(chatroomId: number, newerThan: Date = new Date(null)) {
 		return await this.prisma.message.findMany({
 			where: {
 				chatRoom: {
 					id: chatroomId,
+				},
+				createdAt: {
+					gte: newerThan,
 				}
 			},
 			include: { author: true }
@@ -23,7 +26,7 @@ export class ChatService {
 		const chatroom = await this.chatroom.findOne(chatRoomId);
 		if (!user) { throw new Error('User not found'); }
 
-		await this.prisma.message.create({
+		return await this.prisma.message.create({
 			data: {
 				chatRoomId: chatroom.id,
 				authorId: user.id,

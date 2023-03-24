@@ -23,8 +23,8 @@ class ChatService {
     this.socketService.send("joinRoom", { chatroomId: chatroomId });
   }
 
-  getRoomMessages(chatroomId: number) {
-    this.socketService.send("getRoomMessages", { chatroomId: chatroomId });
+  getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {
+    this.socketService.send("getRoomMessages", { chatroomId: chatroomId, newerThan: newerThan });
   }
 }
 

@@ -32,15 +32,17 @@ export class ChatGateway
   @SubscribeMessage('msgToServer')
   async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, message: string }) {
     try {
+      console.log(payload);
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
       
-      await this.chat.saveMessage(client['decoded'].sub, payload.chatroomId, payload.message);
+      const message = await this.chat.saveMessage(client['decoded'].sub, payload.chatroomId, payload.message);
 
       client.to(chatroom.slug).emit('msgToClient', {
         author: user.nickname,
         chatroomId: chatroom.id,
-        data: payload
+        sentAt: message.createdAt,
+        data: payload.message
       });
     } catch (error) {
       this.logger.warn('HandleMessage error');
@@ -57,15 +59,16 @@ export class ChatGateway
   }
 
   @SubscribeMessage('getRoomMessages')
-  async handleMessageHistory(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+  async handleMessageHistory(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, newerThan: Date }) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId)
 
     if (!chatroom) { return ; }
-    const messages = await this.chat.getMessages(chatroom.id);
+    const messages = await this.chat.getMessages(chatroom.id, payload.newerThan);
     for (const id in messages) {
       client.emit('msgToClient', {
         author: messages[id].author.nickname,
         chatroomId: chatroom.id,
+        sentAt: messages[id].createdAt,
         data: messages[id].content,
       });
     }

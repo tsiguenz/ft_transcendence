@@ -78,7 +78,7 @@ export default {
     },
     joinChatroom(id) {
       this.currentChatroomId = id;
-      if (!this.messages.hasOwnProperty(id)) { ChatService.getRoomMessages(id); }
+      ChatService.getRoomMessages(id, this.lastMessageTime(id));
     },
     async getChatrooms() {
       try {
@@ -107,11 +107,15 @@ export default {
       if (message.author === this.sessionStore.nickname) {
         message.author = 'Me';
       }
-      this.pushMessage(this.currentChatroomId, message);
+      this.pushMessage(message.chatroomId, message);
     },
     pushMessage(chatroomId, message) {
       if (!this.messages.hasOwnProperty(chatroomId)) { this.messages[chatroomId] = []; }
       this.messages[chatroomId].push(message);
+    },
+    lastMessageTime(chatroomId) {
+      if (!this.messages.hasOwnProperty(chatroomId)) { return new Date(); }
+      return new Date(this.messages[chatroomId].slice(-1).sentAt);
     }
   }
 };
