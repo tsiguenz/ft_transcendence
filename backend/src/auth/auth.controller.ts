@@ -3,14 +3,18 @@ import {
   Get,
   Post,
   Body,
+  Req,
+  Res,
   HttpCode,
   HttpStatus,
-  UseGuards
+  UseGuards,
+  Redirect
 } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { FortyTwoGuard } from './guard';
+import { Request, Response } from 'express';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -60,8 +64,14 @@ export class AuthController {
 
   @Get('42')
   @UseGuards(FortyTwoGuard)
-  async fortyTwoAuth() {
-    console.log('fortyTwoAuth');
-    return;
+  async fortyTwoAuth() {}
+
+  @Redirect('http://localhost:8080/home')
+  @UseGuards(FortyTwoGuard)
+  @Get('42/callback')
+  async fortyTwoAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const token = await this.authService.fortyTwoLogin(req.user);
+    res.cookie('jwt', token.access_token);
+    return res.status(HttpStatus.OK);
   }
 }

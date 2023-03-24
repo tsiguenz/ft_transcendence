@@ -84,4 +84,9 @@ export class AuthService {
     });
     return decoded;
   }
+
+  async fortyTwoLogin(user: any) {
+    const token = await this.createJwt(1);
+    return token;
+  }
 }
