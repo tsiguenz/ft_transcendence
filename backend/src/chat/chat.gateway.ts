@@ -5,7 +5,8 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody
+  MessageBody,
+  ConnectedSocket
 } from '@nestjs/websockets';
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
@@ -29,9 +30,8 @@ export class ChatGateway
   private logger: Logger = new Logger('ChatGateway');
 
   @SubscribeMessage('msgToServer')
-  async handleMessage(client: Socket, @MessageBody() payload: { chatroomId: number, message: string }) {
+  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, message: string }) {
     try {
-      console.log(payload);
       await this.chat.saveMessage(client['decoded'].sub, payload.chatroomId, payload.message);
     } catch (error) {
       this.logger.warn('HandleMessage error');
@@ -82,6 +82,7 @@ export class ChatGateway
       client.disconnect();
       return;
     }
+    console.log(client);
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
       client.disconnect();

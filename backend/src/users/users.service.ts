@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -59,5 +60,19 @@ export class UsersService {
       }
     });
     return users;
+  }
+  //TODO: Use guard to verify authorization
+  async deleteUser(paramName: string, nickname: string) {
+    if (paramName !== nickname) {
+      throw new UnauthorizedException(
+        'You are not authorized to delete this profile'
+      );
+    }
+    const deleteUser = await this.prisma.user.delete({
+      where: {
+        nickname: nickname
+      }
+    });
+    return deleteUser;
   }
 }
