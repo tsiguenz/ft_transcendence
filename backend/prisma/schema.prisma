@@ -72,6 +72,7 @@ model ChatRoomUser {
 model ChatRoom {
   id        Int         @id @default(autoincrement())
   name      String      @db.VarChar(255) @unique
+  slug      String      @db.VarChar(255) @unique
   messages  Message[]   @relation("chatRoom")
   users     ChatRoomUser[]
   createdAt DateTime    @default(now())

@@ -91,7 +91,6 @@ export default {
           }
         );
         this.chatrooms.push({ name: response.data.name });
-        console.log(response.data);
         ChatService.joinRoom(response.data.id);
       } catch (error) {
         alert(error.response.data.message);

@@ -12,6 +12,7 @@ export class ChatroomService {
       const chatroom = await this.prisma.chatRoom.create({
         data: {
           name: dto.name,
+          slug: `chatroom_${dto.name}`,
           users: { create: [{ user: { connect: { id: userId } } }] }
         }
       });
@@ -50,7 +51,7 @@ export class ChatroomService {
   async findOrCreateDefaultChatroom() {
     let defaultChatroom = await this.prisma.chatRoom.findUnique({ where: { name: ChatroomService.DEFAULT_CHATROOM } });
     if (!defaultChatroom) {
-      defaultChatroom = await this.prisma.chatRoom.create({ data: { name: ChatroomService.DEFAULT_CHATROOM } });
+      defaultChatroom = await this.prisma.chatRoom.create({ data: { name: ChatroomService.DEFAULT_CHATROOM, slug: `chatroom_${ChatroomService.DEFAULT_CHATROOM}` } });
     }
     return defaultChatroom;
   }

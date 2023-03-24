@@ -45,9 +45,12 @@ export class ChatGateway
   }
 
   @SubscribeMessage('joinRoom')
-  handleTest(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId)
+
+    if (!chatroom) { return ; }
+    client.join(chatroom.slug);
     this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
-    // this.server.emit('msgToClient', { author: 'SERVER', data: payload });
   }
 
   afterInit(server: Server) {
@@ -98,4 +101,9 @@ export class ChatGateway
       }
     }
   }
+
+
+  // async joinChatroom(client: Socket, chatroomId: number) {
+
+  // }
 }

@@ -41,6 +41,7 @@ async function populateChatrooms() {
   await prisma.chatRoom.create({
     data: {
       name: 'general',
+      slug: 'chatroom_general',
     }
   });
 }

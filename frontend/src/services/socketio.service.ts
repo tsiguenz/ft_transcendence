@@ -15,7 +15,6 @@ class SocketioService {
   }
 
   send(event: string, message: string) {
-    console.log(message)
     this.socket.emit(event, message);
   }
 

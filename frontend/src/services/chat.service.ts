@@ -20,9 +20,7 @@ class ChatService {
   }
 
   joinRoom(chatroomId: number) {
-    console.log("BEFORE");
     this.socketService.send("joinRoom", { chatroomId: chatroomId });
-    console.log("SUCCESS");
   }
 }
 
