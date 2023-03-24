@@ -22,6 +22,10 @@ class ChatService {
   joinRoom(chatroomId: number) {
     this.socketService.send("joinRoom", { chatroomId: chatroomId });
   }
+
+  getRoomMessages(chatroomId: number) {
+    this.socketService.send("getRoomMessages", { chatroomId: chatroomId });
+  }
 }
 
 export default new ChatService();

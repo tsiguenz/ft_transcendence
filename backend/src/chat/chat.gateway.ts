@@ -32,16 +32,19 @@ export class ChatGateway
   @SubscribeMessage('msgToServer')
   async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, message: string }) {
     try {
+      const chatroom = await this.chatroom.findOne(payload.chatroomId);
+      const user = await this.users.getUserById(client['decoded'].sub);
+      
       await this.chat.saveMessage(client['decoded'].sub, payload.chatroomId, payload.message);
+
+      client.to(chatroom.slug).emit('msgToClient', {
+        author: user.nickname,
+        chatroomId: chatroom.id,
+        data: payload
+      });
     } catch (error) {
       this.logger.warn('HandleMessage error');
     }
-
-    const user = await this.users.getUserById(client['decoded'].sub);
-    client.broadcast.emit('msgToClient', {
-      author: user.nickname,
-      data: payload
-    });
   }
 
   @SubscribeMessage('joinRoom')
@@ -51,6 +54,21 @@ export class ChatGateway
     if (!chatroom) { return ; }
     client.join(chatroom.slug);
     this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
+  }
+
+  @SubscribeMessage('getRoomMessages')
+  async handleMessageHistory(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId)
+
+    if (!chatroom) { return ; }
+    const messages = await this.chat.getMessages(chatroom.id);
+    for (const id in messages) {
+      client.emit('msgToClient', {
+        author: messages[id].author.nickname,
+        chatroomId: chatroom.id,
+        data: messages[id].content,
+      });
+    }
   }
 
   afterInit(server: Server) {
@@ -90,15 +108,6 @@ export class ChatGateway
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
       client.disconnect();
-    } else {
-      const chatroom = await this.chatroom.findOrCreateDefaultChatroom();
-      const messages = await this.chat.getMessages(chatroom.id);
-      for (const id in messages) {
-        client.emit('msgToClient', {
-          author: messages[id].author.nickname,
-          data: messages[id].content
-        });
-      }
     }
   }
 

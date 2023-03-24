@@ -3,6 +3,7 @@
   <v-layout>
     <v-navigation-drawer>
       <div v-for="chatroom in chatrooms">
+        <v-btn variant='text' v-if="chatroom.id != this.currentChatroomId" v-on:click="joinChatroom(chatroom.id)">Join</v-btn>
         {{ chatroom.name }}
       </div>
       <v-form @submit.prevent>
@@ -15,7 +16,7 @@
     </v-navigation-drawer>
     <v-main>
       <v-sheet width="300" class="mx-auto">
-        <div v-for="message in messages">
+        <div v-for="message in messages[this.currentChatroomId]">
           From [{{ message.author }}]: {{ message.data }}
         </div>
         <v-form @submit.prevent>
@@ -42,7 +43,7 @@ export default {
     return {
       users: [],
       message: '',
-      messages: [],
+      messages: {},
       newChatroomName: '',
       chatrooms: [],
       currentChatroomId: 0,
@@ -55,6 +56,7 @@ export default {
     ChatService.subscribeToMessages((message) => { this.chatMessageCallback(message) });
     this.loadChatrooms().then((chatrooms) => {
       this.currentChatroomId = this.chatrooms[0].id
+      ChatService.getRoomMessages(this.currentChatroomId); 
     });
   },
   beforeUnmount() {
@@ -67,12 +69,16 @@ export default {
     sendMessage() {
       if (this.message == '') { return; }
       ChatService.sendMessage({ chatroomId: this.currentChatroomId, message: this.message });
-      this.messages.push({ author: 'Me', data: this.message });
+      this.pushMessage(this.currentChatroomId, { author: 'Me', data: this.message });
       this.message = '';
     },
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
       this.chatrooms.push(...chatrooms);
+    },
+    joinChatroom(id) {
+      this.currentChatroomId = id;
+      if (!this.messages.hasOwnProperty(id)) { ChatService.getRoomMessages(id); }
     },
     async getChatrooms() {
       try {
@@ -90,7 +96,7 @@ export default {
             name: this.newChatroomName,
           }
         );
-        this.chatrooms.push({ name: response.data.name });
+        this.chatrooms.push(response.data);
         ChatService.joinRoom(response.data.id);
       } catch (error) {
         alert(error.response.data.message);
@@ -101,7 +107,11 @@ export default {
       if (message.author === this.sessionStore.nickname) {
         message.author = 'Me';
       }
-      this.messages.push(message);
+      this.pushMessage(this.currentChatroomId, message);
+    },
+    pushMessage(chatroomId, message) {
+      if (!this.messages.hasOwnProperty(chatroomId)) { this.messages[chatroomId] = []; }
+      this.messages[chatroomId].push(message);
     }
   }
 };
