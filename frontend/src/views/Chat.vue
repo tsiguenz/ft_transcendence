@@ -11,7 +11,8 @@
 			  <v-card>
 			      <v-list ref="chat" height="1000" class="overflow-y-auto">
 			        <div v-for="item in messages">
-			          From [{{ item.author }}]: {{item.data }}
+			          <p class="text-right ma-2" ><a class="rounded-pill pa-1 bg-blue" v-if="item.author === 'Me'" >From {{ item.author }}: {{item.data }}</a></p>
+			          <p class="text-left ma-2"><a class="rounded-pill pa-1 bg-green" v-if="item.author !== 'Me'" >From {{ item.author }}: {{item.data }}</a></p>
 			        </div>
 			      </v-list>
 			  </v-card>
@@ -20,20 +21,16 @@
 		<v-row justify="space-between" align="start">
 			<v-col cols="3">
         <v-text-field
-	          v-model="chans"
-	          label="Create chan"
-	        ></v-text-field>
+					v-model="chans"
+					label="Create chan"
+	       ></v-text-field>
 			</v-col>
 			<v-col cols="9">
-			  <v-card>
-			      <v-form @submit.prevent>
-			        <v-text-field
-			          v-model="message"
-			          label="Message"
-			          v-on:keyup.enter="sendMessage"
-			        ></v-text-field>
-			      </v-form>
-			  </v-card>
+				<v-text-field
+ 					v-model="message"
+					label="Message"
+					v-on:keyup.enter="sendMessage"
+       ></v-text-field>
 			</v-col>
 		</v-row>
 	</v-container>
