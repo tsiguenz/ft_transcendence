@@ -8,7 +8,6 @@
       label="Nickname"
       variant="outlined"
       autocomplete="username"
-      :rules="[rules.nicknameCharacters]"
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
@@ -48,11 +47,6 @@ export default {
       password: '',
       twoFactorCode: '',
       errorMessage: '',
-      rules: {
-        nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
-          "Must contain only alphanumeric, '-' and be less than 8 characters long"
-      }
     };
   },
   computed: {
