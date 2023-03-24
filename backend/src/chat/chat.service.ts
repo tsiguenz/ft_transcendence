@@ -19,6 +19,7 @@ export class ChatService {
 
 	async saveMessage(userId: number, chatRoomId: number, message: string) {
 		const user = await this.prisma.user.findUnique({ where: { id: userId } });
+		// TODO: Check if the user is in the chatroom
 		const chatroom = await this.chatroom.findOne(chatRoomId);
 		if (!user) { throw new Error('User not found'); }
 

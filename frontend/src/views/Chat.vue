@@ -33,7 +33,7 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
-import SocketioService from '../services/socketio.service';
+import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
@@ -49,16 +49,16 @@ export default {
     };
   },
   created() {
-    SocketioService.setupSocketConnection(this.$cookie.getCookie('jwt'));
+    ChatService.setup(this.$cookie.getCookie('jwt'));
   },
   mounted() {
-    SocketioService.subscribe("msgToClient", (message) => { this.chatMessageCallback(message) });
+    ChatService.subscribeToMessages((message) => { this.chatMessageCallback(message) });
     this.loadChatrooms().then((chatrooms) => {
       this.currentChatroomId = this.chatrooms[0].id
     });
   },
   beforeUnmount() {
-    SocketioService.disconnect();
+    ChatService.disconnect();
   },
   computed: {
     ...mapStores(useSessionStore),
@@ -66,7 +66,7 @@ export default {
   methods: {
     sendMessage() {
       if (this.message == '') { return; }
-      SocketioService.sendMessage("msgToServer", { chatroomId: this.currentChatroomId, message: this.message });
+      ChatService.sendMessage({ chatroomId: this.currentChatroomId, message: this.message });
       this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     },
@@ -91,6 +91,8 @@ export default {
           }
         );
         this.chatrooms.push({ name: response.data.name });
+        console.log(response.data);
+        ChatService.joinRoom(response.data.id);
       } catch (error) {
         alert(error.response.data.message);
       }

@@ -44,9 +44,10 @@ export class ChatGateway
     });
   }
 
-  @SubscribeMessage('testChannel')
-  handleTest(client: Socket, payload: string) {
-    this.server.emit('msgToClient', { author: 'SERVER', data: payload });
+  @SubscribeMessage('joinRoom')
+  handleTest(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+    this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
+    // this.server.emit('msgToClient', { author: 'SERVER', data: payload });
   }
 
   afterInit(server: Server) {
@@ -82,7 +83,7 @@ export class ChatGateway
       client.disconnect();
       return;
     }
-    console.log(client);
+
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
       client.disconnect();

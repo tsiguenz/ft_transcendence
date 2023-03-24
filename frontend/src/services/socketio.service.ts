@@ -14,7 +14,8 @@ class SocketioService {
     if (this.socket) { this.socket.disconnect(); }
   }
 
-  sendMessage(event: string, message: string) {
+  send(event: string, message: string) {
+    console.log(message)
     this.socket.emit(event, message);
   }
 
@@ -26,4 +27,4 @@ class SocketioService {
   }
 }
 
-export default new SocketioService();
+export default SocketioService;

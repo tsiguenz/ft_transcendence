@@ -4,6 +4,7 @@ export const useSessionStore = defineStore('session', {
   persist: true,
   state() {
     return {
+      userId: null,
       nickname: null,
       loggedIn: false
     };
