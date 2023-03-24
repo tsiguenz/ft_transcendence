@@ -19,7 +19,8 @@
     "test:debug": "npx dotenv -e .env.test -- node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "npx dotenv -e .env.test -- jest --config ./test/jest-e2e.json",
     "test:migrate": "npx dotenv -e .env.test -- npx prisma migrate deploy",
-    "geoguessr": "xdg-open http://geoguessr.com"
+    "geoguessr": "xdg-open http://geoguessr.com",
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -73,6 +74,9 @@
     "tsconfig-paths": "4.1.1",
     "typescript": "^4.9.5"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -89,8 +93,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   }
 }
