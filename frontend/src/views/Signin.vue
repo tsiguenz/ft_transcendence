@@ -33,7 +33,7 @@
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
   </v-form>
-  <v-btn href="http://localhost:3000/api/auth/42">Sign in with 42</v-btn>
+  <v-btn :href="auth42">Sign in with 42</v-btn>
 </template>
 
 <script>
@@ -49,6 +49,7 @@ export default {
       password: '',
       twoFactorCode: '',
       errorMessage: '',
+      auth42: constants.API_URL + '/auth/42',
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{0,8}$/.test(v) ||

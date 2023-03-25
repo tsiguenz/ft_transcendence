@@ -66,7 +66,7 @@ export class AuthController {
   @UseGuards(FortyTwoGuard)
   async fortyTwoAuth() {}
 
-  @Redirect('http://localhost:8080/home')
+  @Redirect('http://' + process.env.HOST_IP + ':8080/home')
   @UseGuards(FortyTwoGuard)
   @Get('42/callback')
   async fortyTwoAuthCallback(@Req() req: Request, @Res() res: Response) {

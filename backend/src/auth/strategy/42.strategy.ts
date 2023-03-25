@@ -8,9 +8,10 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     super({
       authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
       tokenURL: 'https://api.intra.42.fr/oauth/token',
-      clientID: '',
-      clientSecret: '',
-      callbackURL: 'http://localhost:3000/api/auth/42/callback',
+      clientID: process.env.APP42_ID,
+      clientSecret: process.env.APP42_KEY,
+      callbackURL:
+        'http://' + process.env.HOST_IP + ':3000/api/auth/42/callback',
       scope: 'public'
     });
   }
