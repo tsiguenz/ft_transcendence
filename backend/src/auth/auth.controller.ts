@@ -64,14 +64,13 @@ export class AuthController {
 
   @Get('42')
   @UseGuards(FortyTwoGuard)
-  async fortyTwoAuth() {}
+  fortyTwoAuth() {}
 
-  @Redirect('http://' + process.env.HOST_IP + ':8080/home')
   @UseGuards(FortyTwoGuard)
   @Get('42/callback')
   async fortyTwoAuthCallback(@Req() req: Request, @Res() res: Response) {
     const token = await this.authService.fortyTwoLogin(req.user);
     res.cookie('jwt', token.access_token);
-    return res.status(HttpStatus.OK);
+    return res.redirect('http://' + process.env.HOST_IP + ':8080/home');
   }
 }

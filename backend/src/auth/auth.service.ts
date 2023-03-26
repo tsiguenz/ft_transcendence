@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TwoFaService } from '../2fa/2fa.service';
+import * as axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -86,6 +87,20 @@ export class AuthService {
   }
 
   async fortyTwoLogin(user: any) {
+    //    const token = await axios.default.get(
+    //      'https://api.intra.42.fr/oauth/token?grant_type=client_credentials&client_id='
+    //    );
+    //
+    //    const response = await axios.default.get(
+    //      `https://api.intra.42.fr/v2/users/${user.nickname}`,
+    //      {
+    //        headers: {
+    //          Authorization: `Bearer ${user.accessToken}`
+    //        }
+    //      }
+    //    );
+    //    console.log(response);
+    console.log(user);
     const token = await this.createJwt(1);
     return token;
   }
