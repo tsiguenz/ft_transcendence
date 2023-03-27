@@ -1,34 +1,43 @@
 <template>
   <h1>Chat</h1>
-  <v-layout>
-    <v-navigation-drawer>
-      <div v-for="chatroom in chatrooms">
-        <v-btn variant='text' v-if="chatroom.id != this.currentChatroomId" v-on:click="joinChatroom(chatroom.id)">Join</v-btn>
-        {{ chatroom.name }}
-      </div>
-      <v-form @submit.prevent>
+	<v-container fuild>
+		<v-row justify="space-between" align="start">
+			<v-col cols="3">
+			  <v-card height="1000">
+  				<div v-for="chatroom in chatrooms">
+            <v-btn variant='text' v-if="chatroom.id != this.currentChatroomId" v-on:click="joinChatroom(chatroom.id)">Join</v-btn>
+            {{ chatroom.name }}
+          </div>
+			  </v-card>
+			</v-col>
+			<v-col cols="9">
+			  <v-card>
+			      <v-list ref="chat" height="1000" class="overflow-y-auto">
+			        <div v-for="item in messages[this.currentChatroomId]">
+			          <p class="text-right ma-2" ><a class="rounded-pill pa-1 bg-blue" v-if="item.author === 'Me'" >{{item.data }}</a></p>
+			          <p class="text-left ma-2"><a class="rounded-pill pa-1 bg-green" v-if="item.author !== 'Me'" >{{ item.author }}: {{item.data }}</a></p>
+			        </div>
+			      </v-list>
+			  </v-card>
+			</v-col>
+		</v-row>
+		<v-row justify="space-between" align="start">
+			<v-col cols="3">
         <v-text-field
-          v-model="newChatroomName"
-          label="New chatroom"
-          v-on:keyup.enter="newChatroom"
-        ></v-text-field>
-      </v-form>
-    </v-navigation-drawer>
-    <v-main>
-      <v-sheet width="300" class="mx-auto">
-        <div v-for="message in messages[this.currentChatroomId]">
-          From [{{ message.author }}]: {{ message.data }}
-        </div>
-        <v-form @submit.prevent>
-          <v-text-field
-            v-model="message"
-            label="Message"
-            v-on:keyup.enter="sendMessage"
-          ></v-text-field>
-        </v-form>
-      </v-sheet>
-    </v-main>
-  </v-layout>
+              v-model="newChatroomName"
+              label="New chatroom"
+              v-on:keyup.enter="newChatroom"
+            ></v-text-field>
+			</v-col>
+			<v-col cols="9">
+				<v-text-field
+ 					v-model="message"
+					label="Message"
+					v-on:keyup.enter="sendMessage"
+       ></v-text-field>
+			</v-col>
+		</v-row>
+	</v-container>
 </template>
 
 <script>
@@ -108,6 +117,9 @@ export default {
         message.author = 'Me';
       }
       this.pushMessage(message.chatroomId, message);
+      this.$nextTick(() => {
+        this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
+      });
     },
     pushMessage(chatroomId, message) {
       if (!this.messages.hasOwnProperty(chatroomId)) { this.messages[chatroomId] = []; }
@@ -117,7 +129,7 @@ export default {
       if (!this.messages.hasOwnProperty(chatroomId) || this.messages[chatroomId].length < 1) { return new Date(null); }
       return new Date(this.messages[chatroomId].at(-1).sentAt);
     }
-  }
+  },
 };
 
 </script>
