@@ -13,7 +13,7 @@ export class ChatService {
 					id: chatroomId,
 				},
 				createdAt: {
-					gte: newerThan,
+					gt: newerThan,
 				}
 			},
 			include: { author: true }

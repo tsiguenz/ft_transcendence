@@ -58,6 +58,15 @@ export class ChatGateway
     this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
   }
 
+  // @SubscribeMessage('leaveRoom')
+  // async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
+  //   const chatroom = await this.chatroom.findOne(payload.chatroomId)
+
+  //   if (!chatroom) { return ; }
+  //   client.join(chatroom.slug);
+  //   this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
+  // }
+
   @SubscribeMessage('getRoomMessages')
   async handleMessageHistory(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, newerThan: Date }) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId)

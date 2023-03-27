@@ -55,8 +55,7 @@ export default {
   mounted() {
     ChatService.subscribeToMessages((message) => { this.chatMessageCallback(message) });
     this.loadChatrooms().then((chatrooms) => {
-      this.currentChatroomId = this.chatrooms[0].id
-      ChatService.getRoomMessages(this.currentChatroomId); 
+      this.joinChatroom(this.chatrooms[0].id) 
     });
   },
   beforeUnmount() {
@@ -69,7 +68,7 @@ export default {
     sendMessage() {
       if (this.message == '') { return; }
       ChatService.sendMessage({ chatroomId: this.currentChatroomId, message: this.message });
-      this.pushMessage(this.currentChatroomId, { author: 'Me', data: this.message });
+      this.pushMessage(this.currentChatroomId, { author: 'Me', data: this.message, sentAt: new Date() });
       this.message = '';
     },
     async loadChatrooms() {
@@ -79,6 +78,7 @@ export default {
     joinChatroom(id) {
       this.currentChatroomId = id;
       ChatService.getRoomMessages(id, this.lastMessageTime(id));
+      ChatService.joinRoom(id);
     },
     async getChatrooms() {
       try {
@@ -114,8 +114,8 @@ export default {
       this.messages[chatroomId].push(message);
     },
     lastMessageTime(chatroomId) {
-      if (!this.messages.hasOwnProperty(chatroomId)) { return new Date(); }
-      return new Date(this.messages[chatroomId].slice(-1).sentAt);
+      if (!this.messages.hasOwnProperty(chatroomId) || this.messages[chatroomId].length < 1) { return new Date(null); }
+      return new Date(this.messages[chatroomId].at(-1).sentAt);
     }
   }
 };
