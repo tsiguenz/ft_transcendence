@@ -49,12 +49,10 @@ export class AuthService {
         nickname: dto.nickname
       }
     });
-    if (!user) {
-      throw new ForbiddenException('User not found');
-    }
-    const valid = await argon.verify(user.hash, dto.password).catch(() => {
+    if (!user || user.fortyTwoId) {
       throw new ForbiddenException('Invalid password');
-    });
+    }
+    const valid = await argon.verify(user.hash, dto.password);
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
