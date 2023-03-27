@@ -2,14 +2,11 @@ import { Injectable } from '@nestjs/common';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
-import { Request } from 'express';
 
 @Injectable()
 export class TwoFaService {
   constructor(private prisma: PrismaService) {}
-  async createSecret(req: Request) {
-    const userId = req.user['id'];
+  async createSecret(userId: number) {
     const secret = speakeasy.generateSecret({
       name: 'ft_transcendence'
     });
@@ -28,9 +25,9 @@ export class TwoFaService {
     return { qrcode: await qrcode.toDataURL(otpAuthUrl) };
   }
 
-  async verifyTwoFa(user: User, token: string) {
+  async verifyTwoFa(twoFactorSecret: string, token: string) {
     return speakeasy.totp.verify({
-      secret: user.twoFactorSecret,
+      secret: twoFactorSecret,
       encoding: 'ascii',
       token: token
     });

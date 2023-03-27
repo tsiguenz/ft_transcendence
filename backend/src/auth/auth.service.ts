@@ -15,6 +15,7 @@ export class AuthService {
     private twoFa: TwoFaService
   ) {}
 
+  // TODO: sanitize input
   async signup(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -32,12 +33,13 @@ export class AuthService {
           hash: hash
         }
       });
-      return this.createJwt(user.id, user.nickname);
+      return this.createJwt(user.id);
     } catch (e) {
       throw e;
     }
   }
 
+  // TODO: sanitize input
   async signin(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -55,20 +57,19 @@ export class AuthService {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
       }
-      const valid = await this.twoFa.verifyTwoFa(user, dto.twoFactorCode);
+      const valid = await this.twoFa.verifyTwoFa(
+        user.twoFactorSecret,
+        dto.twoFactorCode
+      );
       if (!valid) {
         throw new ForbiddenException('Invalid two factor code');
       }
     }
-    return this.createJwt(user.id, user.nickname);
+    return this.createJwt(user.id);
   }
 
-  async createJwt(
-    userId: number,
-    nickname: string
-  ): Promise<{ access_token: string }> {
+  async createJwt(userId: number) {
     const payload = {
-      nickname: nickname,
       sub: userId
     };
     const token = await this.jwt.signAsync(payload, {

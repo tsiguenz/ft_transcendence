@@ -1,17 +1,21 @@
 <template>
   <br />
   <v-form>
-    <v-text-field class="mb-5"
+    <v-text-field
+      v-if="!askFor2fa()"
       v-model="nickname"
+      class="mb-5"
       label="Nickname"
       variant="outlined"
       autocomplete="username"
-      @keydown.enter.prevent="signin"
+      :rules="[rules.nicknameCharacters]"
       required
-      :rules='[rules.nicknameCharacters]'
+      @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field class="mb-5"
+    <v-text-field
+      v-if="!askFor2fa()"
       v-model="password"
+      class="mb-5"
       label="Password"
       type="password"
       variant="outlined"
@@ -19,9 +23,11 @@
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field class="mb-5"
+    <v-text-field
+      v-if="askFor2fa()"
       v-model="twoFactorCode"
-      label="2fa code (optional)"
+      class="mb-5"
+      label="2fa code"
       variant="outlined"
       @keydown.enter.prevent="signin"
     ></v-text-field>
@@ -41,8 +47,11 @@ export default {
       nickname: '',
       password: '',
       twoFactorCode: '',
+      errorMessage: '',
       rules: {
-	nicknameCharacters: (v) => /^[a-zA-Z0-9-]{0,8}$/.test(v) || 'Nickname must contain only alphanumeric characters and the \'-\' character',
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and be less than 8 characters long"
       }
     };
   },
@@ -51,7 +60,6 @@ export default {
   },
   methods: {
     async signin() {
-      // TODO: clean the input to protect injection
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
@@ -64,8 +72,15 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
-        alert(error.response.data.message);
+        this.errorMessage = error.response.data.message;
+        if (!this.askFor2fa()) {
+          alert(error.response.data.message);
+        }
+        this.twoFactorCode = '';
       }
+    },
+    askFor2fa() {
+      return this.errorMessage === 'Two factor code required';
     }
   }
 };
