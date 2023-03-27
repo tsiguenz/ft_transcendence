@@ -6,29 +6,54 @@ const prisma = new PrismaClient();
 
 // TODO: setup an account with 2fa enabled for testing
 async function populateUsers() {
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { nickname: 'gmorange' },
+    create: {
+      nickname: 'gmorange',
+      ladderPoints: 682,
+      hash: await argon.hash('gmetire')
+    },
+    update: {
       nickname: 'gmorange',
       ladderPoints: 682,
       hash: await argon.hash('gmetire')
     }
   });
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { nickname: 'abourdar' },
+    create: {
+      nickname: 'abourdar',
+      ladderPoints: 836,
+      hash: await argon.hash('pioupiou')
+    },
+    update: {
       nickname: 'abourdar',
       ladderPoints: 836,
       hash: await argon.hash('pioupiou')
     }
   });
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { nickname: 'lpassera' },
+    create: {
+      nickname: 'lpassera',
+      ladderPoints: 712,
+      hash: await argon.hash('dudududududuel')
+    },
+    update: {
       nickname: 'lpassera',
       ladderPoints: 712,
       hash: await argon.hash('dudududududuel')
     }
   });
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { nickname: 'tsiguenz' },
+    create: {
+      nickname: 'tsiguenz',
+      // oopsi miss click
+      ladderPoints: 999999999,
+      hash: await argon.hash('password')
+    },
+    update: {
       nickname: 'tsiguenz',
       // oopsi miss click
       ladderPoints: 999999999,
@@ -38,8 +63,13 @@ async function populateUsers() {
 }
 
 async function populateChatrooms() {
-  await prisma.chatRoom.create({
-    data: {
+  await prisma.chatRoom.upsert({
+    where: { name: 'general' },
+    create: {
+      name: 'general',
+      slug: 'chatroom_general',
+    },
+    update: {
       name: 'general',
       slug: 'chatroom_general',
     }
