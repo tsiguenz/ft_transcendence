@@ -16,7 +16,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     });
   }
 
-  async validate(code: string) {
-    return { code: code };
+  async validate(accessToken42: string) {
+    return { accessToken42: accessToken42 };
   }
 }

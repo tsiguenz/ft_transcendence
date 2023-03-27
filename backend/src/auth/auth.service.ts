@@ -1,9 +1,12 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  UnauthorizedException,
+  Injectable
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { TwoFaService } from '../2fa/2fa.service';
 import * as axios from 'axios';
 
@@ -12,7 +15,6 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private config: ConfigService,
     private twoFa: TwoFaService
   ) {}
 
@@ -75,33 +77,49 @@ export class AuthService {
     };
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '1d',
-      secret: this.config.get('JWT_SECRET')
+      secret: process.env.JWT_SECRET
     });
     return { access_token: token };
   }
   async verifyJwt(token: string) {
     const decoded = await this.jwt.verify(token, {
-      secret: this.config.get('JWT_SECRET')
+      secret: process.env.JWT_SECRET
     });
     return decoded;
   }
 
-  async fortyTwoLogin(user: any) {
-    //    const token = await axios.default.get(
-    //      'https://api.intra.42.fr/oauth/token?grant_type=client_credentials&client_id='
-    //    );
-    //
-    //    const response = await axios.default.get(
-    //      `https://api.intra.42.fr/v2/users/${user.nickname}`,
-    //      {
-    //        headers: {
-    //          Authorization: `Bearer ${user.accessToken}`
-    //        }
-    //      }
-    //    );
-    //    console.log(response);
-    console.log(user);
-    const token = await this.createJwt(1);
-    return token;
+  async getFortyTwoProfile(accessToken42: string) {
+    const response = await axios.default
+      .get('https://api.intra.42.fr/v2/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken42}`
+        }
+      })
+      .catch(() => {
+        throw new UnauthorizedException('Invalid 42 token');
+      });
+    return response.data;
+  }
+
+  async fortyTwoLogin(accessToken42: string) {
+    const user42 = await this.getFortyTwoProfile(accessToken42);
+    const userDb = await this.prisma.user.findUnique({
+      where: {
+        fortyTwoId: user42.id
+      },
+      select: {
+        id: true
+      }
+    });
+    if (userDb) {
+      return this.createJwt(userDb.id);
+    }
+    const newUser = await this.prisma.user.create({
+      data: {
+        nickname: `42user-${user42.login}`,
+        fortyTwoId: user42.id
+      }
+    });
+    return this.createJwt(newUser.id);
   }
 }
