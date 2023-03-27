@@ -52,7 +52,9 @@ export class AuthService {
     if (!user) {
       throw new ForbiddenException('User not found');
     }
-    const valid = await argon.verify(user.hash, dto.password);
+    const valid = await argon.verify(user.hash, dto.password).catch(() => {
+      throw new ForbiddenException('Invalid password');
+    });
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
