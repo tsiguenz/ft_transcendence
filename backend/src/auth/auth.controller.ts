@@ -7,8 +7,7 @@ import {
   Res,
   HttpCode,
   HttpStatus,
-  UseGuards,
-  Redirect
+  UseGuards
 } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -69,10 +68,12 @@ export class AuthController {
   @UseGuards(FortyTwoGuard)
   @Get('42/callback')
   async fortyTwoAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const token = await this.authService.fortyTwoLogin(
-      req.user['accessToken42']
-    );
-    res.cookie('jwt', token.access_token);
+    // TODO: move in service
+    if (req.user['status'] == 403) {
+      console.table(req.user);
+      return res.redirect(`http://${process.env.HOST_IP}:8080/login`);
+    }
+    res.cookie('jwt', req.user['access_token']);
     return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
   }
 }

@@ -25,9 +25,7 @@ export class AuthService {
         nickname: dto.nickname
       }
     });
-    if (user) {
-      throw new ForbiddenException('Nickname already exists');
-    }
+    if (user) throw new ForbiddenException('Nickname already exists');
     const hash = await argon.hash(dto.password);
     try {
       const user = await this.prisma.user.create({
@@ -49,24 +47,20 @@ export class AuthService {
         nickname: dto.nickname
       }
     });
-    if (!user || user.fortyTwoId) {
+    if (!user || user.fortyTwoId)
       throw new ForbiddenException('Invalid password');
-    }
     const valid = await argon.verify(user.hash, dto.password);
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
     if (user.twoFactorEnable) {
-      if (!dto.twoFactorCode) {
+      if (!dto.twoFactorCode)
         throw new ForbiddenException('Two factor code required');
-      }
       const valid = await this.twoFa.verifyTwoFa(
         user.twoFactorSecret,
         dto.twoFactorCode
       );
-      if (!valid) {
-        throw new ForbiddenException('Invalid two factor code');
-      }
+      if (!valid) throw new ForbiddenException('Invalid two factor code');
     }
     return this.createJwt(user.id);
   }
@@ -99,27 +93,5 @@ export class AuthService {
         throw new UnauthorizedException('Invalid 42 token');
       });
     return response.data;
-  }
-
-  async fortyTwoLogin(accessToken42: string) {
-    const user42 = await this.getFortyTwoProfile(accessToken42);
-    const userDb = await this.prisma.user.findUnique({
-      where: {
-        fortyTwoId: user42.id
-      },
-      select: {
-        id: true
-      }
-    });
-    if (userDb) {
-      return this.createJwt(userDb.id);
-    }
-    const newUser = await this.prisma.user.create({
-      data: {
-        nickname: `42user-${user42.login}`,
-        fortyTwoId: user42.id
-      }
-    });
-    return this.createJwt(newUser.id);
   }
 }
