@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { Strategy } from 'passport-oauth2';
 import { AuthService } from '../auth.service';
 import { TwoFaService } from '../../2fa/2fa.service';
@@ -17,8 +17,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
       tokenURL: 'https://api.intra.42.fr/oauth/token',
       clientID: process.env.APP42_ID,
       clientSecret: process.env.APP42_KEY,
-      callbackURL:
-        'http://' + process.env.HOST_IP + ':3000/api/auth/42/callback',
+      callbackURL: `http://${process.env.HOST_IP}:3000/api/auth/42`,
       scope: 'public'
     });
   }

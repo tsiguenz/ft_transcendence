@@ -33,7 +33,10 @@
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
   </v-form>
-  <v-btn :href="auth42">Sign in with 42</v-btn>
+  <br />
+  <div v-if="!askFor2fa()">
+    <v-btn :href="auth42">Sign in with 42</v-btn>
+  </div>
 </template>
 
 <script>

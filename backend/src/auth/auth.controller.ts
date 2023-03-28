@@ -61,17 +61,12 @@ export class AuthController {
     return this.authService.signin(dto);
   }
 
+  @UseGuards(FortyTwoGuard)
   @Get('42')
-  @UseGuards(FortyTwoGuard)
-  fortyTwoAuth() {}
-
-  @UseGuards(FortyTwoGuard)
-  @Get('42/callback')
-  async fortyTwoAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async fortyTwoAuth(@Req() req: Request, @Res() res: Response) {
     // TODO: move in service
     if (req.user['status'] == 403) {
-      console.table(req.user);
-      return res.redirect(`http://${process.env.HOST_IP}:8080/login`);
+      return res.redirect(`http://${process.env.HOST_IP}:8080/signin`);
     }
     res.cookie('jwt', req.user['access_token']);
     return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
