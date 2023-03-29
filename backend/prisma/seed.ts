@@ -13,11 +13,7 @@ async function populateUsers() {
       ladderPoints: 682,
       hash: await argon.hash('gmetire')
     },
-    update: {
-      nickname: 'gmorange',
-      ladderPoints: 682,
-      hash: await argon.hash('gmetire')
-    }
+    update: {}
   });
   await prisma.user.upsert({
     where: { nickname: 'abourdar' },
@@ -26,11 +22,7 @@ async function populateUsers() {
       ladderPoints: 836,
       hash: await argon.hash('pioupiou')
     },
-    update: {
-      nickname: 'abourdar',
-      ladderPoints: 836,
-      hash: await argon.hash('pioupiou')
-    }
+    update: {}
   });
   await prisma.user.upsert({
     where: { nickname: 'lpassera' },
@@ -39,11 +31,7 @@ async function populateUsers() {
       ladderPoints: 712,
       hash: await argon.hash('dudududududuel')
     },
-    update: {
-      nickname: 'lpassera',
-      ladderPoints: 712,
-      hash: await argon.hash('dudududududuel')
-    }
+    update: {}
   });
   await prisma.user.upsert({
     where: { nickname: 'tsiguenz' },
@@ -53,12 +41,7 @@ async function populateUsers() {
       ladderPoints: 999999999,
       hash: await argon.hash('password')
     },
-    update: {
-      nickname: 'tsiguenz',
-      // oopsi miss click
-      ladderPoints: 999999999,
-      hash: await argon.hash('password')
-    }
+    update: {}
   });
 }
 
@@ -67,12 +50,9 @@ async function populateChatrooms() {
     where: { name: 'general' },
     create: {
       name: 'general',
-      slug: 'chatroom_general',
+      slug: 'chatroom_general'
     },
-    update: {
-      name: 'general',
-      slug: 'chatroom_general',
-    }
+    update: {}
   });
 }
 
