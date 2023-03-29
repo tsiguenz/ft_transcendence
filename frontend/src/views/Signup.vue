@@ -50,7 +50,7 @@ export default {
 			isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) && v !== '' ||
+          /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
           "Must contain only alphanumeric, '-' and have a length between 1 and 8",
         passwordCheck: (v) => v === this.password || 'Passwords do not match !'
       }
