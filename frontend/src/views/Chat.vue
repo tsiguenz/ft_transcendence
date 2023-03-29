@@ -1,41 +1,56 @@
 <template>
   <h1>Chat</h1>
-	<v-container fuild>
+
+	<v-container fluid>
+
 		<v-row justify="space-between" align="start">
 			<v-col cols="3">
 			  <v-card height="1000">
-  				<div v-for="chatroom in chatrooms">
-            <v-btn variant='text' v-if="chatroom.id != this.currentChatroomId" v-on:click="joinChatroom(chatroom.id)">Join</v-btn>
-            {{ chatroom.name }}
-          </div>
+          <v-list>
+    				<v-list-item
+              v-for="chatroom in chatrooms"
+              :key="chatroom.id"
+              :title="chatroom.name"
+              :value="chatroom.name"
+              :active="chatroom.id == currentChatroomId"
+              @click="joinChatroom(chatroom.id)"
+            ></v-list-item>
+          </v-list>
 			  </v-card>
 			</v-col>
-			<v-col cols="9">
+			<v-col cols="6">
 			  <v-card>
 			      <v-list ref="chat" height="1000" class="overflow-y-auto">
-			        <div v-for="item in messages[this.currentChatroomId]">
-			          <p class="text-right ma-2" ><a class="rounded-pill pa-1 bg-blue" v-if="item.author === 'Me'" >{{item.data }}</a></p>
-			          <p class="text-left ma-2"><a class="rounded-pill pa-1 bg-green" v-if="item.author !== 'Me'" >{{ item.author }}: {{item.data }}</a></p>
+			        <div v-for="item in messages[currentChatroomId]" :key="item.data">
+			          <p class="text-right ma-2" ><a v-if="item.author === 'Me'" class="rounded-pill pa-1 bg-blue">{{item.data }}</a></p>
+			          <p class="text-left ma-2"><a v-if="item.author !== 'Me'" class="rounded-pill pa-1 bg-green" >{{ item.author }}: {{item.data }}</a></p>
 			        </div>
 			      </v-list>
 			  </v-card>
 			</v-col>
+      <v-col cols="3">
+        <v-card>
+          <v-list>
+          </v-list>
+        </v-card>
+      </v-col>
 		</v-row>
 		<v-row justify="space-between" align="start">
 			<v-col cols="3">
         <v-text-field
               v-model="newChatroomName"
               label="New chatroom"
-              v-on:keyup.enter="newChatroom"
+              @keyup.enter="newChatroom"
             ></v-text-field>
 			</v-col>
-			<v-col cols="9">
+			<v-col cols="6">
 				<v-text-field
  					v-model="message"
 					label="Message"
-					v-on:keyup.enter="sendMessage"
+					@keyup.enter="sendMessage"
        ></v-text-field>
 			</v-col>
+      <v-col cols="3"></v-col>
 		</v-row>
 	</v-container>
 </template>
@@ -58,20 +73,20 @@ export default {
       currentChatroomId: 0,
     };
   },
+  computed: {
+    ...mapStores(useSessionStore),
+  },
   created() {
     ChatService.setup(this.$cookie.getCookie('jwt'));
   },
   mounted() {
     ChatService.subscribeToMessages((message) => { this.chatMessageCallback(message) });
     this.loadChatrooms().then((chatrooms) => {
-      this.joinChatroom(this.chatrooms[0].id) 
+      this.joinChatroom(chatrooms[0].id) 
     });
   },
   beforeUnmount() {
     ChatService.disconnect();
-  },
-  computed: {
-    ...mapStores(useSessionStore),
   },
   methods: {
     sendMessage() {
@@ -83,6 +98,8 @@ export default {
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
       this.chatrooms.push(...chatrooms);
+
+      return chatrooms;
     },
     joinChatroom(id) {
       this.currentChatroomId = id;
@@ -122,10 +139,12 @@ export default {
       });
     },
     pushMessage(chatroomId, message) {
+      // eslint-disable-next-line no-prototype-builtins
       if (!this.messages.hasOwnProperty(chatroomId)) { this.messages[chatroomId] = []; }
       this.messages[chatroomId].push(message);
     },
     lastMessageTime(chatroomId) {
+      // eslint-disable-next-line no-prototype-builtins
       if (!this.messages.hasOwnProperty(chatroomId) || this.messages[chatroomId].length < 1) { return new Date(null); }
       return new Date(this.messages[chatroomId].at(-1).sentAt);
     }
