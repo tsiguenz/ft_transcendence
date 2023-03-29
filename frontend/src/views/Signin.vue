@@ -35,7 +35,7 @@
   </v-form>
   <br />
   <div v-if="!askFor2fa()">
-    <v-btn :href="auth42">Sign in with 42</v-btn>
+    <v-btn @click="signin42">Sign in with 42</v-btn>
   </div>
 </template>
 
@@ -83,6 +83,9 @@ export default {
         }
         this.twoFactorCode = '';
       }
+    },
+    async signin42() {
+      window.location.href = this.auth42;
     },
     askFor2fa() {
       return this.errorMessage === 'Two factor code required';

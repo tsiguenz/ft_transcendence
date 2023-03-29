@@ -64,11 +64,6 @@ export class AuthController {
   @UseGuards(FortyTwoGuard)
   @Get('42')
   async fortyTwoAuth(@Req() req: Request, @Res() res: Response) {
-    // TODO: move in service
-    if (req.user['status'] == 403) {
-      return res.redirect(`http://${process.env.HOST_IP}:8080/signin`);
-    }
-    res.cookie('jwt', req.user['access_token']);
-    return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
+    return await this.authService.fortyTwoAuth(res, req.user);
   }
 }

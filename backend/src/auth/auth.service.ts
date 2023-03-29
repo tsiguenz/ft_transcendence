@@ -1,14 +1,18 @@
 import {
   ForbiddenException,
   UnauthorizedException,
-  Injectable
+  Injectable,
+  Res,
+  HttpStatus
 } from '@nestjs/common';
+import { Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { TwoFaService } from '../2fa/2fa.service';
 import * as axios from 'axios';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -93,5 +97,21 @@ export class AuthService {
         throw new UnauthorizedException('Invalid 42 token');
       });
     return response.data;
+  }
+
+  async fortyTwoAuth(@Res() res: Response, user: any) {
+    if (user.twoFactorEnable) {
+      // TODO: how can I get the two factor code from the request?
+      const valid = await this.twoFa.verifyTwoFa(user.twoFactorSecret, '');
+      if (!valid) {
+        res.status(HttpStatus.FORBIDDEN);
+        //        res.send('Invalid two factor code');
+        return res.redirect(`http://${process.env.HOST_IP}:8080/signin`);
+      }
+    }
+    // TODO: move in service
+    const jwt = await this.createJwt(user['id']);
+    res.cookie('jwt', jwt.access_token);
+    return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
   }
 }
