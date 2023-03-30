@@ -1,12 +1,10 @@
 <template>
-  <h1>Chat</h1>
-
 	<v-container fluid>
-
 		<v-row justify="space-between" align="start">
 			<v-col cols="3">
 			  <v-card height="1000">
           <v-list>
+            <v-list-subheader>Chatrooms</v-list-subheader>
     				<v-list-item
               v-for="chatroom in chatrooms"
               :key="chatroom.id"
@@ -20,17 +18,29 @@
 			</v-col>
 			<v-col cols="6">
 			  <v-card>
-			      <v-list ref="chat" height="1000" class="overflow-y-auto">
-			        <div v-for="item in messages[currentChatroomId]" :key="item.data">
-			          <p class="text-right ma-2" ><a v-if="item.author === 'Me'" class="rounded-pill pa-1 bg-blue">{{item.data }}</a></p>
-			          <p class="text-left ma-2"><a v-if="item.author !== 'Me'" class="rounded-pill pa-1 bg-green" >{{ item.author }}: {{item.data }}</a></p>
-			        </div>
-			      </v-list>
-			  </v-card>
+		      <Chat :id='currentChatroomId' title="Chat" :messages='messages[currentChatroomId]' />
+        </v-card>
 			</v-col>
       <v-col cols="3">
         <v-card>
           <v-list>
+            <v-list-subheader>Users</v-list-subheader>
+            <v-list-item
+              prepend-icon="mdi-account-circle"
+              title="abourdar"
+            ></v-list-item>
+            <v-list-item
+              prepend-icon="mdi-account-circle"
+              title="gmorange"
+            ></v-list-item>
+            <v-list-item
+              prepend-icon="mdi-account-circle"
+              title="lpassera"
+            ></v-list-item>
+            <v-list-item
+              prepend-icon="mdi-account-circle"
+              title="tsiguenz"
+            ></v-list-item>
           </v-list>
         </v-card>
       </v-col>
@@ -61,8 +71,12 @@ import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import Chat from '../components/Chat.vue';
 
 export default {
+  components: {
+    Chat
+  },
   data() {
     return {
       users: [],
@@ -134,9 +148,6 @@ export default {
         message.author = 'Me';
       }
       this.pushMessage(message.chatroomId, message);
-      this.$nextTick(() => {
-        this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
-      });
     },
     pushMessage(chatroomId, message) {
       // eslint-disable-next-line no-prototype-builtins
