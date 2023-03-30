@@ -8,7 +8,6 @@
       label="Nickname"
       variant="outlined"
       autocomplete="username"
-      :rules="[rules.nicknameCharacters]"
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
