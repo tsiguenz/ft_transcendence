@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class ChatroomService {
@@ -13,7 +14,12 @@ export class ChatroomService {
         data: {
           name: dto.name,
           slug: `chatroom_${dto.name}`,
-          users: { create: [{ user: { connect: { id: userId } } }] }
+          users: {
+            create: [{
+              user: { connect: { id: userId } },
+              role: Role.OWNER 
+            }]
+          }
         }
       });
       return chatroom;

@@ -63,6 +63,7 @@ model ChatRoomUser {
   userId      Int
   chatRoom    ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   chatRoomId  Int
+  role        Role      @default(USER)
 
   createdAt DateTime    @default(now())
   @@id([userId, chatRoomId])
@@ -78,4 +79,10 @@ model ChatRoom {
   createdAt DateTime    @default(now())
 
   @@map("chatrooms")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  USER
 }

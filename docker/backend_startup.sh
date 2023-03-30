@@ -10,8 +10,10 @@ elif [[ $(uname -a | grep aarch64) ]] && [[ ! -e /lib/libc.musl-aarch64.so.1 ]];
 fi
 
 npm install --only=development
-npx prisma migrate dev
+npx prisma migrate deploy
+npx prisma generate
+# npx prisma migrate dev
 # TODO: change this hack to something better
-npx prisma db seed 2> /dev/null || true
+npx prisma db seed
 
 exec "$@"
