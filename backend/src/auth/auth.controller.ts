@@ -7,7 +7,8 @@ import {
   Res,
   HttpCode,
   HttpStatus,
-  UseGuards
+  UseGuards,
+  Query
 } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -63,7 +64,41 @@ export class AuthController {
 
   @UseGuards(FortyTwoGuard)
   @Get('42')
-  async fortyTwoAuth(@Req() req: Request, @Res() res: Response) {
-    return await this.authService.fortyTwoAuth(res, req.user);
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async fortyTwoAuth() {}
+
+  @UseGuards(FortyTwoGuard)
+  @Get('42/callback')
+  async fortyTwoCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Query('code') state: string
+  ) {
+    return await this.authService.fortyTwoAuth(res, req.user, state);
+  }
+
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        code: {
+          type: 'string',
+          description: 'Two factor code'
+        }
+      }
+    }
+  })
+  @Post('42')
+  async fortyTwoAuthVerify2fa(
+    @Body('twoFa') twoFaCode: string,
+    @Res() res: Response,
+    @Query('state') state: string
+  ) {
+    return await this.authService.fortyTwoAuthWithTwoFa(
+      res,
+      Number(twoFaCode),
+      state
+    );
   }
 }

@@ -99,18 +99,71 @@ export class AuthService {
     return response.data;
   }
 
-  async fortyTwoAuth(@Res() res: Response, user: any) {
+  async fortyTwoAuth(@Res() res: Response, user: any, state: string) {
+    await this.prisma.user
+      .update({
+        where: {
+          id: user.id
+        },
+        data: {
+          api42State: state
+        }
+      })
+      .catch(() => {
+        throw new UnauthorizedException('State is already used');
+      });
     if (user.twoFactorEnable) {
-      // TODO: how can I get the two factor code from the request?
-      const valid = await this.twoFa.verifyTwoFa(user.twoFactorSecret, '');
-      if (!valid) {
-        res.status(HttpStatus.FORBIDDEN);
-        //        res.send('Invalid two factor code');
-        return res.redirect(`http://${process.env.HOST_IP}:8080/signin`);
-      }
+      res.send(
+        `<form action="/api/auth/42?state=${state}" method="post"> \
+        <label for="twoFa">Two factor code :</label> \
+        <input id="twoFa" name="twoFa" autofocus></input> \
+        <button type="submit">Submit</button> \
+        </form>`
+      );
+      return;
     }
-    // TODO: move in service
     const jwt = await this.createJwt(user['id']);
+    res.cookie('jwt', jwt.access_token);
+    return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
+  }
+
+  redirectionAlert(res: Response, message: string, url: string) {
+    const send = ` <script type="text/javascript"> \
+            alert("${message}"); \
+            window.location.href = "${url}"; \
+          </script>`;
+    res.send(send);
+  }
+
+  async fortyTwoAuthWithTwoFa(
+    @Res() res: Response,
+    twoFaCode: number,
+    state: string
+  ) {
+    const urlSignin = `http://${process.env.HOST_IP}:8080/signin`;
+    const user = await this.prisma.user.findUnique({
+      where: {
+        api42State: state
+      },
+      select: {
+        id: true,
+        twoFactorSecret: true
+      }
+    });
+    if (!user) {
+      this.redirectionAlert(res, 'Invalid state', urlSignin);
+      return;
+    }
+    // recast to string to avoid injection
+    const valid = await this.twoFa.verifyTwoFa(
+      user.twoFactorSecret,
+      twoFaCode.toString()
+    );
+    if (!valid) {
+      this.redirectionAlert(res, 'Invalid two factor code', urlSignin);
+      return;
+    }
+    const jwt = await this.createJwt(user.id);
     res.cookie('jwt', jwt.access_token);
     return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
   }
