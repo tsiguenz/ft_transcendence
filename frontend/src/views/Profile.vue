@@ -113,8 +113,8 @@ export default {
       }
     },
     async dispatchEditProfile() {
-      if (!/^[a-zA-Z0-9-]{0,8}$/.test(this.newNickname)) {
-        alert('Invalid character in nickname');
+      if (!this.isFormValid) {
+        alert('Invalid character or length in nickname');
         return;
       }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
