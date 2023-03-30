@@ -67,6 +67,9 @@ export class AuthController {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   async fortyTwoAuth() {}
 
+  // TODO: this route crash if we refresh it when code is already defined
+  // because of the @UseGuards(FortyTwoGuard)
+  // but I don't know how to fix it
   @UseGuards(FortyTwoGuard)
   @Get('42/callback')
   async fortyTwoCallback(

@@ -112,6 +112,8 @@ export class AuthService {
       .catch(() => {
         throw new UnauthorizedException('State is already used');
       });
+    // TODO: change this to a better way to handle 2fa
+    // backend will never prompt a form, it will be handled by the frontend
     if (user.twoFactorEnable) {
       res.send(
         `<form action="/api/auth/42?state=${state}" method="post"> \

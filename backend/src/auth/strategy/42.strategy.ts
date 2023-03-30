@@ -20,7 +20,8 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     });
   }
 
-  async validate(accessToken42: string) {
+  // TODO: implement refresh token
+  async validate(accessToken42: string, refreshToken42: string) {
     const user42 = await this.authService.getFortyTwoProfile(accessToken42);
     const userDb = await this.prisma.user.findUnique({
       where: {
