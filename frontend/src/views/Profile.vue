@@ -6,7 +6,6 @@
   <p>Created at: {{ user.createdAt }}</p>
   <p>Avatar: {{ user.avatar }}</p>
 
-  <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
   <v-form v-if="!qrcode" v-model="isFormValid">
@@ -29,7 +28,7 @@
 
     <br />
 
-    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile">
+    <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
       submit
     </v-btn>
   </v-form>
@@ -47,7 +46,6 @@
     >
   </v-form>
 
-  <!-- TODO: add delete account and logout logic -->
   <v-btn to="/logout">Logout</v-btn>
   <v-btn @click="deleteAccount">Delete Account</v-btn>
 </template>

@@ -23,7 +23,6 @@ model User {
   avatar              Bytes? 
   twoFactorEnable     Boolean   @default(false)
   twoFactorSecret     String?
-  api42State          String?   @unique
   hash                String?
   gamesWin            Game[]    @relation("winner")
   gamesLoose          Game[]    @relation("looser")

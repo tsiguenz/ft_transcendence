@@ -27,6 +27,7 @@
       label="Verify password"
       type="password"
       variant="outlined"
+      autocomplete="new-password"
       required
       :rules="[rules.passwordCheck]"
       @keydown.enter.prevent="signup"
@@ -47,7 +48,7 @@ export default {
       nickname: '',
       password: '',
       passwordVerify: '',
-			isFormValid: false,
+      isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
