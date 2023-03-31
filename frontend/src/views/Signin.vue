@@ -32,6 +32,10 @@
     ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
   </v-form>
+  <br />
+  <div v-if="!askFor2fa()">
+    <v-btn @click="signin42">Sign in with 42</v-btn>
+  </div>
 </template>
 
 <script>
@@ -47,6 +51,12 @@ export default {
       password: '',
       twoFactorCode: '',
       errorMessage: '',
+      auth42: constants.API_URL + '/auth/42',
+      rules: {
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and be less than 8 characters long"
+      }
     };
   },
   computed: {
@@ -72,6 +82,9 @@ export default {
         }
         this.twoFactorCode = '';
       }
+    },
+    async signin42() {
+      window.location.href = this.auth42;
     },
     askFor2fa() {
       return this.errorMessage === 'Two factor code required';

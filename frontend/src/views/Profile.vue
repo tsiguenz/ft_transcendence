@@ -9,7 +9,7 @@
   <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
- 	<v-form v-if="!qrcode" v-model="isFormValid">
+  <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
       v-model="newNickname"
       label="Nickname"
@@ -29,7 +29,9 @@
 
     <br />
 
-    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
+    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile">
+      submit
+    </v-btn>
   </v-form>
 
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
@@ -62,10 +64,11 @@ export default {
       newTwoFactorEnable: false,
       twoFactorCode: '',
       qrcode: '',
-			isFormValid: false,
+      isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
+          this.user.nickname === v ||
           "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
