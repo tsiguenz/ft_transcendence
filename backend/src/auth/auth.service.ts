@@ -57,15 +57,8 @@ export class AuthService {
     if (!valid) {
       throw new ForbiddenException('Invalid password');
     }
-    if (user.twoFactorEnable) {
-      if (!dto.twoFactorCode)
-        throw new ForbiddenException('Two factor code required');
-      const valid = await this.twoFa.verifyTwoFa(
-        user.twoFactorSecret,
-        dto.twoFactorCode
-      );
-      if (!valid) throw new ForbiddenException('Invalid two factor code');
-    }
+    if (user.twoFactorEnable)
+      return { message: 'Two factor code required', id: user.id };
     return this.createJwt(user.id);
   }
 
@@ -99,74 +92,44 @@ export class AuthService {
     return response.data;
   }
 
-  async fortyTwoAuth(@Res() res: Response, user: any, state: string) {
-    await this.prisma.user
-      .update({
-        where: {
-          id: user.id
-        },
-        data: {
-          api42State: state
-        }
+  async get42Token(authorizationCode: string) {
+    const response = await axios.default
+      .post('https://api.intra.42.fr/oauth/token', {
+        grant_type: 'authorization_code',
+        client_id: process.env.APP42_ID,
+        client_secret: process.env.APP42_KEY,
+        code: authorizationCode,
+        redirect_uri: `http://${process.env.HOST_IP}:8080/42/callback`
       })
       .catch(() => {
-        throw new UnauthorizedException('State is already used');
+        throw new UnauthorizedException('Invalid 42 authorization code');
       });
-    // TODO: change this to a better way to handle 2fa
-    // backend will never prompt a form, it will be handled by the frontend
-    if (user.twoFactorEnable) {
-      res.send(
-        `<form action="/api/auth/42?state=${state}" method="post"> \
-        <label for="twoFa">Two factor code :</label> \
-        <input id="twoFa" name="twoFa" autofocus></input> \
-        <button type="submit">Submit</button> \
-        </form>`
-      );
-      return;
-    }
-    const jwt = await this.createJwt(user['id']);
-    res.cookie('jwt', jwt.access_token);
-    return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
+    return response.data.access_token;
   }
 
-  redirectionAlert(res: Response, message: string, url: string) {
-    const send = ` <script type="text/javascript"> \
-            alert("${message}"); \
-            window.location.href = "${url}"; \
-          </script>`;
-    res.send(send);
-  }
-
-  async fortyTwoAuthWithTwoFa(
-    @Res() res: Response,
-    twoFaCode: number,
-    state: string
-  ) {
-    const urlSignin = `http://${process.env.HOST_IP}:8080/signin`;
-    const user = await this.prisma.user.findUnique({
+  async signin42(authorizationCode: string) {
+    const accessToken42 = await this.get42Token(authorizationCode);
+    const user42 = await this.getFortyTwoProfile(accessToken42);
+    let user = await this.prisma.user.findUnique({
       where: {
-        api42State: state
-      },
-      select: {
-        id: true,
-        twoFactorSecret: true
+        fortyTwoId: user42.id
       }
     });
     if (!user) {
-      this.redirectionAlert(res, 'Invalid state', urlSignin);
-      return;
+      user = await this.prisma.user
+        .create({
+          data: {
+            nickname: `42user-${user42.login}`,
+            fortyTwoId: user42.id
+          }
+        })
+        .catch(() => {
+          throw new UnauthorizedException('User already exist');
+        });
     }
-    // recast to string to avoid injection
-    const valid = await this.twoFa.verifyTwoFa(
-      user.twoFactorSecret,
-      twoFaCode.toString()
-    );
-    if (!valid) {
-      this.redirectionAlert(res, 'Invalid two factor code', urlSignin);
-      return;
-    }
+    if (user.twoFactorEnable)
+      return { message: 'Two factor code required', id: user.id };
     const jwt = await this.createJwt(user.id);
-    res.cookie('jwt', jwt.access_token);
-    return res.redirect(`http://${process.env.HOST_IP}:8080/home`);
+    return { id: user.nickname, access_token: jwt.access_token };
   }
 }
