@@ -29,15 +29,16 @@
 
     <br />
 
-    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile">
+    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
+  </v-form>
+
 			<v-snackbar
 				v-model="snackbar"
 				location="top"
 				timeout="3000"
 				color="blue"
 				rounded="pill"
-			><v-row justify="center"> {{ snackbarMsg }}</v-row> </v-snackbar> submit </v-btn>
-  </v-form>
+			><v-row justify="center"> {{ snackbarMsg }}</v-row> </v-snackbar> 
 
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <v-form v-if="qrcode">

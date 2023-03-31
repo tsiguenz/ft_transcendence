@@ -40,6 +40,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import swal from 'sweetalert';
 
 export default {
   data() {
@@ -67,14 +68,18 @@ export default {
           twoFactorCode: this.twoFactorCode
         });
         this.sessionStore.signin(this.nickname);
-        alert('You are now connected !');
+//        alert('You are now connected !'); Is it utile to make an alert for this ?
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
         this.errorMessage = error.response.data.message;
         if (!this.askFor2fa()) {
-          alert(error.response.data.message);
+					swal({
+						icon: "error",
+						text: error.response.data.message,
+						buttons: ["false", "true"]
+					});
         }
         this.twoFactorCode = '';
       }
