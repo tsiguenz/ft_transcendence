@@ -66,6 +66,7 @@ export default {
       twoFactorCode: '',
       qrcode: '',
 	isFormValid: false,
+	deleteable: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -168,9 +169,12 @@ export default {
 		},
 	}).then((confirm) => {
 		if (confirm) {
-			swal("TEST");
+			swal("TEST"),
+			this.deleteable = true;
 		}
 	});
+	if (!this.deleteable)
+		return ;
       const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.delete(
