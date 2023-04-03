@@ -68,18 +68,17 @@ export default {
           twoFactorCode: this.twoFactorCode
         });
         this.sessionStore.signin(this.nickname);
-//        alert('You are now connected !'); Is it utile to make an alert for this ?
+//        alert('You are now connected !'); Is it useful to make an alert for this ?
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
         this.errorMessage = error.response.data.message;
         if (!this.askFor2fa()) {
-					swal({
-						icon: "error",
-						text: error.response.data.message,
-						buttons: ["false", "true"]
-					});
+		swal({
+			icon: "error",
+			text: error.response.data.message,
+		});
         }
         this.twoFactorCode = '';
       }
@@ -90,3 +89,23 @@ export default {
   }
 };
 </script>
+
+<style>
+	.swal-overlay {
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+	.swal-modal{
+		background-color: rgba(0, 0, 0, 1);
+		border: 3px solid white;
+	}
+
+	.swal-button{
+		background-color: rgba(255, 255, 255, 0);
+		border: 1px solid white;
+	}
+
+	.swal-text{
+		color: rgba(225, 225, 225, 1);
+	}
+</style>
