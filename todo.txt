@@ -1,6 +1,0 @@
-- define the api use-case and implement
-- prepare the database diagram
-- generate the 42api and test it
-- connect backend to database
-- connect frontend to backend
-- configure vite

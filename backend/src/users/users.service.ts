@@ -61,6 +61,7 @@ export class UsersService {
     });
     return users;
   }
+
   //TODO: Use guard to verify authorization
   async deleteUser(paramName: string, nickname: string) {
     if (paramName !== nickname) {
