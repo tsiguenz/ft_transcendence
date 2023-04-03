@@ -40,6 +40,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import swal from 'sweetalert';
 
 export default {
   data() {
@@ -62,11 +63,19 @@ export default {
   methods: {
     async signup() {
       if (this.password !== this.passwordVerify) {
-        alert('Passwords do not match !');
+	swal({
+		icon: 'error',
+		text: 'Passwords do not match !',
+	});
+//        alert('Passwords do not match !');
         return;
       }
-      if (!/^[a-zA-Z0-9-]{0,8}$/.test(this.nickname)) {
-        alert('Invalid character in nickname');
+      if (!this.isFormValid) {
+	swal({
+		icon: 'error',
+		text: 'Invalid character or length in nickname'
+	});
+//        alert('Invalid character in nickname');
         return;
       }
       try {
@@ -74,7 +83,7 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-        alert('Account created !');
+//        alert('Account created !'); Is it useful to make an alert for this ?
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
@@ -86,3 +95,23 @@ export default {
   }
 };
 </script>
+
+<style>
+	.swal-overlay {
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+	.swal-modal{
+		background-color: rgba(0, 0, 0, 1);
+		border: 3px solid white;
+	}
+
+	.swal-button{
+		background-color: rgba(255, 255, 255, 0);
+		border: 1px solid white;
+	}
+
+	.swal-text{
+		color: rgba(225, 225, 225, 1);
+	}
+</style>

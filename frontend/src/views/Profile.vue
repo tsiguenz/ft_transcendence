@@ -34,14 +34,6 @@
     </v-btn>
   </v-form>
 
-			<v-snackbar
-				v-model="snackbar"
-				location="top"
-				timeout="3000"
-				color="blue"
-				rounded="pill"
-			><v-row justify="center"> {{ snackbarMsg }}</v-row> </v-snackbar> 
-
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <v-form v-if="qrcode">
     <v-text-field
@@ -63,6 +55,7 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
+import	swal from 'sweetalert';
 
 export default {
   data() {
@@ -72,20 +65,11 @@ export default {
       newTwoFactorEnable: false,
       twoFactorCode: '',
       qrcode: '',
-<<<<<<< HEAD
-			isFormValid: false,
-			snackbar: false,
-			snackbarMsg: '',
+	isFormValid: false,
+	deleatable: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
-=======
-      isFormValid: false,
-      rules: {
-        nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
-          this.user.nickname === v ||
->>>>>>> main
           "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
@@ -126,17 +110,27 @@ export default {
             }
           }
         );
-        this.snackbarMsg = response.data.message;
-				this.snackbar = "true";
-//        this.$router.push('/home');
-//				this.$router.go(0);
+	swal({
+		icon: "https://cdn3.emoji.gg/emojis/5573-okcat.png",
+//		icon: "info", //success do stranger things
+		text: response.data.message,
+	});
+        this.$router.push('/home');
       } catch (error) {
-        alert(error.response.data.message);
+	swal({
+		icon: "error",
+		text: error.response.data.message,
+	});
+//        alert(error.response.data.message);
       }
     },
     async dispatchEditProfile() {
       if (!this.isFormValid) {
-        alert('Invalid character or length in nickname');
+	swal({
+		icon: "error",
+		text: 'Invalid character or length in nickname',
+	});
+//        alert('Invalid character or length in nickname');
         return;
       }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
@@ -158,10 +152,18 @@ export default {
         );
         this.qrcode = response.data.qrcode;
       } catch (error) {
-        alert(error.response.data.message);
+	swal({
+		icon: "error",
+		text: error.response.data.message,
+	});
+//        alert(error.response.data.message);
       }
     },
     async deleteAccount() {
+	swal({
+		icon: "warning",
+		text: "You are deleting your account, do you want to continue?",
+	});
       const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.delete(
@@ -172,12 +174,36 @@ export default {
             }
           }
         );
-        alert('Account is delete');
+//        alert('Account is delete');
         this.$router.push('/logout');
       } catch (error) {
-        alert(error.response.data.message);
+	swal({
+		icon: "error",
+		text: error.response.data.message,
+	});
+//        alert(error.response.data.message);
       }
     }
   }
 };
 </script>
+
+<style>
+	.swal-overlay {
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+	.swal-modal{
+		background-color: rgba(0, 0, 0, 1);
+		border: 3px solid white;
+	}
+
+	.swal-button{
+		background-color: rgba(255, 255, 255, 0);
+		border: 1px solid white;
+	}
+
+	.swal-text{
+		color: rgba(225, 225, 225, 1);
+	}
+</style>
