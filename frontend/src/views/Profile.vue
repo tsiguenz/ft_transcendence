@@ -68,6 +68,7 @@ export default {
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
+          this.user.nickname === v ||
           "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
@@ -120,7 +121,7 @@ export default {
         });
       }
     },
-    async dispatchEditProfile() {
+    dispatchEditProfile() {
       if (!this.isFormValid) {
         swal({
           icon: 'error',

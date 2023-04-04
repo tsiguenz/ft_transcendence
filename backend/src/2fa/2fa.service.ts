@@ -27,25 +27,21 @@ export class TwoFaService {
   }
 
   async verifyTwoFaRoute(id: string, code: number) {
-    const newEntry = await this.prisma.twoFactorId
-      .findUnique({
-        where: {
-          uuid: id
-        },
-        select: {
-          user: {
-            select: {
-              id: true,
-              nickname: true,
-              twoFactorEnable: true,
-              twoFactorSecret: true
-            }
+    const newEntry = await this.prisma.twoFactorId.findUnique({
+      where: {
+        uuid: id
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            twoFactorEnable: true,
+            twoFactorSecret: true
           }
         }
-      })
-      .catch(() => {
-        throw new ForbiddenException('Invalid user');
-      });
+      }
+    });
     if (!newEntry) throw new ForbiddenException('Invalid user');
     if (!newEntry.user.twoFactorEnable)
       throw new ForbiddenException('2fa not enabled');
