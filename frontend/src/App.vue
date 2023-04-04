@@ -18,7 +18,8 @@ export default {
   methods: {
     hideHeader() {
       return (
-        this.$route.path === '/callback' || this.$route.path === '/2fa/verify'
+        this.$route.path === '/42/callback' ||
+        this.$route.path === '/2fa/verify'
       );
     }
   }

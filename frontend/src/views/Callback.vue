@@ -9,7 +9,6 @@ import { useSessionStore } from '@/store/session';
 export default {
   data() {
     return {
-      auth42: constants.API_URL + '/auth/42',
       authorizationCode: this.$route.query.code,
       twoFactorCode: ''
     };
@@ -29,7 +28,7 @@ export default {
         return;
       }
       try {
-        const response = await axios.post(this.auth42, {
+        const response = await axios.post(constants.API_URL + '/auth/42', {
           authorization: this.authorizationCode
         });
         if (response.data.message === 'Two factor code required') {

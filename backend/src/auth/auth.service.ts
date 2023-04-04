@@ -54,7 +54,10 @@ export class AuthService {
       throw new ForbiddenException('Invalid password');
     }
     if (user.twoFactorEnable)
-      return { message: 'Two factor code required', id: user.id };
+      return {
+        message: 'Two factor code required',
+        id: await this.twoFa.generateTwoFaId(user.id)
+      };
     return this.createJwt(user.id);
   }
 
@@ -124,8 +127,11 @@ export class AuthService {
         });
     }
     if (user.twoFactorEnable)
-      return { message: 'Two factor code required', id: user.id };
+      return {
+        message: 'Two factor code required',
+        id: await this.twoFa.generateTwoFaId(user.id)
+      };
     const jwt = await this.createJwt(user.id);
-    return { id: user.nickname, access_token: jwt.access_token };
+    return { nickname: user.nickname, access_token: jwt.access_token };
   }
 }

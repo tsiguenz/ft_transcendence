@@ -34,15 +34,13 @@ export class TwoFaController {
     }
   })
   @Post('verify')
-  // TODO: use dto and use uuid or something else instead of id
-  // tmp random string can be used to verify the user
   async verify(@Body('code') code: string, @Body('id') id: string) {
-    const res = await this.twoFaService.verifyTwoFaRoute(
-      Number(id),
-      Number(code)
-    );
-    if (!res || !res.ret) return { message: 'Invalid two factor code' };
-    const jwt = await this.authService.createJwt(Number(id));
+    const res = await this.twoFaService.verifyTwoFaRoute(id, Number(code));
+    await this.twoFaService.deleteTwoFaId(id);
+    if (!res || !res.ret) {
+      return { message: 'Invalid two factor code' };
+    }
+    const jwt = await this.authService.createJwt(res.userId);
     return {
       nickname: res.nickname,
       access_token: jwt.access_token

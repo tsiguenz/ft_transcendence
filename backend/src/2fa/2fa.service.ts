@@ -2,6 +2,7 @@ import { Injectable, ForbiddenException } from '@nestjs/common';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import { PrismaService } from '../prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TwoFaService {
@@ -25,26 +26,33 @@ export class TwoFaService {
     return { qrcode: await qrcode.toDataURL(otpAuthUrl) };
   }
 
-  async verifyTwoFaRoute(userId: number, code: number) {
-    const user = await this.prisma.user
+  async verifyTwoFaRoute(id: string, code: number) {
+    const newEntry = await this.prisma.twoFactorId
       .findUnique({
         where: {
-          id: userId
+          uuid: id
         },
         select: {
-          nickname: true,
-          twoFactorEnable: true,
-          twoFactorSecret: true
+          user: {
+            select: {
+              id: true,
+              nickname: true,
+              twoFactorEnable: true,
+              twoFactorSecret: true
+            }
+          }
         }
       })
       .catch(() => {
         throw new ForbiddenException('Invalid user');
       });
-    if (!user) throw new ForbiddenException('Invalid user');
-    if (!user.twoFactorEnable) throw new ForbiddenException('2fa not enabled');
+    if (!newEntry) throw new ForbiddenException('Invalid user');
+    if (!newEntry.user.twoFactorEnable)
+      throw new ForbiddenException('2fa not enabled');
     return {
-      nickname: user.nickname,
-      ret: this.verifyTwoFa(user.twoFactorSecret, code)
+      userId: newEntry.user.id,
+      nickname: newEntry.user.nickname,
+      ret: this.verifyTwoFa(newEntry.user.twoFactorSecret, code)
     };
   }
 
@@ -53,6 +61,34 @@ export class TwoFaService {
       secret: twoFactorSecret,
       encoding: 'ascii',
       token: token
+    });
+  }
+
+  async generateTwoFaId(userId: number) {
+    const newEntry = await this.prisma.twoFactorId.upsert({
+      where: {
+        userId: userId
+      },
+      update: { uuid: uuidv4() },
+      create: {
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      },
+      select: {
+        uuid: true
+      }
+    });
+    return newEntry.uuid;
+  }
+
+  async deleteTwoFaId(uuid: string) {
+    await this.prisma.twoFactorId.delete({
+      where: {
+        uuid: uuid
+      }
     });
   }
 }
