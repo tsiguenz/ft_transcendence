@@ -37,17 +37,15 @@
   <v-form v-if="qrcode">
     <v-text-field
       v-model="twoFactorCode"
-      label="2fa code"
+      label="Code"
       required
       @keydown.enter.prevent="editProfile"
     ></v-text-field>
-    <v-btn v-if="qrcode" @click="editProfile"
-      >Validate edit profile with 2fa code</v-btn
-    >
+    <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
   </v-form>
 
-  <v-btn to="/logout">Logout</v-btn>
-  <v-btn @click="alertDeleteAccount">Delete Account</v-btn>
+  <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
+  <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
 </template>
 
 <script>
