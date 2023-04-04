@@ -5,6 +5,8 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -23,7 +25,10 @@ export default {
     // TODO: code duplication from Signin.vue
     async signin42() {
       if (!this.authorizationCode) {
-        alert('You need to be connected to 42 to access this page');
+        swal({
+          icon: 'error',
+          text: 'You need to be connected to 42 to access this page'
+        });
         this.$router.push('/signin');
         return;
       }
@@ -36,12 +41,11 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
-        alert('You are now connected !');
         this.sessionStore.signin(response.data.nickname);
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-        alert(error.response.data.message);
+        swal({ icon: 'error', text: formatError(error.response.data.message) });
         this.$router.push('/signin');
       }
     }

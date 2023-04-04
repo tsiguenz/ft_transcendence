@@ -33,6 +33,8 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -62,13 +64,15 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
-        alert('You are now connected !');
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
     signin42() {
@@ -77,3 +81,23 @@ export default {
   }
 };
 </script>
+
+<style>
+.swal-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.swal-modal {
+  background-color: rgba(0, 0, 0, 1);
+  border: 3px solid white;
+}
+
+.swal-button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid white;
+}
+
+.swal-text {
+  color: rgba(225, 225, 225, 1);
+}
+</style>

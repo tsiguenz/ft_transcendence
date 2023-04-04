@@ -20,24 +20,20 @@ export class AuthService {
 
   // TODO: sanitize input
   async signup(dto: AuthDto) {
-    const user = await this.prisma.user.findUnique({
+    let user = await this.prisma.user.findUnique({
       where: {
         nickname: dto.nickname
       }
     });
     if (user) throw new ForbiddenException('Nickname already exists');
     const hash = await argon.hash(dto.password);
-    try {
-      const user = await this.prisma.user.create({
-        data: {
-          nickname: dto.nickname,
-          hash: hash
-        }
-      });
-      return this.createJwt(user.id);
-    } catch (e) {
-      throw e;
-    }
+    user = await this.prisma.user.create({
+      data: {
+        nickname: dto.nickname,
+        hash: hash
+      }
+    });
+    return this.createJwt(user.id);
   }
 
   // TODO: sanitize input

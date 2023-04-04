@@ -26,9 +26,9 @@ export class TwoFaController {
       type: 'object',
       properties: {
         code: { type: 'string', description: 'Two factor code' },
-        id: {
+        uuid: {
           type: 'string',
-          description: 'User id'
+          description: 'UUID of the user to verify the two factor code'
         }
       }
     }
