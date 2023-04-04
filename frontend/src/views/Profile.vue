@@ -6,7 +6,6 @@
   <p>Created at: {{ user.createdAt }}</p>
   <p>Avatar: {{ user.avatar }}</p>
 
-  <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
   <v-form v-if="!qrcode" v-model="isFormValid">
@@ -29,7 +28,11 @@
 
     <br />
 
-    <v-btn :disabled="!isFormValid" v-if="!qrcode" @click="dispatchEditProfile">
+    <input type="file" name="avatar" @change="onFileChange" />
+
+    <br />
+
+    <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
       submit
     </v-btn>
   </v-form>
@@ -47,7 +50,6 @@
     >
   </v-form>
 
-  <!-- TODO: add delete account and logout logic -->
   <v-btn to="/logout">Logout</v-btn>
   <v-btn @click="alertDeleteAccount">Delete Account</v-btn>
 </template>
@@ -55,7 +57,7 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import	swal from 'sweetalert';
+import swal from 'sweetalert';
 
 export default {
   data() {
@@ -63,9 +65,10 @@ export default {
       user: {},
       newNickname: '',
       newTwoFactorEnable: false,
+      newAvatar: '',
       twoFactorCode: '',
       qrcode: '',
-			isFormValid: false,
+      isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -101,7 +104,9 @@ export default {
           {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable,
-            twoFactorCode: this.twoFactorCode
+            twoFactorCode: this.twoFactorCode,
+            fileType: this.newAvatar.type,
+            fileSize: this.newAvatar.size
           },
           {
             headers: {
@@ -109,24 +114,24 @@ export default {
             }
           }
         );
-	swal({
-		icon: "https://cdn3.emoji.gg/emojis/5573-okcat.png",
-		text: response.data.message,
-	});
+        swal({
+          icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
+          text: response.data.message
+        });
         this.$router.push('/home');
       } catch (error) {
-	swal({
-		icon: "error",
-		text: error.response.data.message,
-	});
+        swal({
+          icon: 'error',
+          text: error.response.data.message
+        });
       }
     },
     async dispatchEditProfile() {
       if (!this.isFormValid) {
-	swal({
-		icon: "error",
-		text: 'Invalid character or length in nickname',
-	});
+        swal({
+          icon: 'error',
+          text: 'Invalid character or length in nickname'
+        });
         return;
       }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
@@ -148,66 +153,67 @@ export default {
         );
         this.qrcode = response.data.qrcode;
       } catch (error) {
-	swal({
-		icon: "error",
-		text: error.response.data.message,
-	});
+        swal({
+          icon: 'error',
+          text: error.response.data.message
+        });
       }
     },
     async deleteAccount() {
       const jwt = this.$cookie.getCookie('jwt');
       try {
-        const response = await axios.delete(
-          constants.API_URL + '/users/' + this.user.nickname,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
+        await axios.delete(constants.API_URL + '/users/' + this.user.nickname, {
+          headers: {
+            Authorization: 'Bearer ' + jwt
           }
-        );
+        });
         this.$router.push('/logout');
       } catch (error) {
-	swal({
-		icon: "error",
-		text: error.response.data.message,
-	});
+        swal({
+          icon: 'error',
+          text: error.response.data.message
+        });
       }
     },
-		alertDeleteAccount() {
-			swal({
-				icon: "warning",
-				text: "You are deleting your account, do you want to continue?",
-				buttons: {
-					confirm: "I'll lost all my datas",
-					cancel: "Don't delete my account",
-				},
-			}).then((confirm) => {
-				if (confirm) {
-					swal("Account deleted");
-					this.deleteAccount();
-				}
-			});
-		},
+    alertDeleteAccount() {
+      swal({
+        icon: 'warning',
+        text: 'You are deleting your account, do you want to continue?',
+        buttons: {
+          confirm: "I'll lost all my datas",
+          cancel: "Don't delete my account"
+        }
+      }).then((confirm) => {
+        if (confirm) {
+          swal('Account deleted');
+          this.deleteAccount();
+        }
+      });
+    },
+    onFileChange(e) {
+      this.newAvatar = e.target.files[0];
+      // TODO: input validation here
+    }
   }
 };
 </script>
 
 <style>
-	.swal-overlay {
-		background-color: rgba(255, 255, 255, 0.5);
-	}
+.swal-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+}
 
-	.swal-modal{
-		background-color: rgba(0, 0, 0, 1);
-		border: 3px solid white;
-	}
+.swal-modal {
+  background-color: rgba(0, 0, 0, 1);
+  border: 3px solid white;
+}
 
-	.swal-button{
-		background-color: rgba(255, 255, 255, 0);
-		border: 1px solid white;
-	}
+.swal-button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid white;
+}
 
-	.swal-text{
-		color: rgba(225, 225, 225, 1);
-	}
+.swal-text {
+  color: rgba(225, 225, 225, 1);
+}
 </style>

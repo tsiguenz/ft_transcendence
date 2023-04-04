@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsBoolean, IsString, ValidateIf } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsBoolean,
+  IsString,
+  ValidateIf,
+  IsInt,
+  Max
+} from 'class-validator';
 import { ToBoolean } from 'src/helpers/to-boolean.decorator';
 
 export class EditProfileDto {
@@ -10,12 +17,18 @@ export class EditProfileDto {
   @IsBoolean()
   twoFactorEnable: boolean;
 
-  @ValidateIf((o) => o === '')
+  @ValidateIf((o) => o.twoFactorCode === '')
   @IsString()
   twoFactorCode: string;
 
-  // TODO: handle avatar
-  //  @IsBuffer
-  //  @IsString()
-  //  avatar: Buffer;
+  @ValidateIf((o) => {
+    const mime = ['image/jpg', 'image/png', 'image/jpeg'];
+    return mime.includes(o.fileType);
+  })
+  @IsString()
+  fileType: string;
+
+  @IsInt()
+  @Max(1000000)
+  fileSize: number;
 }
