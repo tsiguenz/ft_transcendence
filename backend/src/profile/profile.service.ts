@@ -54,7 +54,7 @@ export class ProfileService {
       }
       const valid = await this.twoFa.verifyTwoFa(
         user.twoFactorSecret,
-        dto.twoFactorCode
+        Number(dto.twoFactorCode)
       );
       if (!valid) {
         throw new ForbiddenException('Invalid two factor code');

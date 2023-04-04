@@ -1,20 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Req,
-  Res,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Query
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
-import { FortyTwoGuard } from './guard';
-import { Request, Response } from 'express';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -62,24 +49,6 @@ export class AuthController {
     return this.authService.signin(dto);
   }
 
-  @UseGuards(FortyTwoGuard)
-  @Get('42')
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async fortyTwoAuth() {}
-
-  // TODO: this route crash if we refresh it when code is already defined
-  // because of the @UseGuards(FortyTwoGuard)
-  // but I don't know how to fix it
-  @UseGuards(FortyTwoGuard)
-  @Get('42/callback')
-  async fortyTwoCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Query('code') state: string
-  ) {
-    return await this.authService.fortyTwoAuth(res, req.user, state);
-  }
-
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
     schema: {
@@ -87,21 +56,14 @@ export class AuthController {
       properties: {
         code: {
           type: 'string',
-          description: 'Two factor code'
+          description:
+            'Authorization code returned by the 42 API after the user has logged in'
         }
       }
     }
   })
   @Post('42')
-  async fortyTwoAuthVerify2fa(
-    @Body('twoFa') twoFaCode: string,
-    @Res() res: Response,
-    @Query('state') state: string
-  ) {
-    return await this.authService.fortyTwoAuthWithTwoFa(
-      res,
-      Number(twoFaCode),
-      state
-    );
+  async signin42(@Body('authorization') authorizationCode: string) {
+    return await this.authService.signin42(authorizationCode);
   }
 }

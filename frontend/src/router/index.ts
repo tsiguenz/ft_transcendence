@@ -43,6 +43,16 @@ const router = createRouter({
       path: '/logout',
       name: 'Logout',
       component: () => import('../views/Logout.vue')
+    },
+    {
+      path: '/42/callback',
+      name: '42',
+      component: () => import('../views/Callback.vue')
+    },
+    {
+      path: '/2fa/verify',
+      name: '2fa',
+      component: () => import('../views/TwoFactorVerify.vue')
     }
   ]
 });
@@ -52,7 +62,13 @@ router.beforeEach(async (to) => {
     router.push('/home');
     return;
   }
-  const UNAUTHENTICATED_ROUTES = ['/signin', '/signup', '/home'];
+  const UNAUTHENTICATED_ROUTES = [
+    '/signin',
+    '/signup',
+    '/home',
+    '/42/callback',
+    '/2fa/verify'
+  ];
   if (
     !VueCookieNext.isCookieAvailable('jwt') &&
     !UNAUTHENTICATED_ROUTES.includes(to.path)

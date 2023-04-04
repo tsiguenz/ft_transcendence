@@ -1,4 +1,3 @@
-
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -16,35 +15,45 @@ enum GameType {
 }
 
 model User {
-  id                  Int       @default(autoincrement()) @id
-  fortyTwoId          Int?      @unique
-  nickname            String    @unique
-  ladderPoints        Int       @default(0)
-  avatar              Bytes? 
-  twoFactorEnable     Boolean   @default(false)
-  twoFactorSecret     String?
-  api42State          String?   @unique
-  hash                String?
-  gamesWin            Game[]    @relation("winner")
-  gamesLoose          Game[]    @relation("looser")
-  messages            Message[] @relation("author")
-  createdAt           DateTime  @default(now())
+  id              Int          @id @default(autoincrement())
+  fortyTwoId      Int?         @unique
+  nickname        String       @unique
+  ladderPoints    Int          @default(0)
+  avatar          Bytes?
+  twoFactorEnable Boolean      @default(false)
+  twoFactorSecret String?
+  hash            String?
+  gamesWin        Game[]       @relation("winner")
+  gamesLoose      Game[]       @relation("looser")
+  messages        Message[]    @relation("author")
+  createdAt       DateTime     @default(now())
+  TwoFactorId     TwoFactorId?
+
   @@map("users")
 }
 
+model TwoFactorId {
+  uuid      String   @id @default(uuid())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("two_factor_ids")
+}
+
 model Game {
-  id                    Int       @id @default(autoincrement())
-  type                  GameType
-  winnerId              Int
-  winner                User      @relation("winner", fields: [winnerId], references: [id])
-  looserId              Int
-  looser                User      @relation("looser", fields: [looserId], references: [id])
-  previousWinnerRating  Int
-  previousLooserRating  Int
-  winnerScore           Int       @default(0)
-  looserScore           Int       @default(0)
-  duration              DateTime 
-  createdAt             DateTime  @default(now())
+  id                   Int      @id @default(autoincrement())
+  type                 GameType
+  winnerId             Int
+  winner               User     @relation("winner", fields: [winnerId], references: [id])
+  looserId             Int
+  looser               User     @relation("looser", fields: [looserId], references: [id])
+  previousWinnerRating Int
+  previousLooserRating Int
+  winnerScore          Int      @default(0)
+  looserScore          Int      @default(0)
+  duration             DateTime
+  createdAt            DateTime @default(now())
+
   @@map("games")
 }
 
@@ -54,7 +63,8 @@ model Message {
   authorId  Int
   author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
   // chatRoomId Int
-//  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
+  //  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
   createdAt DateTime @default(now())
+
   @@map("messages")
 }

@@ -27,6 +27,7 @@
       label="Verify password"
       type="password"
       variant="outlined"
+      autocomplete="new-password"
       required
       :rules="[rules.passwordCheck]"
       @keydown.enter.prevent="signup"
@@ -41,6 +42,7 @@ import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -48,7 +50,7 @@ export default {
       nickname: '',
       password: '',
       passwordVerify: '',
-			isFormValid: false,
+      isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -63,17 +65,17 @@ export default {
   methods: {
     async signup() {
       if (this.password !== this.passwordVerify) {
-	swal({
-		icon: 'error',
-		text: 'Passwords do not match !',
-	});
+        swal({
+          icon: 'error',
+          text: 'Passwords do not match !'
+        });
         return;
       }
       if (!this.isFormValid) {
-	swal({
-		icon: 'error',
-		text: 'Invalid character or length in nickname'
-	});
+        swal({
+          icon: 'error',
+          text: 'Invalid character or length in nickname'
+        });
         return;
       }
       try {
@@ -85,10 +87,10 @@ export default {
         this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
-					swal({
-						icon: 'error',
-						text: error.response.data.message,
-					});
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
         // TODO: Handle error with a snackbar
       }
     }
@@ -97,21 +99,21 @@ export default {
 </script>
 
 <style>
-	.swal-overlay {
-		background-color: rgba(255, 255, 255, 0.5);
-	}
+.swal-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+}
 
-	.swal-modal{
-		background-color: rgba(0, 0, 0, 1);
-		border: 3px solid white;
-	}
+.swal-modal {
+  background-color: rgba(0, 0, 0, 1);
+  border: 3px solid white;
+}
 
-	.swal-button{
-		background-color: rgba(255, 255, 255, 0);
-		border: 1px solid white;
-	}
+.swal-button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid white;
+}
 
-	.swal-text{
-		color: rgba(225, 225, 225, 1);
-	}
+.swal-text {
+  color: rgba(225, 225, 225, 1);
+}
 </style>

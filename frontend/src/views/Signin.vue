@@ -2,7 +2,6 @@
   <br />
   <v-form>
     <v-text-field
-      v-if="!askFor2fa()"
       v-model="nickname"
       class="mb-5"
       label="Nickname"
@@ -12,7 +11,6 @@
       @keydown.enter.prevent="signin"
     ></v-text-field>
     <v-text-field
-      v-if="!askFor2fa()"
       v-model="password"
       class="mb-5"
       label="Password"
@@ -22,18 +20,10 @@
       required
       @keydown.enter.prevent="signin"
     ></v-text-field>
-    <v-text-field
-      v-if="askFor2fa()"
-      v-model="twoFactorCode"
-      class="mb-5"
-      label="2fa code"
-      variant="outlined"
-      @keydown.enter.prevent="signin"
-    ></v-text-field>
     <v-btn @click="signin">Sign In</v-btn>
   </v-form>
   <br />
-  <div v-if="!askFor2fa()">
+  <div>
     <v-btn @click="signin42">Sign in with 42</v-btn>
   </div>
 </template>
@@ -44,6 +34,7 @@ import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -51,13 +42,11 @@ export default {
       nickname: '',
       password: '',
       twoFactorCode: '',
-      errorMessage: '',
-      auth42: constants.API_URL + '/auth/42',
-      rules: {
-        nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
-          "Must contain only alphanumeric, '-' and be less than 8 characters long"
-      }
+      auth42: `https://api.intra.42.fr/oauth/authorize?client_id=${
+        import.meta.env.VITE_APP42_ID
+      }&redirect_uri=${
+        constants.FRONT_URL
+      }/42/callback&response_type=code&scope=public`
     };
   },
   computed: {
@@ -71,47 +60,44 @@ export default {
           password: this.password,
           twoFactorCode: this.twoFactorCode
         });
+        if (response.data.message === 'Two factor code required') {
+          this.$router.push(`/2fa/verify?id=${response.data.id}`);
+          return;
+        }
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
-        this.errorMessage = error.response.data.message;
-        if (!this.askFor2fa()) {
-		swal({
-			icon: "error",
-			text: error.response.data.message,
-		});
-        }
-        this.twoFactorCode = '';
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
-    async signin42() {
+    signin42() {
       window.location.href = this.auth42;
-    },
-    askFor2fa() {
-      return this.errorMessage === 'Two factor code required';
     }
   }
 };
 </script>
 
 <style>
-	.swal-overlay {
-		background-color: rgba(255, 255, 255, 0.5);
-	}
+.swal-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+}
 
-	.swal-modal{
-		background-color: rgba(0, 0, 0, 1);
-		border: 3px solid white;
-	}
+.swal-modal {
+  background-color: rgba(0, 0, 0, 1);
+  border: 3px solid white;
+}
 
-	.swal-button{
-		background-color: rgba(255, 255, 255, 0);
-		border: 1px solid white;
-	}
+.swal-button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid white;
+}
 
-	.swal-text{
-		color: rgba(225, 225, 225, 1);
-	}
+.swal-text {
+  color: rgba(225, 225, 225, 1);
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <AppHeader></AppHeader>
+    <AppHeader v-if="!hideHeader()"></AppHeader>
     <router-view />
   </v-app>
 </template>
@@ -14,6 +14,14 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
+    hideHeader() {
+      return (
+        this.$route.path === '/42/callback' ||
+        this.$route.path === '/2fa/verify'
+      );
+    }
   }
 };
 </script>
