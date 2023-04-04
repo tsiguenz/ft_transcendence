@@ -49,7 +49,7 @@
 
   <!-- TODO: add delete account and logout logic -->
   <v-btn to="/logout">Logout</v-btn>
-  <v-btn @click="deleteAccount">Delete Account</v-btn>
+  <v-btn @click="alertDeleteAccount">Delete Account</v-btn>
 </template>
 
 <script>
@@ -65,7 +65,7 @@ export default {
       newTwoFactorEnable: false,
       twoFactorCode: '',
       qrcode: '',
-	isFormValid: false,
+			isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -111,7 +111,6 @@ export default {
         );
 	swal({
 		icon: "https://cdn3.emoji.gg/emojis/5573-okcat.png",
-//		icon: "info", //success do stranger things
 		text: response.data.message,
 	});
         this.$router.push('/home');
@@ -120,7 +119,6 @@ export default {
 		icon: "error",
 		text: error.response.data.message,
 	});
-//        alert(error.response.data.message);
       }
     },
     async dispatchEditProfile() {
@@ -129,7 +127,6 @@ export default {
 		icon: "error",
 		text: 'Invalid character or length in nickname',
 	});
-//        alert('Invalid character or length in nickname');
         return;
       }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
@@ -155,22 +152,9 @@ export default {
 		icon: "error",
 		text: error.response.data.message,
 	});
-//        alert(error.response.data.message);
       }
     },
     async deleteAccount() {
-	swal({
-		icon: "warning",
-		text: "You are deleting your account, do you want to continue?",
-		buttons: {
-			confirm: "I'll lost all my datas",
-			cancel: "Don't delete my account",
-		},
-	}).then((confirm) => {
-		if (confirm) {
-			swal("TEST");
-		}
-	});
       const jwt = this.$cookie.getCookie('jwt');
       try {
         const response = await axios.delete(
@@ -181,16 +165,29 @@ export default {
             }
           }
         );
-//        alert('Account is delete');
         this.$router.push('/logout');
       } catch (error) {
 	swal({
 		icon: "error",
 		text: error.response.data.message,
 	});
-//        alert(error.response.data.message);
       }
-    }
+    },
+		alertDeleteAccount() {
+			swal({
+				icon: "warning",
+				text: "You are deleting your account, do you want to continue?",
+				buttons: {
+					confirm: "I'll lost all my datas",
+					cancel: "Don't delete my account",
+				},
+			}).then((confirm) => {
+				if (confirm) {
+					swal("Account deleted");
+					this.deleteAccount();
+				}
+			});
+		},
   }
 };
 </script>

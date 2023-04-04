@@ -67,7 +67,6 @@ export default {
 		icon: 'error',
 		text: 'Passwords do not match !',
 	});
-//        alert('Passwords do not match !');
         return;
       }
       if (!this.isFormValid) {
@@ -75,7 +74,6 @@ export default {
 		icon: 'error',
 		text: 'Invalid character or length in nickname'
 	});
-//        alert('Invalid character in nickname');
         return;
       }
       try {
@@ -83,13 +81,15 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-//        alert('Account created !'); Is it useful to make an alert for this ?
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
+					swal({
+						icon: 'error',
+						text: error.response.data.message,
+					});
         // TODO: Handle error with a snackbar
-        alert(error.response.data.message);
       }
     }
   }

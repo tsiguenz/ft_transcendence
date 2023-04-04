@@ -72,7 +72,6 @@ export default {
           twoFactorCode: this.twoFactorCode
         });
         this.sessionStore.signin(this.nickname);
-//        alert('You are now connected !'); Is it useful to make an alert for this ?
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
