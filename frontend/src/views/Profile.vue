@@ -4,9 +4,10 @@
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
-  <p>Avatar: {{ user.avatar }}</p>
+  <img :src="avatar" alt="avatar" width="200" height="200" />
 
   <br />
+
   <h1>Edit profile</h1>
   <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
@@ -64,7 +65,8 @@ export default {
       user: {},
       newNickname: '',
       newTwoFactorEnable: false,
-      newAvatar: '',
+      newAvatar: {},
+      avatar: '',
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
@@ -91,6 +93,8 @@ export default {
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
+        this.avatar = response.data;
+        console.log(response);
       } catch (error) {
         // TODO: Handle error
         this.$router.push('/logout');
@@ -105,8 +109,9 @@ export default {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable,
             twoFactorCode: this.twoFactorCode,
-            fileType: this.newAvatar.type,
-            fileSize: this.newAvatar.size
+            avatarFileType: this.newAvatar.type,
+            avatarFileSize: this.newAvatar.size,
+            avatarFileBase64: this.newAvatar.base64
           },
           {
             headers: {
@@ -192,7 +197,29 @@ export default {
     },
     onFileChange(e) {
       this.newAvatar = e.target.files[0];
-      // TODO: input validation here
+      console.log(this.newAvatar);
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      const fileSizeMb = this.newAvatar.size / 1024 ** 2;
+      if (!allowedTypes.includes(this.newAvatar.type) || fileSizeMb > 2) {
+        swal({
+          icon: 'error',
+          text: 'Invalid file type (png / jpeg / jpg) or size (max 2MB)'
+        });
+        e.target.value = '';
+        this.newAvatar = {};
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.newAvatar.base64 = reader.result;
+      };
+      reader.onError = () => {
+        swal({
+          icon: 'error',
+          text: 'Error while reading file'
+        });
+      };
+      reader.readAsDataURL(this.newAvatar);
     }
   }
 };

@@ -3,8 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { EditProfileDto } from './dto';
-import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { TwoFaService } from '../2fa/2fa.service';
+import * as fs from 'fs';
 
 @Injectable()
 export class ProfileService {
@@ -15,39 +16,16 @@ export class ProfileService {
     private twoFa: TwoFaService
   ) {}
   async getProfile(userId: number) {
-    try {
-      const userProfile = await this.prisma.user.findUnique({
-        where: {
-          id: userId
-        },
-        select: {
-          id: true,
-          nickname: true,
-          avatar: true,
-          createdAt: true,
-          twoFactorEnable: true
-        }
-      });
-      return userProfile;
-    } catch (e) {
-      throw new UnauthorizedException(
-        'You are not authorized to access this profile'
-      );
-    }
+    const userProfile = await this.users.getUserById(userId);
+    return userProfile;
   }
 
   // TODO: refactor this function
   async editProfile(dto: EditProfileDto, userId: number) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId
-      },
-      select: {
-        twoFactorEnable: true,
-        twoFactorSecret: true
-      }
-    });
-    // check when user enable two factor
+    const fileExtension = dto.avatarFileType.split('/')[1];
+    const avatarPath = `./public/avatars/${userId}.${fileExtension}`;
+    fs.writeFileSync(avatarPath, dto.avatarFileBase64, 'base64');
+    const user = await this.users.getUserById(userId);
     if (dto.twoFactorEnable && !user.twoFactorEnable) {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
@@ -56,9 +34,7 @@ export class ProfileService {
         user.twoFactorSecret,
         Number(dto.twoFactorCode)
       );
-      if (!valid) {
-        throw new ForbiddenException('Invalid two factor code');
-      }
+      if (!valid) throw new ForbiddenException('Invalid two factor code');
     }
     await this.prisma.user
       .update({
@@ -67,8 +43,8 @@ export class ProfileService {
         },
         data: {
           nickname: dto.nickname,
-          twoFactorEnable: dto.twoFactorEnable
-          // TODO: handle avatar
+          twoFactorEnable: dto.twoFactorEnable,
+          avatarPath: avatarPath
         }
       })
       .catch(() => {

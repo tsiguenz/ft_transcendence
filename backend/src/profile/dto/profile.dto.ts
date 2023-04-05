@@ -23,12 +23,15 @@ export class EditProfileDto {
 
   @ValidateIf((o) => {
     const mime = ['image/jpg', 'image/png', 'image/jpeg'];
-    return mime.includes(o.fileType);
+    return mime.includes(o.avatarFileType);
   })
   @IsString()
-  fileType: string;
+  avatarFileType: string;
 
   @IsInt()
   @Max(1000000)
-  fileSize: number;
+  avatarFileSize: number;
+
+  @IsString()
+  avatarFileBase64: string;
 }

@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
       whitelist: true
     })
   );
+  app.use(bodyParser.json({ limit: '2mb' }));
   app.enableCors();
   await app.listen(3000);
 }

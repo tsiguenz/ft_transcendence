@@ -35,7 +35,7 @@ export class ProfileController {
   })
   @Put()
   editProfile(@Body() dto: EditProfileDto, @Req() req: Request) {
-    console.log(dto);
+    //console.log(dto);
     return this.profileService.editProfile(dto, req.user['id']);
   }
 }
