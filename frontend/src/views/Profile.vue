@@ -108,10 +108,7 @@ export default {
           {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable,
-            twoFactorCode: this.twoFactorCode,
-            avatarFileType: this.newAvatar.type,
-            avatarFileSize: this.newAvatar.size,
-            avatarFileBase64: this.newAvatar.base64
+            twoFactorCode: this.twoFactorCode
           },
           {
             headers: {
