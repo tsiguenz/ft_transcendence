@@ -41,23 +41,22 @@
   <v-form v-if="qrcode">
     <v-text-field
       v-model="twoFactorCode"
-      label="2fa code"
+      label="Code"
       required
       @keydown.enter.prevent="editProfile"
     ></v-text-field>
-    <v-btn v-if="qrcode" @click="editProfile"
-      >Validate edit profile with 2fa code</v-btn
-    >
+    <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
   </v-form>
 
-  <v-btn to="/logout">Logout</v-btn>
-  <v-btn @click="alertDeleteAccount">Delete Account</v-btn>
+  <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
+  <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
 </template>
 
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -72,6 +71,7 @@ export default {
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
+          this.user.nickname === v ||
           "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
@@ -116,17 +116,17 @@ export default {
         );
         swal({
           icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
-          text: response.data.message
+          text: formatError(response.data.message)
         });
         this.$router.push('/home');
       } catch (error) {
         swal({
           icon: 'error',
-          text: error.response.data.message
+          text: formatError(error.response.data.message)
         });
       }
     },
-    async dispatchEditProfile() {
+    dispatchEditProfile() {
       if (!this.isFormValid) {
         swal({
           icon: 'error',
@@ -155,7 +155,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: error.response.data.message
+          text: formatError(error.response.data.message)
         });
       }
     },
@@ -171,7 +171,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: error.response.data.message
+          text: formatError(error.response.data.message)
         });
       }
     },

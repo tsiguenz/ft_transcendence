@@ -13,14 +13,19 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
+
 export default {
   data() {
     return {};
   },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
   methods: {
-    // TODO: verify the jwt
     isLog() {
-      return this.$cookie.isCookieAvailable('jwt');
+      return this.sessionStore.loggedIn;
     }
   }
 };
