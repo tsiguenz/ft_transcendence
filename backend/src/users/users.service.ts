@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Delete } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
@@ -75,5 +75,79 @@ export class UsersService {
       }
     });
     return deleteUser;
+  }
+
+  async addFriend(
+    userNickname: string,
+    friendNickname: string,
+    userId: number
+  ) {
+    const user = await this.getUser(userNickname);
+    const friend = await this.getUser(friendNickname);
+    if (!user || !friend) throw new NotFoundException('User not found');
+    console.log(userNickname, friendNickname, userId, user.id);
+    if (userNickname === friendNickname || userId !== user.id) {
+      throw new UnauthorizedException(
+        'You are not authorized to add this friend'
+      );
+    }
+    const userFriends = await this.prisma.friend.findMany({
+      where: {
+        initiatorId: user.id
+      },
+      select: {
+        friend: true
+      }
+    });
+    if (userFriends.some((friend) => friend.friend === friendNickname))
+      throw new ForbiddenException('Friend already added');
+    await this.prisma.friend.create({
+      data: {
+        initiatorId: user.id,
+        friend: friendNickname
+      }
+    });
+    return { message: 'Friend added' };
+  }
+
+  async deleteFriend(
+    userNickname: string,
+    friendNickname: string,
+    userId: number
+  ) {
+    const user = await this.getUser(userNickname);
+    if (!user) throw new NotFoundException('User not found');
+    if (userNickname === friendNickname || userId !== user.id) {
+      throw new UnauthorizedException(
+        'You are not authorized to add this friend'
+      );
+    }
+    const res = await this.prisma.friend.deleteMany({
+      where: {
+        initiatorId: user.id,
+        friend: friendNickname
+      }
+    });
+    if (res.count === 0) throw new NotFoundException('Friend not found');
+    return { message: 'Friend deleted :)' };
+  }
+
+  async getFriends(userNickname: string, userId: number) {
+    const user = await this.getUser(userNickname);
+    if (!user) throw new NotFoundException('User not found');
+    if (userId !== user.id) {
+      throw new ForbiddenException(
+        'You are not authorized to get this user friends'
+      );
+    }
+    const friends = await this.prisma.friend.findMany({
+      where: {
+        initiatorId: user.id
+      },
+      select: {
+        friend: true
+      }
+    });
+    return friends;
   }
 }
