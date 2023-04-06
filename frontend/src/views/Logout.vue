@@ -8,12 +8,12 @@ export default {
   data() {
     return {};
   },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
   mounted() {
     this.logout();
     this.$router.push('/home');
-  },
-  computed: {
-    ...mapStores(useSessionStore)
   },
   methods: {
     logout() {

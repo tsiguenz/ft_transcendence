@@ -85,7 +85,6 @@ export class UsersService {
     const user = await this.getUser(userNickname);
     const friend = await this.getUser(friendNickname);
     if (!user || !friend) throw new NotFoundException('User not found');
-    console.log(userNickname, friendNickname, userId, user.id);
     if (userNickname === friendNickname || userId !== user.id) {
       throw new UnauthorizedException(
         'You are not authorized to add this friend'

@@ -5,6 +5,7 @@
       <v-tab v-if="isLog()" to="/game">Game</v-tab>
       <v-tab v-if="isLog()" to="/chat">Chat</v-tab>
       <v-tab v-if="isLog()" to="/leaderboard">Leaderboard</v-tab>
+      <v-tab v-if="isLog()" to="/friends">Friends</v-tab>
       <v-tab v-if="isLog()" to="/profile">Profile</v-tab>
       <v-tab v-if="!isLog()" to="/signin">Signin</v-tab>
       <v-tab v-if="!isLog()" to="/signup">Signup</v-tab>
