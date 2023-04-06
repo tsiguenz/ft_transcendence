@@ -6,7 +6,8 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   MessageBody,
-  ConnectedSocket
+  ConnectedSocket,
+  WsException
 } from '@nestjs/websockets';
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
@@ -30,16 +31,24 @@ export class ChatGateway
   private logger: Logger = new Logger('ChatGateway');
 
   @SubscribeMessage('msgToServer')
-  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, message: string }) {
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: number; message: string }
+  ) {
     try {
       console.log(payload);
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
-      
-      const message = await this.chat.saveMessage(client['decoded'].sub, payload.chatroomId, payload.message);
 
-      client.to(chatroom.slug).emit('msgToClient', {
-        author: user.nickname,
+      const message = await this.chat.saveMessage(
+        client['decoded'].sub,
+        payload.chatroomId,
+        payload.message
+      );
+
+      this.server.to(chatroom.slug).emit('msgToClient', {
+        authorId: user.id,
+        authorNickname: user.nickname,
         chatroomId: chatroom.id,
         sentAt: message.createdAt,
         data: payload.message
@@ -50,12 +59,21 @@ export class ChatGateway
   }
 
   @SubscribeMessage('joinRoom')
-  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId)
+  async handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: number }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (!chatroom) { return ; }
-    client.join(chatroom.slug);
-    this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
+    if (!chatroom) {
+      return;
+    }
+    try {
+      // await this.chatroom.join(client['decoded'].sub, chatroom.id);
+      client.join(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
   }
 
   // @SubscribeMessage('leaveRoom')
@@ -67,18 +85,40 @@ export class ChatGateway
   //   this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
   // }
 
-  @SubscribeMessage('getRoomMessages')
-  async handleMessageHistory(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number, newerThan: Date }) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId)
+  @SubscribeMessage('getRoomUsers')
+  async getRoomUsers(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: number }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+    if (!chatroom) {
+      return;
+    }
 
-    if (!chatroom) { return ; }
-    const messages = await this.chat.getMessages(chatroom.id, payload.newerThan);
+    client.emit('');
+  }
+
+  @SubscribeMessage('getRoomMessages')
+  async handleMessageHistory(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: number; newerThan: Date }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+    const messages = await this.chat.getMessages(
+      chatroom.id,
+      payload.newerThan
+    );
     for (const id in messages) {
       client.emit('msgToClient', {
-        author: messages[id].author.nickname,
+        authorId: messages[id].author.id,
+        authorNickname: messages[id].author.nickname,
         chatroomId: chatroom.id,
         sentAt: messages[id].createdAt,
-        data: messages[id].content,
+        data: messages[id].content
       });
     }
   }
@@ -122,7 +162,6 @@ export class ChatGateway
       client.disconnect();
     }
   }
-
 
   // async joinChatroom(client: Socket, chatroomId: number) {
 

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 import { Request } from 'express';
@@ -23,8 +33,14 @@ export class ChatroomController {
   })
   @UseGuards(JwtGuard)
   @Post()
-  async create(@Body() createChatroomDto: CreateChatroomDto, @Req() req: Request) {
-    return await this.chatroomService.create(Number.parseInt(req.user['id']), createChatroomDto);
+  async create(
+    @Body() createChatroomDto: CreateChatroomDto,
+    @Req() req: Request
+  ) {
+    return await this.chatroomService.create(
+      Number.parseInt(req.user['id']),
+      createChatroomDto
+    );
   }
 
   @ApiBearerAuth()
@@ -34,13 +50,34 @@ export class ChatroomController {
     return await this.chatroomService.findAll();
   }
 
+  @UseGuards(JwtGuard)
+  @Get('mine')
+  async findChatroomsForUser(@Req() req: Request) {
+    return await this.chatroomService.findChatroomsForUser(req.user['id']);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.chatroomService.findOne(+id);
   }
 
+  @UseGuards(JwtGuard)
+  @Get(':id/users')
+  async findChatroomUsers(@Param('id') id: string) {
+    const users = await this.chatroomService.findChatroomUsers(+id);
+    const formattedUsers = users.map((user) => ({
+      id: user.id,
+      nickname: user.nickname,
+      role: user.chatrooms[0].role
+    }));
+    return formattedUsers;
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatroomDto: UpdateChatroomDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateChatroomDto: UpdateChatroomDto
+  ) {
     return this.chatroomService.update(+id, updateChatroomDto);
   }
 

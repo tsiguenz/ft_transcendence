@@ -1,0 +1,79 @@
+<template>
+  <v-card height="1000">
+    <v-list>
+      <v-list-subheader>Chatrooms</v-list-subheader>
+      <v-list-item
+        v-for="chatroom in chatrooms"
+        :key="chatroom.id"
+        :title="chatroom.name"
+        :value="chatroom.name"
+        :active="chatroom.id == id"
+        @click="join(chatroom.id)"
+      ></v-list-item>
+    </v-list>
+  </v-card>
+  <v-text-field
+    v-model="newChatroomName"
+    label="New chatroom"
+    @keyup.enter="newChatroom"
+  ></v-text-field>
+</template>
+
+<script>
+import axios from 'axios';
+import * as constants from '@/constants';
+import ChatService from '../services/chat.service';
+
+export default {
+  data() {
+    return {
+      chatrooms: [],
+      newChatroomName: ''
+    }
+  },
+  props: [
+    'id',
+  ],
+  emits: [
+    'join'
+  ],
+  mounted() {
+    this.loadChatrooms().then((chatrooms) => {
+      this.join(chatrooms[0].id);
+    });
+  },
+  methods: {
+    join(id) {
+      this.$emit('join', id);
+    },
+    async loadChatrooms() {
+      const chatrooms = await this.getChatrooms();
+      this.chatrooms.push(...chatrooms);
+      return chatrooms;
+    },
+    async getChatrooms() {
+      try {
+        const response = await axios.get(constants.API_URL + '/chatrooms/mine');
+        return response.data;
+      } catch (error) {
+        alert(error.response.data.message);
+      }
+    },
+    async newChatroom() {
+      // TODO: clean the input to protect injection
+      try {
+        const response = await axios.post(constants.API_URL + '/chatrooms', {
+          name: this.newChatroomName
+        });
+        this.chatrooms.push(response.data);
+        ChatService.joinRoom(response.data.id);
+        console.log(response.data);
+      } catch (error) {
+        alert(error.response.data.message);
+      }
+      this.newChatroomName = '';
+    },
+  }
+}
+
+</script>

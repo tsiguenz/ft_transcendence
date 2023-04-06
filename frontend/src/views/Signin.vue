@@ -37,6 +37,7 @@
 
 <script>
 import axios from 'axios';
+import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -66,9 +67,11 @@ export default {
           password: this.password,
           twoFactorCode: this.twoFactorCode
         });
-        this.sessionStore.signin(this.nickname);
+        const jwt = response.data.access_token;
+
+        this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, this.nickname);
         alert('You are now connected !');
-        this.$cookie.setCookie('jwt', response.data.access_token);
+        this.$cookie.setCookie('jwt', jwt);
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar

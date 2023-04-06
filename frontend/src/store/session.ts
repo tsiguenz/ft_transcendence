@@ -4,19 +4,21 @@ export const useSessionStore = defineStore('session', {
   persist: true,
   state() {
     return {
-      userId: null,
-      nickname: null,
+      userId: 0,
+      nickname: '',
       loggedIn: false
     };
   },
   actions: {
-    signin(nickname) {
+    signin(id: number, nickname: string) {
+      this.userId = id;
       this.loggedIn = true;
       this.nickname = nickname;
     },
     logout() {
+      this.userId = 0;
       this.loggedIn = false;
-      this.nickname = null;
+      this.nickname = '';
     }
   }
 });

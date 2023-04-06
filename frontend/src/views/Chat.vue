@@ -1,68 +1,24 @@
 <template>
-	<v-container fluid>
-		<v-row justify="space-between" align="start">
-			<v-col cols="3">
-			  <v-card height="1000">
-          <v-list>
-            <v-list-subheader>Chatrooms</v-list-subheader>
-    				<v-list-item
-              v-for="chatroom in chatrooms"
-              :key="chatroom.id"
-              :title="chatroom.name"
-              :value="chatroom.name"
-              :active="chatroom.id == currentChatroomId"
-              @click="joinChatroom(chatroom.id)"
-            ></v-list-item>
-          </v-list>
-			  </v-card>
-			</v-col>
-			<v-col cols="6">
-			  <v-card>
-		      <Chat :id='currentChatroomId' title="Chat" :messages='messages[currentChatroomId]' />
-        </v-card>
-			</v-col>
+  <v-container fluid>
+    <v-row justify="space-between" align="start">
       <v-col cols="3">
-        <v-card>
-          <v-list>
-            <v-list-subheader>Users</v-list-subheader>
-            <v-list-item
-              prepend-icon="mdi-account-circle"
-              title="abourdar"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-account-circle"
-              title="gmorange"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-account-circle"
-              title="lpassera"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-account-circle"
-              title="tsiguenz"
-            ></v-list-item>
-          </v-list>
-        </v-card>
+        <Chatrooms
+          :id="currentChatroomId"
+          @join="joinChatroom"
+        />
       </v-col>
-		</v-row>
-		<v-row justify="space-between" align="start">
-			<v-col cols="3">
-        <v-text-field
-              v-model="newChatroomName"
-              label="New chatroom"
-              @keyup.enter="newChatroom"
-            ></v-text-field>
-			</v-col>
-			<v-col cols="6">
-				<v-text-field
- 					v-model="message"
-					label="Message"
-					@keyup.enter="sendMessage"
-       ></v-text-field>
-			</v-col>
-      <v-col cols="3"></v-col>
-		</v-row>
-	</v-container>
+      <v-col cols="6">
+        <Chat
+          :id="currentChatroomId"
+          title="Chat"
+          :messages="messages[currentChatroomId]"
+        />
+      </v-col>
+      <v-col cols="3">
+        <ChatroomUsers :id="currentChatroomId" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -71,95 +27,57 @@ import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useChatStore } from '@/store/chat';
 import Chat from '../components/Chat.vue';
+import Chatrooms from '../components/Chatrooms.vue';
+import ChatroomUsers from '../components/ChatroomUsers.vue';
 
 export default {
   components: {
-    Chat
+    Chat,
+    Chatrooms,
+    ChatroomUsers
   },
   data() {
     return {
       users: [],
       message: '',
-      messages: {},
-      newChatroomName: '',
-      chatrooms: [],
-      currentChatroomId: 0,
+      currentChatroomId: 0
     };
   },
   computed: {
-    ...mapStores(useSessionStore),
-  },
-  created() {
-    ChatService.setup(this.$cookie.getCookie('jwt'));
-  },
-  mounted() {
-    ChatService.subscribeToMessages((message) => { this.chatMessageCallback(message) });
-    this.loadChatrooms().then((chatrooms) => {
-      this.joinChatroom(chatrooms[0].id) 
-    });
-  },
-  beforeUnmount() {
-    ChatService.disconnect();
+    ...mapStores(useSessionStore, useChatStore),
+    messages() {
+      return this.chatStore.messages;
+    }
   },
   methods: {
-    sendMessage() {
-      if (this.message == '') { return; }
-      ChatService.sendMessage({ chatroomId: this.currentChatroomId, message: this.message });
-      this.pushMessage(this.currentChatroomId, { author: 'Me', data: this.message, sentAt: new Date() });
-      this.message = '';
-    },
-    async loadChatrooms() {
-      const chatrooms = await this.getChatrooms();
-      this.chatrooms.push(...chatrooms);
-
-      return chatrooms;
-    },
-    joinChatroom(id) {
+    async joinChatroom(id) {
       this.currentChatroomId = id;
       ChatService.getRoomMessages(id, this.lastMessageTime(id));
       ChatService.joinRoom(id);
+      // const users = await this.getChatroomUsers(id);
     },
-    async getChatrooms() {
+    async getChatroomUsers(chatroomId) {
       try {
-        const response = await axios.get(constants.API_URL + '/chatrooms');
+        const response = await axios.get(
+          constants.API_URL + '/chatrooms/' + chatroomId + '/users'
+        );
         return response.data;
       } catch (error) {
         alert(error.response.data.message);
       }
     },
-    async newChatroom() {
-      // TODO: clean the input to protect injection
-      try {
-        const response = await axios.post(constants.API_URL + '/chatrooms',
-          {
-            name: this.newChatroomName,
-          }
-        );
-        this.chatrooms.push(response.data);
-        ChatService.joinRoom(response.data.id);
-      } catch (error) {
-        alert(error.response.data.message);
-      }
-      this.newChatroomName = '';
-    },
-    chatMessageCallback(message) {
-      if (message.author === this.sessionStore.nickname) {
-        message.author = 'Me';
-      }
-      this.pushMessage(message.chatroomId, message);
-    },
-    pushMessage(chatroomId, message) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (!this.messages.hasOwnProperty(chatroomId)) { this.messages[chatroomId] = []; }
-      this.messages[chatroomId].push(message);
-    },
     lastMessageTime(chatroomId) {
       // eslint-disable-next-line no-prototype-builtins
-      if (!this.messages.hasOwnProperty(chatroomId) || this.messages[chatroomId].length < 1) { return new Date(null); }
+      if (
+        !this.messages.hasOwnProperty(chatroomId) ||
+        this.messages[chatroomId].length < 1
+      ) {
+        return new Date(null);
+      }
       return new Date(this.messages[chatroomId].at(-1).sentAt);
     }
-  },
+  }
 };
-
 </script>
