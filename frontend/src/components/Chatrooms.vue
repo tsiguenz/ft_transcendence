@@ -12,11 +12,68 @@
       ></v-list-item>
     </v-list>
   </v-card>
-  <v-text-field
-    v-model="newChatroomName"
-    label="New chatroom"
-    @keyup.enter="newChatroom"
-  ></v-text-field>
+ <v-dialog
+    v-model="dialog"
+    persistent
+    width="1024"
+  >
+    <template v-slot:activator="{ props }">
+      <v-btn v-bind="props" block>
+        New chatroom
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title>
+        <span class="text-h5">Chatroom</span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="newChatroomName"
+                label="Room name*"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" >
+              <v-select
+                v-model="newChatroomType"
+                :items="['PUBLIC', 'PROTECTED', 'PRIVATE']"
+                label="Room type*"
+                required
+              ></v-select>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-if="newChatroomType === 'PROTECTED'"
+                label="Password*"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+        <small>*indicates required field</small>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue-darken-1"
+          variant="text"
+          @click="dialog = false"
+        >
+          Close
+        </v-btn>
+        <v-btn
+          color="blue-darken-1"
+          variant="text"
+          @click="newChatroom"
+        >
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -28,7 +85,9 @@ export default {
   data() {
     return {
       chatrooms: [],
-      newChatroomName: ''
+      newChatroomName: '',
+      dialog: false,
+      newChatroomType: 'PUBLIC'
     }
   },
   props: [
@@ -60,6 +119,7 @@ export default {
       }
     },
     async newChatroom() {
+      this.dialog = false;
       // TODO: clean the input to protect injection
       try {
         const response = await axios.post(constants.API_URL + '/chatrooms', {
@@ -72,6 +132,7 @@ export default {
         alert(error.response.data.message);
       }
       this.newChatroomName = '';
+      this.newChatroomType = 'PUBLIC';
     },
   }
 }
