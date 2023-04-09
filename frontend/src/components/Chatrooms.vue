@@ -123,7 +123,8 @@ export default {
       // TODO: clean the input to protect injection
       try {
         const response = await axios.post(constants.API_URL + '/chatrooms', {
-          name: this.newChatroomName
+          name: this.newChatroomName,
+          type: this.newChatroomType
         });
         this.chatrooms.push(response.data);
         ChatService.joinRoom(response.data.id);

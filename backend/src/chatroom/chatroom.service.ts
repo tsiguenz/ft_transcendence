@@ -9,11 +9,14 @@ export class ChatroomService {
 
   constructor(private prisma: PrismaService) {}
   async create(userId: number, dto: CreateChatroomDto) {
+    const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
+
     try {
       const chatroom = await this.prisma.chatRoom.create({
         data: {
           name: dto.name,
-          slug: `chatroom_${dto.name}`,
+          type: dto.type,
+          slug: `chatroom_${snakecaseName}`,
           users: {
             create: [
               {

@@ -36,7 +36,6 @@ export class ChatGateway
     @MessageBody() payload: { chatroomId: number; message: string }
   ) {
     try {
-      console.log(payload);
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
 
