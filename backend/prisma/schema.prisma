@@ -76,6 +76,8 @@ model ChatRoom {
   slug      String      @db.VarChar(255) @unique
   messages  Message[]   @relation("chatRoom")
   users     ChatRoomUser[]
+  type      RoomType    @default(PUBLIC)
+  hash      String?     
   createdAt DateTime    @default(now())
 
   @@map("chatrooms")
@@ -85,4 +87,10 @@ enum Role {
   OWNER
   ADMIN
   USER
+}
+
+enum RoomType {
+  PRIVATE
+  PROTECTED
+  PUBLIC
 }
