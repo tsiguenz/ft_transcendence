@@ -1,31 +1,41 @@
 <template>
-    <h1>Friends</h1>
-    <v-sheet width="100%">
-      <v-row>
+  <h1>Friends</h1>
+  <v-sheet width="100%">
+    <v-row>
       <v-col cols="12" md="4">
         <v-form @submit.prevent>
-          <v-text-field v-model="newFriend" label="Friend's nickname" block></v-text-field>
+          <v-text-field
+            v-model="newFriend"
+            label="Friend's nickname"
+            block
+          ></v-text-field>
         </v-form>
       </v-col>
       <v-col cols="12" md="4">
-        <v-btn type="submit" block class="mt-2" @click="addFriend(newFriend)">Add as friend</v-btn>
+        <v-btn type="submit" block class="mt-2" @click="addFriend(newFriend)"
+          >Add as friend</v-btn
+        >
       </v-col>
     </v-row>
-    </v-sheet>
-    <v-table density="compact">
-      <thead>
-        <tr>
-          <th class="text-left">Nickname</th>
-          <th class="text-left"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="friend in friends" :key="friend.nickname">
-          <td>{{ friend.friend }}</td>
-          <td><v-btn size="small" @click="deleteFriend(friend.friend)">Delete friend</v-btn></td>
-        </tr>
-      </tbody>
-    </v-table>
+  </v-sheet>
+  <v-table density="compact">
+    <thead>
+      <tr>
+        <th class="text-left">Nickname</th>
+        <th class="text-left"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="friend in friends" :key="friend">
+        <td>{{ friend }}</td>
+        <td>
+          <v-btn size="small" @click="deleteFriend(friend)"
+            >Delete friend</v-btn
+          >
+        </td>
+      </tr>
+    </tbody>
+  </v-table>
 </template>
 
 <script>
@@ -39,8 +49,8 @@ import formatError from '@/utils/lib';
 export default {
   data() {
     return {
-        friends: [],
-        newFriend: ''
+      friends: [],
+      newFriend: ''
     };
   },
   computed: {
@@ -58,53 +68,65 @@ export default {
     async getFriends() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`, {
-          headers: {
-            Authorization: 'Bearer ' + jwt
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
           }
-        });
+        );
         this.friends = response.data;
       } catch (error) {
         swall({
-          title: "Error",
+          title: 'Error',
           text: formatError(error.response.data.message),
-          icon: "error",
-          button: "OK",
-        });      }
+          icon: 'error',
+          button: 'OK'
+        });
+      }
     },
-    async deleteFriend(friend){
+    async deleteFriend(friend) {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        await axios.delete(constants.API_URL + `/users/${this.sessionStore.nickname}/friends/${friend}`, {
-          headers: {
-            Authorization: 'Bearer ' + jwt
+        await axios.delete(
+          constants.API_URL +
+            `/users/${this.sessionStore.nickname}/friends/${friend}`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
           }
-        });
+        );
       } catch (error) {
         swall({
-          title: "Error",
+          title: 'Error',
           text: formatError(error.response.data.message),
-          icon: "error",
-          button: "OK",
+          icon: 'error',
+          button: 'OK'
         });
       }
     },
     async addFriend(friend) {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        await axios.post(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`, {
-          friendNickname: friend
-        }, {
-          headers: {
-            Authorization: 'Bearer ' + jwt
+        await axios.post(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
+          {
+            friendNickname: friend
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
           }
-        });
+        );
       } catch (error) {
         swall({
-          title: "Error",
+          title: 'Error',
           text: formatError(error.response.data.message),
-          icon: "error",
-          button: "OK",
+          icon: 'error',
+          button: 'OK'
         });
       }
     }

@@ -71,14 +71,14 @@ export class UsersController {
       }
     }
   })
-  @Post(':userNickname/friends')
+  @Post(':nickname/friends')
   addFriend(
-    @Param('userNickname') userNickname: string,
+    @Param('nickname') nickname: string,
     @Body('friendNickname') friendNickname: string,
     @Req() req: Request
   ) {
     return this.usersService.addFriend(
-      userNickname,
+      nickname,
       friendNickname,
       req.user['id']
     );

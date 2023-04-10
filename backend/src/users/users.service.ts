@@ -118,7 +118,7 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     if (userNickname === friendNickname || userId !== user.id) {
       throw new UnauthorizedException(
-        'You are not authorized to add this friend'
+        'You are not authorized to delete this friend'
       );
     }
     const res = await this.prisma.friend.deleteMany({
@@ -128,7 +128,7 @@ export class UsersService {
       }
     });
     if (res.count === 0) throw new NotFoundException('Friend not found');
-    return { message: 'Friend deleted :)' };
+    return { message: 'Friend deleted' };
   }
 
   async getFriends(userNickname: string, userId: number) {
@@ -147,6 +147,6 @@ export class UsersService {
         friend: true
       }
     });
-    return friends;
+    return friends.map((friend) => friend.friend);
   }
 }
