@@ -57,8 +57,8 @@ export default {
     ...mapStores(useSessionStore)
   },
   watch: {
-    friends() {
-      this.getFriends();
+    async friends() {
+      await this.getFriends();
     }
   },
   async mounted() {
@@ -84,14 +84,15 @@ export default {
           icon: 'error',
           button: 'OK'
         });
+        this.$router.push('/logout');
       }
     },
-    async deleteFriend(friend) {
+    async deleteFriend(nickname) {
       try {
         const jwt = this.$cookie.getCookie('jwt');
         await axios.delete(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${friend}`,
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
           {
             headers: {
               Authorization: 'Bearer ' + jwt
@@ -107,13 +108,13 @@ export default {
         });
       }
     },
-    async addFriend(friend) {
+    async addFriend(nickname) {
       try {
         const jwt = this.$cookie.getCookie('jwt');
         await axios.post(
           constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
           {
-            friendNickname: friend
+            friendNickname: nickname
           },
           {
             headers: {

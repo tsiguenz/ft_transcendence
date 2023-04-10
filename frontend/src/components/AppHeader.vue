@@ -26,7 +26,9 @@ export default {
   },
   methods: {
     isLog() {
-      return this.sessionStore.loggedIn;
+      return (
+        this.sessionStore.loggedIn && this.$cookie.isCookieAvailable('jwt')
+      );
     }
   }
 };

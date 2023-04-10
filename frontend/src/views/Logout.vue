@@ -17,10 +17,10 @@ export default {
   },
   methods: {
     logout() {
-      if (this.$cookie.isCookieAvailable('jwt')) {
+      if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
-        this.sessionStore.logout();
-      }
+      this.sessionStore.logout();
+      console.log(this.sessionStore);
     }
   }
 };
