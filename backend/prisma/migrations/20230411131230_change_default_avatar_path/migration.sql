@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "users" ALTER COLUMN "avatarPath" SET DEFAULT '/avatars/default.jpeg';
+ALTER TABLE "users" ALTER COLUMN "avatarPath" SET DEFAULT '/default.jpeg';

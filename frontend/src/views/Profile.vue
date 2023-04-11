@@ -93,8 +93,7 @@ export default {
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
-        this.avatarPath = constants.API_URL + this.user.avatarPath;
-        this.avatarPath = this.avatarPath.replace('/api', '');
+        this.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
       } catch (error) {
         swal({
           icon: 'error',

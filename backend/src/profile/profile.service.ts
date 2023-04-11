@@ -52,7 +52,7 @@ export class ProfileService {
 
   deleteAvatar(avatarPath: string) {
     try {
-      fs.unlinkSync(`./public${avatarPath}`);
+      fs.unlinkSync(`./public/avatars${avatarPath}`);
     } catch (err) {
       console.log(
         "Can't delete avatar because it doesn't exist (no problem for the user)"
@@ -80,7 +80,7 @@ export class ProfileService {
       throw new ForbiddenException('Invalid file type');
     if (fileSizeMb > 2)
       throw new ForbiddenException('File size limit exceeded (2MB)');
-    file.path = file.path.replace('public', '');
+    file.path = file.path.replace('public/avatars', '');
     await this.prisma.user.update({
       where: {
         id: userId
@@ -89,7 +89,7 @@ export class ProfileService {
         avatarPath: file.path
       }
     });
-    if (oldAvatar.avatarPath !== '/avatars/default.jpeg') {
+    if (oldAvatar.avatarPath !== '/default.jpeg') {
       this.deleteAvatar(oldAvatar.avatarPath);
     }
     return { message: 'Avatar updated' };
