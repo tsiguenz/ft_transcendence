@@ -26,7 +26,7 @@ model User {
   gamesWin        Game[]       @relation("winner")
   gamesLoose      Game[]       @relation("looser")
   messages        Message[]    @relation("author")
-  friends         Friend[]     @relation("initiator")
+  friends         Friend[]     @relation("user")
   createdAt       DateTime     @default(now())
   TwoFactorId     TwoFactorId?
 
@@ -71,10 +71,11 @@ model Message {
 }
 
 model Friend {
-  id            Int   @id @default(autoincrement())
-  initiatorId   Int
-  initiatorUser User  @relation("initiator", fields: [initiatorId], references: [id], onDelete: Cascade)
-  friend        String
+  userId          Int
+  user            User  @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+// TODO: use id instead of nickname because nickname can be changed
+  friendNickname  String
 
+  @@id([userId, friendNickname], name: "friend_pkey")
   @@map("friends")
 }

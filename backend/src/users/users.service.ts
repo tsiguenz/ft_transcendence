@@ -90,20 +90,22 @@ export class UsersService {
         'You are not authorized to add this friend'
       );
     }
-    const userFriends = await this.prisma.friend.findMany({
+    const userFriends = await this.prisma.friend.findUnique({
       where: {
-        initiatorId: user.id
+        friend_pkey: {
+          userId: user.id,
+          friendNickname: friendNickname
+        }
       },
       select: {
-        friend: true
+        friendNickname: true
       }
     });
-    if (userFriends.some((friend) => friend.friend === friendNickname))
-      throw new ForbiddenException('Friend already added');
+    if (userFriends) throw new ForbiddenException('Friend already added');
     await this.prisma.friend.create({
       data: {
-        initiatorId: user.id,
-        friend: friendNickname
+        userId: user.id,
+        friendNickname: friendNickname
       }
     });
     return { message: 'Friend added' };
@@ -121,14 +123,21 @@ export class UsersService {
         'You are not authorized to delete this friend'
       );
     }
-    const res = await this.prisma.friend.deleteMany({
-      where: {
-        initiatorId: user.id,
-        friend: friendNickname
-      }
-    });
-    if (res.count === 0) throw new NotFoundException('Friend not found');
-    return { message: 'Friend deleted' };
+    await this.prisma.friend
+      .delete({
+        where: {
+          friend_pkey: {
+            userId: user.id,
+            friendNickname: friendNickname
+          }
+        }
+      })
+      .catch(() => {
+        throw new NotFoundException('Friend not found');
+      })
+      .then(() => {
+        return { message: 'Friend deleted' };
+      });
   }
 
   async getFriends(userNickname: string, userId: number) {
@@ -141,12 +150,12 @@ export class UsersService {
     }
     const friends = await this.prisma.friend.findMany({
       where: {
-        initiatorId: user.id
+        userId: user.id
       },
       select: {
-        friend: true
+        friendNickname: true
       }
     });
-    return friends.map((friend) => friend.friend);
+    return friends.map((friend) => friend.friendNickname);
   }
 }
