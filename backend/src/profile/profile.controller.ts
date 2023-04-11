@@ -53,6 +53,18 @@ export class ProfileController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'The avatar file'
+        }
+      }
+    }
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({

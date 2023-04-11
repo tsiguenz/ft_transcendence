@@ -64,6 +64,7 @@ export class ProfileService {
     userId: number,
     @UploadedFile() file: Express.Multer.File
   ) {
+    if (!file) throw new ForbiddenException('File required');
     const allowedTypes = ['.png', '.jpg', '.jpeg'];
     const fileSizeMb = file.size / 1024 ** 2;
     const extension = extname(file.originalname);
@@ -75,7 +76,6 @@ export class ProfileService {
         avatarPath: true
       }
     });
-    if (!file) throw new ForbiddenException('File required');
     if (!allowedTypes.includes(extension))
       throw new ForbiddenException('Invalid file type');
     if (fileSizeMb > 2)
