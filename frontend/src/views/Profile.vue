@@ -1,10 +1,10 @@
 <template>
   <h1>Profile infos</h1>
-  <p>Id: {{ user.id }}</p>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
-  <img :src="avatar" alt="avatar" width="200" height="200" />
+  <img :src="avatarPath" alt="avatar" width="200" height="200" />
+  <p>Avatar path: {{ avatarPath }}</p>
 
   <br />
 
@@ -65,8 +65,8 @@ export default {
       user: {},
       newNickname: '',
       newTwoFactorEnable: false,
-      newAvatar: {},
-      avatar: '',
+      newAvatar: '',
+      avatarPath: '',
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
@@ -78,8 +78,8 @@ export default {
       }
     };
   },
-  mounted() {
-    this.getProfile();
+  async mounted() {
+    await this.getProfile();
   },
   methods: {
     async getProfile() {
@@ -93,10 +93,13 @@ export default {
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
-        this.avatar = response.data;
-        console.log(response);
+        this.avatarPath = constants.API_URL + this.user.avatarPath;
+        this.avatarPath = this.avatarPath.replace('/api', '');
       } catch (error) {
-        // TODO: Handle error
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
         this.$router.push('/logout');
       }
     },
@@ -116,6 +119,7 @@ export default {
             }
           }
         );
+        if (this.newAvatar) await this.uploadAvatar(jwt);
         swal({
           icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
           text: formatError(response.data.message)
@@ -128,7 +132,7 @@ export default {
         });
       }
     },
-    dispatchEditProfile() {
+    async dispatchEditProfile() {
       if (!this.isFormValid) {
         swal({
           icon: 'error',
@@ -137,9 +141,9 @@ export default {
         return;
       }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
-        this.generate2faQrcode();
+        await this.generate2faQrcode();
       } else {
-        this.editProfile();
+        await this.editProfile();
       }
     },
     async generate2faQrcode() {
@@ -193,30 +197,27 @@ export default {
       });
     },
     onFileChange(e) {
-      this.newAvatar = e.target.files[0];
-      console.log(this.newAvatar);
+      const avatar = e.target.files[0];
       const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-      const fileSizeMb = this.newAvatar.size / 1024 ** 2;
-      if (!allowedTypes.includes(this.newAvatar.type) || fileSizeMb > 2) {
+      const fileSizeMb = avatar.size / 1024 ** 2;
+      if (!allowedTypes.includes(avatar.type) || fileSizeMb > 2) {
         swal({
           icon: 'error',
           text: 'Invalid file type (png / jpeg / jpg) or size (max 2MB)'
         });
         e.target.value = '';
-        this.newAvatar = {};
-        return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newAvatar.base64 = reader.result;
-      };
-      reader.onError = () => {
-        swal({
-          icon: 'error',
-          text: 'Error while reading file'
-        });
-      };
-      reader.readAsDataURL(this.newAvatar);
+      this.newAvatar = avatar;
+    },
+    async uploadAvatar(jwt) {
+      const formData = new FormData();
+      formData.append('file', this.newAvatar);
+      await axios.post(constants.API_URL + '/profile/avatar', formData, {
+        headers: {
+          Authorization: 'Bearer ' + jwt,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
     }
   }
 };

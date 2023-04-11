@@ -1,10 +1,12 @@
-import { Injectable, UploadedFile, Req } from '@nestjs/common';
+import { Injectable, UploadedFile } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { EditProfileDto } from './dto';
 import { ForbiddenException } from '@nestjs/common';
 import { TwoFaService } from '../2fa/2fa.service';
+import { extname } from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class ProfileService {
@@ -48,18 +50,48 @@ export class ProfileService {
     return { message: 'Profile updated' };
   }
 
-  async uploadAvatar(@Req() req: Request, @UploadedFile() file) {
-    //    const userId = req.user['id'];
-    //    const user = await this.users.getUserById(userId);
-    //    const avatarPath = `avatars/${user.nickname}.png`;
-    //    await this.prisma.user.update({
-    //      where: {
-    //        id: userId
-    //      },
-    //      data: {
-    //        avatarPath: avatarPath
-    //      }
-    //    });
-    //    return { message: 'Avatar updated' };
+  deleteAvatar(avatarPath: string) {
+    try {
+      fs.unlinkSync(`./public${avatarPath}`);
+    } catch (err) {
+      console.log(
+        "Can't delete avatar because it doesn't exist (no problem for the user)"
+      );
+    }
+  }
+
+  async uploadAvatar(
+    userId: number,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    const allowedTypes = ['.png', '.jpg', '.jpeg'];
+    const fileSizeMb = file.size / 1024 ** 2;
+    const extension = extname(file.originalname);
+    const oldAvatar = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        avatarPath: true
+      }
+    });
+    if (!file) throw new ForbiddenException('File required');
+    if (!allowedTypes.includes(extension))
+      throw new ForbiddenException('Invalid file type');
+    if (fileSizeMb > 2)
+      throw new ForbiddenException('File size limit exceeded (2MB)');
+    file.path = file.path.replace('public', '');
+    await this.prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        avatarPath: file.path
+      }
+    });
+    if (oldAvatar.avatarPath !== '/avatars/default.jpeg') {
+      this.deleteAvatar(oldAvatar.avatarPath);
+    }
+    return { message: 'Avatar updated' };
   }
 }

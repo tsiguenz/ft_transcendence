@@ -50,8 +50,8 @@ export class ProfileController {
     return this.profileService.editProfile(dto, req.user['id']);
   }
 
-  //  @UseGuards(JwtGuard)
-  //  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -62,16 +62,17 @@ export class ProfileController {
             .fill(null)
             .map(() => Math.round(Math.random() * 16).toString(16))
             .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
+          return cb(null, `/${randomName}${extname(file.originalname)}`);
         }
       })
     })
   )
   @Post('avatar')
-  // TODO: pass the user id in the url
-  async uploadAvatar(@Req() req: Request, @UploadedFile() file) {
-    console.log(file);
-    return {};
-    //return this.profileService.uploadAvatar(req.user['id'], file);
+  // TODO: pass the user in the url (/api/users/:nickname/avatar)
+  async uploadAvatar(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.profileService.uploadAvatar(req.user['id'], file);
   }
 }
