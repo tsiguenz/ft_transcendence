@@ -1,4 +1,3 @@
-import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -15,9 +14,6 @@ import { JwtService } from '@nestjs/jwt';
 // TODO: remember when we said global is bad? Well, it's bad here too.
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true
-    }),
     AuthModule,
     ChatroomModule,
     UsersModule,

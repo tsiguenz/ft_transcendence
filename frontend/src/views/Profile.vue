@@ -6,10 +6,9 @@
   <p>Created at: {{ user.createdAt }}</p>
   <p>Avatar: {{ user.avatar }}</p>
 
-  <!-- TODO: make it beautiful -->
   <br />
   <h1>Edit profile</h1>
-  <v-form v-if="!qrcode">
+  <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
       v-model="newNickname"
       label="Nickname"
@@ -29,30 +28,31 @@
 
     <br />
 
-    <v-btn v-if="!qrcode" @click="dispatchEditProfile"> submit </v-btn>
+    <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
+      submit
+    </v-btn>
   </v-form>
 
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <v-form v-if="qrcode">
     <v-text-field
       v-model="twoFactorCode"
-      label="2fa code"
+      label="Code"
       required
       @keydown.enter.prevent="editProfile"
     ></v-text-field>
-    <v-btn v-if="qrcode" @click="editProfile"
-      >Validate edit profile with 2fa code</v-btn
-    >
+    <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
   </v-form>
 
-  <!-- TODO: add delete account and logout logic -->
-  <v-btn to="/logout">Logout</v-btn>
-  <v-btn @click="deleteAccount">Delete Account</v-btn>
+  <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
+  <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
 </template>
 
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   data() {
@@ -62,10 +62,12 @@ export default {
       newTwoFactorEnable: false,
       twoFactorCode: '',
       qrcode: '',
+      isFormValid: false,
       rules: {
         nicknameCharacters: (v) =>
-          /^[a-zA-Z0-9-]{0,8}$/.test(v) ||
-          "Must contain only alphanumeric, '-' and be less than 8 characters long"
+          /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
+          this.user.nickname === v ||
+          "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
   },
@@ -95,13 +97,26 @@ export default {
             twoFactorCode: this.twoFactorCode
           }
         );
-        alert(response.data.message);
+        swal({
+          icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
+          text: formatError(response.data.message)
+        });
         this.$router.push('/home');
       } catch (error) {
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
-    async dispatchEditProfile() {
+    dispatchEditProfile() {
+      if (!this.isFormValid) {
+        swal({
+          icon: 'error',
+          text: 'Invalid character or length in nickname'
+        });
+        return;
+      }
       if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
         this.generate2faQrcode();
       } else {
@@ -114,7 +129,10 @@ export default {
           constants.API_URL + '/2fa/generate-qrcode');
         this.qrcode = response.data.qrcode;
       } catch (error) {
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
     async deleteAccount() {
@@ -128,12 +146,46 @@ export default {
             }
           }
         );
-        alert('Account is delete');
         this.$router.push('/logout');
       } catch (error) {
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
+    },
+    alertDeleteAccount() {
+      swal({
+        icon: 'warning',
+        text: 'You are deleting your account, do you want to continue?',
+        buttons: {
+          confirm: "I'll lost all my datas",
+          cancel: "Don't delete my account"
+        }
+      }).then((confirm) => {
+        if (confirm) this.deleteAccount();
+      });
     }
   }
 };
 </script>
+
+<style>
+.swal-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.swal-modal {
+  background-color: rgba(0, 0, 0, 1);
+  border: 3px solid white;
+}
+
+.swal-button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid white;
+}
+
+.swal-text {
+  color: rgba(225, 225, 225, 1);
+}
+</style>

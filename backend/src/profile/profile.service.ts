@@ -37,7 +37,6 @@ export class ProfileService {
   }
 
   // TODO: refactor this function
-  // TODO: change the jwt when user change nickname
   async editProfile(dto: EditProfileDto, userId: number) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -55,22 +54,26 @@ export class ProfileService {
       }
       const valid = await this.twoFa.verifyTwoFa(
         user.twoFactorSecret,
-        dto.twoFactorCode
+        Number(dto.twoFactorCode)
       );
       if (!valid) {
         throw new ForbiddenException('Invalid two factor code');
       }
     }
-    await this.prisma.user.update({
-      where: {
-        id: userId
-      },
-      data: {
-        nickname: dto.nickname,
-        twoFactorEnable: dto.twoFactorEnable
-        // TODO: handle avatar
-      }
-    });
+    await this.prisma.user
+      .update({
+        where: {
+          id: userId
+        },
+        data: {
+          nickname: dto.nickname,
+          twoFactorEnable: dto.twoFactorEnable
+          // TODO: handle avatar
+        }
+      })
+      .catch(() => {
+        throw new ForbiddenException('Nickname already exists');
+      });
     return { message: 'Profile updated' };
   }
 }

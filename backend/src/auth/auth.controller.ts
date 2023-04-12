@@ -48,4 +48,22 @@ export class AuthController {
   signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
   }
+
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        code: {
+          type: 'string',
+          description:
+            'Authorization code returned by the 42 API after the user has logged in'
+        }
+      }
+    }
+  })
+  @Post('42')
+  async signin42(@Body('authorization') authorizationCode: string) {
+    return await this.authService.signin42(authorizationCode);
+  }
 }
