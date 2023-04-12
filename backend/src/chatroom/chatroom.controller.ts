@@ -50,10 +50,20 @@ export class ChatroomController {
     return await this.chatroomService.findAll();
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Get('mine')
   async findChatroomsForUser(@Req() req: Request) {
     return await this.chatroomService.findChatroomsForUser(req.user['id']);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get('joinable')
+  async findJoinableChatroomsForUser(@Req() req: Request) {
+    return await this.chatroomService.findJoinableChatroomsForUser(
+      req.user['id']
+    );
   }
 
   @Get(':id')
@@ -84,5 +94,16 @@ export class ChatroomController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.chatroomService.remove(+id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Post(':id/join')
+  async joinRoom(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body('password') password: string
+  ) {
+    return await this.chatroomService.join(req.user['id'], +id, password);
   }
 }

@@ -12,83 +12,26 @@
       ></v-list-item>
     </v-list>
   </v-card>
- <v-dialog
-    v-model="dialog"
-    persistent
-    width="1024"
-  >
-    <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" block>
-        New chatroom
-      </v-btn>
-    </template>
-    <v-card>
-      <v-card-title>
-        <span class="text-h5">Chatroom</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="12">
-              <v-text-field
-                v-model="newChatroomName"
-                label="Room name*"
-                required
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" >
-              <v-select
-                v-model="newChatroomType"
-                :items="['PUBLIC', 'PROTECTED', 'PRIVATE']"
-                label="Room type*"
-                required
-              ></v-select>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                v-if="newChatroomType === 'PROTECTED'"
-                label="Password*"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-        <small>*indicates required field</small>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="blue-darken-1"
-          variant="text"
-          @click="dialog = false"
-        >
-          Close
-        </v-btn>
-        <v-btn
-          color="blue-darken-1"
-          variant="text"
-          @click="newChatroom"
-        >
-          Save
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    <v-row no-gutters>
+      <v-col cols="8" class="pa-0">
+        <JoinChatroomDialog @join="pushChatroom" />
+      </v-col>
+      <v-col cols="4" class="pa-0">
+        <NewChatroomDialog @create="pushChatroom" />
+      </v-col>
+    </v-row>
 </template>
 
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
-import ChatService from '../services/chat.service';
+import NewChatroomDialog from '../components/NewChatroomDialog.vue';
+import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 export default {
-  data() {
-    return {
-      chatrooms: [],
-      newChatroomName: '',
-      dialog: false,
-      newChatroomType: 'PUBLIC'
-    }
+  components: {
+    NewChatroomDialog,
+    JoinChatroomDialog
   },
   props: [
     'id',
@@ -96,6 +39,11 @@ export default {
   emits: [
     'join'
   ],
+  data() {
+    return {
+      chatrooms: [],
+    }
+  },
   mounted() {
     this.loadChatrooms().then((chatrooms) => {
       this.join(chatrooms[0].id);
@@ -104,6 +52,9 @@ export default {
   methods: {
     join(id) {
       this.$emit('join', id);
+    },
+    pushChatroom(chatroom) {
+      this.chatrooms.push(chatroom);
     },
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
@@ -117,23 +68,6 @@ export default {
       } catch (error) {
         alert(error.response.data.message);
       }
-    },
-    async newChatroom() {
-      this.dialog = false;
-      // TODO: clean the input to protect injection
-      try {
-        const response = await axios.post(constants.API_URL + '/chatrooms', {
-          name: this.newChatroomName,
-          type: this.newChatroomType
-        });
-        this.chatrooms.push(response.data);
-        ChatService.joinRoom(response.data.id);
-        console.log(response.data);
-      } catch (error) {
-        alert(error.response.data.message);
-      }
-      this.newChatroomName = '';
-      this.newChatroomType = 'PUBLIC';
     },
   }
 }
