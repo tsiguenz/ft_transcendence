@@ -5,16 +5,9 @@ import {
   UseGuards,
   Delete,
   Req,
-  Post,
-  Body
+  Post
 } from '@nestjs/common';
-import {
-  ApiParam,
-  ApiTags,
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiBody
-} from '@nestjs/swagger';
+import { ApiParam, ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtGuard } from '../auth/guard';
 import { Request } from 'express';
@@ -63,22 +56,22 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
-  @ApiConsumes('application/x-www-form-urlencoded')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        friendNickname: {
-          type: 'string',
-          description: 'Nickname of the user you want to add as a friend'
-        }
-      }
-    }
+  @ApiParam({
+    name: 'friendNickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the friend you are adding'
   })
-  @Post(':nickname/friends')
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are adding a friend to'
+  })
+  @Post(':nickname/friends/:friendNickname')
   addFriend(
     @Param('nickname') nickname: string,
-    @Body('friendNickname') friendNickname: string,
+    @Param('friendNickname') friendNickname: string,
     @Req() req: Request
   ) {
     return this.usersService.addFriend(

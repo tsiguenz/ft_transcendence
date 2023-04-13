@@ -112,10 +112,9 @@ export default {
       try {
         const jwt = this.$cookie.getCookie('jwt');
         await axios.post(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
-          {
-            friendNickname: nickname
-          },
+          constants.API_URL +
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
+          {},
           {
             headers: {
               Authorization: 'Bearer ' + jwt
@@ -123,6 +122,7 @@ export default {
           }
         );
       } catch (error) {
+        console.log(error);
         swall({
           title: 'Error',
           text: formatError(error.response.data.message),

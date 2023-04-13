@@ -1,10 +1,9 @@
 -- CreateTable
 CREATE TABLE "friends" (
-    "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "friendId" INTEGER NOT NULL,
 
-    CONSTRAINT "friends_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "friends_pkey" PRIMARY KEY ("userId","friendId")
 );
 
 -- AddForeignKey

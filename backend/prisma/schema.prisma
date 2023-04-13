@@ -73,9 +73,8 @@ model Message {
 model Friend {
   userId          Int
   user            User  @relation("user", fields: [userId], references: [id], onDelete: Cascade)
-// TODO: use id instead of nickname because nickname can be changed
-  friendNickname  String
+  friendId        Int
 
-  @@id([userId, friendNickname], name: "friend_pkey")
+  @@id([userId, friendId], name: "friend_pkey")
   @@map("friends")
 }

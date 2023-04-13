@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, Delete } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
@@ -77,18 +81,18 @@ export class UsersService {
       where: {
         friend_pkey: {
           userId: user.id,
-          friendNickname: friendNickname
+          friendId: friend.id
         }
       },
       select: {
-        friendNickname: true
+        friendId: true
       }
     });
     if (userFriends) throw new ForbiddenException('Friend already added');
     await this.prisma.friend.create({
       data: {
         userId: user.id,
-        friendNickname: friendNickname
+        friendId: friend.id
       }
     });
     return { message: 'Friend added' };
@@ -100,7 +104,8 @@ export class UsersService {
     userId: number
   ) {
     const user = await this.getUser(userNickname);
-    if (!user) throw new NotFoundException('User not found');
+    const friend = await this.getUser(friendNickname);
+    if (!user || !friend) throw new NotFoundException('User not found');
     if (userNickname === friendNickname || userId !== user.id) {
       throw new UnauthorizedException(
         'You are not authorized to delete this friend'
@@ -111,16 +116,14 @@ export class UsersService {
         where: {
           friend_pkey: {
             userId: user.id,
-            friendNickname: friendNickname
+            friendId: friend.id
           }
         }
       })
       .catch(() => {
         throw new NotFoundException('Friend not found');
-      })
-      .then(() => {
-        return { message: 'Friend deleted' };
       });
+    return { message: 'Friend deleted' };
   }
 
   async getFriends(userNickname: string, userId: number) {
@@ -131,14 +134,24 @@ export class UsersService {
         'You are not authorized to get this user friends'
       );
     }
-    const friends = await this.prisma.friend.findMany({
+    const friendsId = await this.prisma.friend.findMany({
       where: {
         userId: user.id
       },
       select: {
-        friendNickname: true
+        friendId: true
       }
     });
-    return friends.map((friend) => friend.friendNickname);
+    const friends = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: friendsId.map((friend) => friend.friendId)
+        }
+      },
+      select: {
+        nickname: true
+      }
+    });
+    return friends.map((friend) => friend.nickname);
   }
 }

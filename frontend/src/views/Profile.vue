@@ -58,6 +58,8 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   data() {
@@ -77,6 +79,9 @@ export default {
           "Must contain only alphanumeric, '-' and have a length between 1 and 8"
       }
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore)
   },
   async mounted() {
     await this.getProfile();
@@ -118,6 +123,7 @@ export default {
             }
           }
         );
+        this.sessionStore.nickname = this.newNickname;
         if (this.newAvatar) await this.uploadAvatar(jwt);
         swal({
           icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
