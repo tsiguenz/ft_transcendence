@@ -54,7 +54,11 @@ export class UsersController {
   })
   @Delete(':nickname')
   deleteUser(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.deleteUser(nickname, req.user['nickname']);
+    return this.usersService.deleteUser(
+      nickname,
+      req.user['nickname'],
+      req.user['avatarPath']
+    );
   }
 
   @UseGuards(JwtGuard)

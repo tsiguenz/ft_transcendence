@@ -45,8 +45,8 @@ export default {
       auth42: `https://api.intra.42.fr/oauth/authorize?client_id=${
         import.meta.env.VITE_APP42_ID
       }&redirect_uri=${
-        constants.FRONT_URL
-      }/42/callback&response_type=code&scope=public`
+        import.meta.env.VITE_CALLBACK_URL
+      }&response_type=code&scope=public`
     };
   },
   computed: {

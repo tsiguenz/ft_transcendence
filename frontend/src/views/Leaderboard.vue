@@ -4,14 +4,12 @@
   <v-table density="compact">
     <thead>
       <tr>
-        <th class="text-left">Id</th>
         <th class="text-left">Nickname</th>
         <th class="text-left">Ladder points</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <td>{{ user.id }}</td>
+      <tr v-for="user in users" :key="user.nickname">
         <td>{{ user.nickname }}</td>
         <td>{{ user.ladderPoints }}</td>
         <td><v-btn size="small" @click="addFriend(user.nickname)">Add friend</v-btn></td>

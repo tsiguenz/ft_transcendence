@@ -10,12 +10,7 @@ export class EditProfileDto {
   @IsBoolean()
   twoFactorEnable: boolean;
 
-  @ValidateIf((o) => o === '')
+  @ValidateIf((o) => o.twoFactorCode === '')
   @IsString()
   twoFactorCode: string;
-
-  // TODO: handle avatar
-  //  @IsBuffer
-  //  @IsString()
-  //  avatar: Buffer;
 }

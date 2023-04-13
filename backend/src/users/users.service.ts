@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Delete } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -11,14 +11,6 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({
         where: {
           nickname: nickname
-        },
-        select: {
-          // TODO: id is necessary?
-          id: true,
-          nickname: true,
-          ladderPoints: true,
-          avatar: true,
-          createdAt: true
         }
       });
       return user;
@@ -32,14 +24,6 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({
         where: {
           id: userId
-        },
-        select: {
-          // TODO: id is necessary?
-          id: true,
-          nickname: true,
-          ladderPoints: true,
-          avatar: true,
-          createdAt: true
         }
       });
       return user;
@@ -51,11 +35,9 @@ export class UsersService {
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
       select: {
-        // TODO: id is necessary?
-        id: true,
         nickname: true,
         ladderPoints: true,
-        avatar: true,
+        avatarPath: true,
         createdAt: true
       }
     });
@@ -63,12 +45,13 @@ export class UsersService {
   }
 
   //TODO: Use guard to verify authorization
-  async deleteUser(paramName: string, nickname: string) {
+  async deleteUser(paramName: string, nickname: string, avatarPath: string) {
     if (paramName !== nickname) {
       throw new UnauthorizedException(
         'You are not authorized to delete this profile'
       );
     }
+    //    this.profile.deleteAvatar(avatarPath);
     const deleteUser = await this.prisma.user.delete({
       where: {
         nickname: nickname
