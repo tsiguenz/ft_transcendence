@@ -22,14 +22,19 @@
     <thead>
       <tr>
         <th class="text-left">Nickname</th>
-        <th class="text-left"></th>
+        <th class="text-left">Ladder points</th>
+        <th class="text-left">Avatar</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="friend in friends" :key="friend">
-        <td>{{ friend }}</td>
+      <tr v-for="friend in friends" :key="friend.nickname">
+        <td>{{ friend.nickname }}</td>
+        <td>{{ friend.ladderPoints }}</td>
         <td>
-          <v-btn size="small" @click="deleteFriend(friend)"
+          <img :src="friend.avatarPath" alt="avatar" width="50" height="50" />
+        </td>
+        <td>
+          <v-btn size="small" @click="deleteFriend(friend.nickname)"
             >Delete friend</v-btn
           >
         </td>
@@ -50,14 +55,15 @@ export default {
   data() {
     return {
       friends: [],
-      newFriend: ''
+      newFriend: '',
+      renderPage: 0
     };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
   watch: {
-    async friends() {
+    async renderPage() {
       await this.getFriends();
     }
   },
@@ -77,6 +83,9 @@ export default {
           }
         );
         this.friends = response.data;
+        this.friends.forEach((friend) => {
+          friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
+        });
       } catch (error) {
         swall({
           title: 'Error',
@@ -99,6 +108,7 @@ export default {
             }
           }
         );
+        this.renderPage++;
       } catch (error) {
         swall({
           title: 'Error',
@@ -121,6 +131,7 @@ export default {
             }
           }
         );
+        this.renderPage++;
       } catch (error) {
         console.log(error);
         swall({

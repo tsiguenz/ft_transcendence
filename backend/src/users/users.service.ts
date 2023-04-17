@@ -49,7 +49,7 @@ export class UsersService {
   }
 
   //TODO: Use guard to verify authorization
-  async deleteUser(paramName: string, nickname: string, avatarPath: string) {
+  async deleteUser(paramName: string, nickname: string) {
     if (paramName !== nickname) {
       throw new UnauthorizedException(
         'You are not authorized to delete this profile'
@@ -149,9 +149,12 @@ export class UsersService {
         }
       },
       select: {
-        nickname: true
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true
       }
     });
+    return friends;
     return friends.map((friend) => friend.nickname);
   }
 }

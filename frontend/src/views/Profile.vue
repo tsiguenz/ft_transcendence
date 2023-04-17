@@ -3,7 +3,7 @@
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
-  <img :src="avatarPath" alt="avatar" width="200" height="200" />
+  <img :src="avatarPath" alt="avatar" width="100" height="100" />
   <p>Avatar path: {{ avatarPath }}</p>
 
   <br />

@@ -7,7 +7,7 @@ import {
   Req,
   Post
 } from '@nestjs/common';
-import { ApiParam, ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { ApiParam, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtGuard } from '../auth/guard';
 import { Request } from 'express';
@@ -47,11 +47,7 @@ export class UsersController {
   })
   @Delete(':nickname')
   deleteUser(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.deleteUser(
-      nickname,
-      req.user['nickname'],
-      req.user['avatarPath']
-    );
+    return this.usersService.deleteUser(nickname, req.user['nickname']);
   }
 
   @UseGuards(JwtGuard)
@@ -99,6 +95,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
+  // TODO: return friend object instead of only nickname
   getFriends(@Param('nickname') nickname: string, @Req() req: Request) {
     return this.usersService.getFriends(nickname, req.user['id']);
   }
