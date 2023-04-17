@@ -95,7 +95,6 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
-  // TODO: return friend object instead of only nickname
   getFriends(@Param('nickname') nickname: string, @Req() req: Request) {
     return this.usersService.getFriends(nickname, req.user['id']);
   }

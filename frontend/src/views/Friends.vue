@@ -133,7 +133,6 @@ export default {
         );
         this.renderPage++;
       } catch (error) {
-        console.log(error);
         swall({
           title: 'Error',
           text: formatError(error.response.data.message),

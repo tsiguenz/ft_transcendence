@@ -155,6 +155,5 @@ export class UsersService {
       }
     });
     return friends;
-    return friends.map((friend) => friend.nickname);
   }
 }
