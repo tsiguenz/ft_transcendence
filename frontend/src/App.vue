@@ -1,8 +1,8 @@
 <template>
-  <v-app>
+    <div class="app">
     <AppHeader v-if="!hideHeader()"></AppHeader>
     <router-view />
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -25,3 +25,44 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+
+:root {
+	--light: #600FDF;
+	--light-purple: #4508A0;
+	--medium-purple: #2B0366;
+	--dark-purple: #1F024A;
+	--dark-alt: #0F0124;
+	--sidebar-width: 300px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Fira sans', sans-serif;
+}
+body {
+	background: linear-gradient(var(--medium-purple), var(--light));
+}
+button {
+	cursor: pointer;
+	appearance: none;
+	border: none;
+	outline: none;
+	background: none;
+}
+
+.app {
+	display: flex;
+	main {
+		flex: 1 1 0;
+		padding: 2rem;
+		@media (max-width: 1024px) {
+			padding-left: 6rem;
+		}
+	}
+}
+
+</style>

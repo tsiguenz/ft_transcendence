@@ -1,4 +1,5 @@
 <template>
+  <div class="full">
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
@@ -51,6 +52,7 @@
 
   <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
   <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
+</div>
 </template>
 
 <script>
@@ -222,7 +224,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
 .swal-overlay {
   background-color: rgba(255, 255, 255, 0.5);
 }

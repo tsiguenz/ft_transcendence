@@ -1,56 +1,41 @@
-<!-- <template>
-  <v-card>
-    <v-tabs bg-color="dark" center-active>
-      <v-tab to="/home">Home</v-tab>
-      <v-tab v-if="isLog()" to="/game">Game</v-tab>
-      <v-tab v-if="isLog()" to="/chat">Chat</v-tab>
-      <v-tab v-if="isLog()" to="/leaderboard">Leaderboard</v-tab>
-      <v-tab v-if="isLog()" to="/profile">Profile</v-tab>
-      <v-tab v-if="!isLog()" to="/signin">Signin</v-tab>
-      <v-tab v-if="!isLog()" to="/signup">Signup</v-tab>
-    </v-tabs>
-  </v-card>
-</template> -->
-
 <template>
-  <nav>
-    <!-- <v-toolbar flat app>
-      <v-toolbar-side-icon @click="drawer = !drawer" class="grey--text"></v-toolbar-side-icon>
-      <v-toolbar-title class="text-uppercase grey--text">
-        <span class="font-weight-light">Todo</span>
-        <span>Ninja</span>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-     
-    </v-toolbar> -->
+	<aside :class="`${is_expanded ? 'is-expanded' : ''}`">
+		<div class="logo"><img src="../../icons/pong.png"></div>
 
-    <v-navigation-drawer v-model="drawer" app class="navBar">
-      <v-list>
-        <v-list-item to="/home" style="margin-block: 5%;">
-          <v-avatar rounded="0" size="25px" style="display:inline-block;margin-right: 5%;">
-            <v-img src="./icons/house.png" style="display:inline-block;"></v-img></v-avatar>Home</v-list-item>
-        <v-list-item v-if="isLog()" to="/game" style="margin-block: 5%;">
-          <v-avatar rounded="0" size="25px" style="display:inline-block;margin-right: 5%;">
-            <v-img src="./icons/joystick.png" style="display:inline-block;margin-right: 5%;"></v-img></v-avatar>Game</v-list-item>
-        <v-list-item v-if="isLog()" to="/chat" style="margin-block: 5%;">
-          <v-avatar rounded="0" size="25px" style="display:inline-block;margin-right: 5%;">
-            <v-img src="./icons/chat.png" style="display:inline-block;margin-right: 5%;"></v-img></v-avatar>Social</v-list-item>
-        <v-list-item v-if="isLog()" to="/leaderboard" style="margin-block: 5%;">
-          <v-avatar rounded="0" size="25px" style="display:inline-block;margin-right: 5%;">
-            <v-img src="./icons/trophy.png" style="display:inline-block;margin-right: 5%;"></v-img></v-avatar>Leaderboard</v-list-item>
-        <v-list-item v-if="!isLog()" to="/signin">Signin</v-list-item>
-        <v-list-item v-if="!isLog()" to="/signup">Signup</v-list-item>
-      </v-list>
-      <template #append>
+		<div class="menu-toggle-wrap">
+			<button class="menu-toggle" @click="ToggleMenu">
+				<span class="material-icons">keyboard_double_arrow_right</span>
+			</button>
+		</div>
+		<div class="menu">
+			<router-link class="button" to="/home"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/house.png"></v-img></v-avatar><span class="text">Home</span></router-link>
+			<router-link v-if="isLog()" class="button" to="/game"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/joystick.png"></v-img></v-avatar><span class="text">Game</span></router-link>
+			<router-link v-if="isLog()" class="button" to="/chat"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/chat.png"></v-img></v-avatar><span class="text">Social</span></router-link>
+			<router-link v-if="isLog()" class="button" to="/leaderboard"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/trophy.png"></v-img></v-avatar><span class="text">LeaderBoard</span></router-link>
+			<router-link v-if="isLog()" class="button" to="/profile"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/user.png"></v-img></v-avatar><span class="text">Profile</span></router-link>
+		</div>
+		<div class="flex"></div>
+		<div>
+			<router-link to="/logout" class="logbutton">
+				<v-btn v-if="isLog()" class="log"  block to="/logout">Logout</v-btn>
+				<v-btn v-if="isLog()" class="logimg"  block to="/logout"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/logout.png"></v-img></v-avatar></v-btn>
+				<v-btn v-if="!isLog()" class="log"  block to="/signin">Sign In</v-btn>
+				<v-btn v-if="!isLog()" class="logimg"  block to="/signin"><v-avatar  rounded="0" size="25px">
+						<v-img  class="icons-avatar" src="./icons/logout.png"></v-img></v-avatar></v-btn>
+			</router-link>
+		</div>
+		<!-- </div>
           <div class="pa-2">
-            <v-list-item v-if="isLog()" to="/profile" style="margin-block: 5%;"> <v-avatar rounded="0" size="25px" style="display:inline-block;margin-right: 5%;"><v-img src="./icons/user.png" style="display:inline-block;margin-right: 5%;"></v-img></v-avatar>Profile</v-list-item>
-            <v-btn v-if="isLog()" class="button"  block to="/logout">Logout</v-btn>
-            <v-btn v-if="!isLog()" class="button"  block to="/signin">Sign In</v-btn>
-          </div>
-        </template>
-    </v-navigation-drawer>
-
-  </nav>
+            <v-btn v-if="isLog()" class="logbutton"  block to="/logout">Logout</v-btn>
+            <v-btn v-if="!isLog()" class="logbutton"  block to="/signin">Sign In</v-btn>
+          </div> -->
+</aside>
 </template>
 
 <script>
@@ -58,39 +43,158 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
 export default {
-  data() {
-    return {
-      drawer: true
-    };
-  },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
-  methods: {
-    isLog() {
-      return this.sessionStore.loggedIn;
-    }
-  }
+	data() {
+		return {
+			drawer: true
+		};
+	},
+	computed: {
+		...mapStores(useSessionStore)
+	},
+	methods: {
+		isLog() {
+			return this.sessionStore.loggedIn;
+		}
+	}
 };
 </script>
+<script setup>
+import { ref } from 'vue';
 
-<style scoped>
-
->>>.navBar{
-  background: #0F0124;
+const is_expanded = ref(false)
+const ToggleMenu = () => {
+	is_expanded.value = !is_expanded.value;
 }
->>>.button:hover {
-  background-position: right center;
+</script>
+<style lang="scss" scoped>
+
+.log:hover {
+	background-position: right center;
 }
 
->>>.button {
-  background-image: linear-gradient(to right, #600FDF 0%, #2B0366 51%, #600FDF 100%);
-  flex: 1 1 auto;
-  padding: 30px;
-  text-align: center;
-  text-transform: uppercase;
-  transition: 0.5s;
-  background-size: 200% auto;
-  border-radius: 10px;
+.log {
+	display: none;
+}
+
+.logimg {
+			background-image: linear-gradient(to right, #600FDF 0%, #2B0366 51%, #600FDF 100%);
+			flex: 1 1 auto;
+			bottom: 0;
+			text-align: center;
+			text-transform: uppercase;
+			transition: 0.5s;
+			background-size: 200% auto;
+			border-radius: 10px;
+			display: flex;
+		}
+
+:root {
+	--light: #600FDF;
+	--light-purple: #4508A0;
+	--medium-purple: #2B0366;
+	--dark-purple: #1F024A;
+	--dark-alt: #0F0124;
+	--sidebar-width: 300px;
+}
+
+aside {
+	display: flex;
+	flex-direction: column;
+	background-color: var(--dark-alt);
+	color: #ffff;
+	width: calc(2rem + 32px);
+	overflow: hidden;
+	min-height: 100vh;
+	padding: 1rem;
+	transition: 0.2s ease-in-out;
+
+	.logo {
+		margin-bottom: 1rem;
+		img {
+			width: 2rem;
+		}
+	}
+
+	.button:hover{
+		background-color: #600FDF;
+	}
+	.menu-toggle-wrap {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 1rem;
+		position: relative;
+		top: 0;
+		transition: 0.2s ease-in-out;
+		.menu-toggle {
+			transition: 0.2s ease-in-out;
+		}
+	}
+	.flex {
+		flex: 1 1 0%;
+	}
+
+	&.is-expanded {
+		width: var(--sidebar-width);
+
+		.menu-toggle-wrap {
+			top: -3rem;
+			
+			.menu-toggle {
+				transform: rotate(-180deg);
+			}
+		}
+		.log:hover {
+			background-position: right center;
+		}
+
+		.log {
+			background-image: linear-gradient(to right, #600FDF 0%, #2B0366 51%, #600FDF 100%);
+			flex: 1 1 auto;
+			bottom: 0;
+			text-align: center;
+			text-transform: uppercase;
+			transition: 0.5s;
+			background-size: 200% auto;
+			border-radius: 10px;
+			display: flex;
+		}
+		.logimg{
+			display: none;
+		}
+	}
+
+	.menu {
+		margin: 0 -1rem;
+		.button {
+			display: flex;
+			align-items: center;
+			text-decoration: none;
+			transition: 0.2s ease-in-out;
+			padding: 0.5rem 1rem;
+			.text {
+				padding-left: 2rem;
+				color: var(--light);
+				transition: 0.2s ease-in-out;
+			}
+			&:hover {
+				background-color: var(--dark-alt);
+				.button, .text {
+					color: var(--primary);
+				}
+			}
+
+			&.router-link-exact-active {
+				background-color: var(--dark-purple);
+				border-right: 5px solid var(--light);
+				.icons-avatar, .text {
+					color: var(--primary);
+				}
+			}
+		}
+	}
+	@media (max-width: 1024px) {
+		position: absolute;
+		z-index: 99;
+	}
 }
 </style>
