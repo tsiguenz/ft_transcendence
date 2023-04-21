@@ -57,7 +57,7 @@ export class AuthService {
     return this.createJwt(user.id);
   }
 
-  async createJwt(userId: number) {
+  async createJwt(userId: string) {
     const payload = {
       sub: userId
     };

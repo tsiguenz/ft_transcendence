@@ -26,14 +26,17 @@ export default {
     return {
       users: [],
       message: '',
-      messages: [],
+      messages: []
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore)
   },
   created() {
     SocketioService.setupSocketConnection(this.$cookie.getCookie('jwt'));
   },
   mounted() {
-    SocketioService.subscribe("msgToClient", (message) => {
+    SocketioService.subscribe('msgToClient', (message) => {
       if (message.author === this.sessionStore.nickname) {
         message.author = 'Me';
       }
@@ -43,18 +46,16 @@ export default {
   beforeUnmount() {
     SocketioService.disconnect();
   },
-  computed: {
-    ...mapStores(useSessionStore),
-  },
   methods: {
     sendMessage() {
-      if (this.message == '') { return; }
-      SocketioService.sendMessage("msgToServer", this.message);
+      if (this.message == '') {
+        return;
+      }
+      SocketioService.sendMessage('msgToServer', this.message);
       // SocketioService.sendMessage("testChannel", this.message);
       this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     }
   }
 };
-
 </script>

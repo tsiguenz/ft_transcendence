@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class TwoFaService {
   constructor(private prisma: PrismaService) {}
-  async createSecret(userId: number) {
+  async createSecret(userId: string) {
     const secret = speakeasy.generateSecret({
       name: process.env.APP_NAME
     });
@@ -29,7 +29,7 @@ export class TwoFaService {
   async verifyTwoFaRoute(id: string, code: number) {
     const newEntry = await this.prisma.twoFactorId.findUnique({
       where: {
-        uuid: id
+        id: id
       },
       select: {
         user: {
@@ -60,12 +60,12 @@ export class TwoFaService {
     });
   }
 
-  async generateTwoFaId(userId: number) {
+  async generateTwoFaId(userId: string) {
     const newEntry = await this.prisma.twoFactorId.upsert({
       where: {
         userId: userId
       },
-      update: { uuid: uuidv4() },
+      update: { id: uuidv4() },
       create: {
         user: {
           connect: {
@@ -74,16 +74,16 @@ export class TwoFaService {
         }
       },
       select: {
-        uuid: true
+        id: true
       }
     });
-    return newEntry.uuid;
+    return newEntry.id;
   }
 
-  async deleteTwoFaId(uuid: string) {
+  async deleteTwoFaId(id: string) {
     await this.prisma.twoFactorId.delete({
       where: {
-        uuid: uuid
+        id: id
       }
     });
   }
