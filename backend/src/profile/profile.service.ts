@@ -16,13 +16,13 @@ export class ProfileService {
     private users: UsersService,
     private twoFa: TwoFaService
   ) {}
-  async getProfile(userId: number) {
+  async getProfile(userId: string) {
     const userProfile = await this.users.getUserById(userId);
     return userProfile;
   }
 
   // TODO: refactor this function
-  async editProfile(dto: EditProfileDto, userId: number) {
+  async editProfile(dto: EditProfileDto, userId: string) {
     const user = await this.users.getUserById(userId);
     if (dto.twoFactorEnable && !user.twoFactorEnable) {
       if (!dto.twoFactorCode) {
@@ -61,7 +61,7 @@ export class ProfileService {
   }
 
   async uploadAvatar(
-    userId: number,
+    userId: string,
     @UploadedFile() file: Express.Multer.File
   ) {
     if (!file) throw new ForbiddenException('File required');

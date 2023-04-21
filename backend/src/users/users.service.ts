@@ -23,7 +23,7 @@ export class UsersService {
     }
   }
 
-  async getUserById(userId: number) {
+  async getUserById(userId: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -67,7 +67,7 @@ export class UsersService {
   async addFriend(
     userNickname: string,
     friendNickname: string,
-    userId: number
+    userId: string
   ) {
     const user = await this.getUser(userNickname);
     const friend = await this.getUser(friendNickname);
@@ -101,7 +101,7 @@ export class UsersService {
   async deleteFriend(
     userNickname: string,
     friendNickname: string,
-    userId: number
+    userId: string
   ) {
     const user = await this.getUser(userNickname);
     const friend = await this.getUser(friendNickname);
@@ -126,7 +126,7 @@ export class UsersService {
     return { message: 'Friend deleted' };
   }
 
-  async getFriends(userNickname: string, userId: number) {
+  async getFriends(userNickname: string, userId: string) {
     const user = await this.getUser(userNickname);
     if (!user) throw new NotFoundException('User not found');
     if (userId !== user.id) {

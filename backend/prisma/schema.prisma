@@ -15,7 +15,7 @@ enum GameType {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
+  id              String       @id @default(uuid())
   fortyTwoId      Int?         @unique
   nickname        String       @unique
   ladderPoints    Int          @default(0)
@@ -34,19 +34,19 @@ model User {
 }
 
 model TwoFactorId {
-  uuid   String @id @default(uuid())
-  userId Int    @unique
+  id   String @id @default(uuid())
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("two_factor_ids")
 }
 
 model Game {
-  id                   Int      @id @default(autoincrement())
+  id                   String   @id @default(uuid())
   type                 GameType
-  winnerId             Int
+  winnerId             String
   winner               User     @relation("winner", fields: [winnerId], references: [id])
-  looserId             Int
+  looserId             String
   looser               User     @relation("looser", fields: [looserId], references: [id])
   previousWinnerRating Int
   previousLooserRating Int
@@ -61,7 +61,7 @@ model Game {
 model Message {
   id        Int      @id @default(autoincrement())
   content   String
-  authorId  Int
+  authorId  String
   author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
   // chatRoomId Int
   //  chatRoom  ChatRoom @relation(fields: [chatRoomId], references: [id])
@@ -71,9 +71,9 @@ model Message {
 }
 
 model Friend {
-  userId          Int
+  userId          String
   user            User  @relation("user", fields: [userId], references: [id], onDelete: Cascade)
-  friendId        Int
+  friendId        String
 
   @@id([userId, friendId], name: "friend_pkey")
   @@map("friends")
