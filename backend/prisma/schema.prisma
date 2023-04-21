@@ -26,6 +26,7 @@ model User {
   gamesWin        Game[]       @relation("winner")
   gamesLoose      Game[]       @relation("looser")
   messages        Message[]    @relation("author")
+  friends         Friend[]     @relation("user")
   createdAt       DateTime     @default(now())
   TwoFactorId     TwoFactorId?
 
@@ -33,9 +34,9 @@ model User {
 }
 
 model TwoFactorId {
-  uuid      String   @id @default(uuid())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  uuid   String @id @default(uuid())
+  userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("two_factor_ids")
 }
@@ -67,4 +68,13 @@ model Message {
   createdAt DateTime @default(now())
 
   @@map("messages")
+}
+
+model Friend {
+  userId          Int
+  user            User  @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+  friendId        Int
+
+  @@id([userId, friendId], name: "friend_pkey")
+  @@map("friends")
 }

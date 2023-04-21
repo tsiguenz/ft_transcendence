@@ -8,19 +8,18 @@ export default {
   data() {
     return {};
   },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
   mounted() {
     this.logout();
     this.$router.push('/home');
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
   methods: {
     logout() {
-      if (this.$cookie.isCookieAvailable('jwt')) {
+      if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
-        this.sessionStore.logout();
-      }
+      this.sessionStore.logout();
     }
   }
 };

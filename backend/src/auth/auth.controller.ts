@@ -27,7 +27,6 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('signin')
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
     schema: {
@@ -45,6 +44,7 @@ export class AuthController {
       }
     }
   })
+  @Post('signin')
   signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
   }
