@@ -21,7 +21,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ProfileModule,
     TwoFaModule,
     ServeStaticModule.forRoot({
-      rootPath: '/app/public'
+      rootPath: '/app/public',
+      serveRoot: '/'
     })
   ],
   controllers: [],
