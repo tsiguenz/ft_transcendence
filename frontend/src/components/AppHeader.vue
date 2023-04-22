@@ -1,5 +1,6 @@
 <template>
 	<aside :class="`${is_expanded ? 'is-expanded' : ''}`">
+		
 		<div class="logo"><img src="../../icons/pong.png"></div>
 
 		<div class="menu-toggle-wrap">
@@ -27,14 +28,9 @@
 						<v-img  class="icons-avatar" src="./icons/logout.png"></v-img></v-avatar></v-btn>
 				<v-btn v-if="!isLog()" class="log"  block to="/signin">Sign In</v-btn>
 				<v-btn v-if="!isLog()" class="logimg"  block to="/signin"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/logout.png"></v-img></v-avatar></v-btn>
+						<v-img  class="icons-avatar" src="./icons/sign-in.png"></v-img></v-avatar></v-btn>
 			</router-link>
 		</div>
-		<!-- </div>
-          <div class="pa-2">
-            <v-btn v-if="isLog()" class="logbutton"  block to="/logout">Logout</v-btn>
-            <v-btn v-if="!isLog()" class="logbutton"  block to="/signin">Sign In</v-btn>
-          </div> -->
 </aside>
 </template>
 
@@ -59,6 +55,7 @@ export default {
 };
 </script>
 <script setup>
+
 import { ref } from 'vue';
 
 const is_expanded = ref(false)
@@ -67,6 +64,15 @@ const ToggleMenu = () => {
 }
 </script>
 <style lang="scss" scoped>
+
+:root {
+	--light: #600FDF;
+	--light-purple: #4508A0;
+	--medium-purple: #2B0366;
+	--dark-purple: #1F024A;
+	--dark-alt: #0F0124;
+	--sidebar-width: 300px;
+}
 
 .log:hover {
 	background-position: right center;
@@ -77,7 +83,7 @@ const ToggleMenu = () => {
 }
 
 .logimg {
-			background-image: linear-gradient(to right, #600FDF 0%, #2B0366 51%, #600FDF 100%);
+			background-image: linear-gradient(to right,var(--light) 0%, var(--medium-purple) 51%, var(--light) 100%);
 			flex: 1 1 auto;
 			bottom: 0;
 			text-align: center;
@@ -87,15 +93,6 @@ const ToggleMenu = () => {
 			border-radius: 10px;
 			display: flex;
 		}
-
-:root {
-	--light: #600FDF;
-	--light-purple: #4508A0;
-	--medium-purple: #2B0366;
-	--dark-purple: #1F024A;
-	--dark-alt: #0F0124;
-	--sidebar-width: 300px;
-}
 
 aside {
 	display: flex;
@@ -108,6 +105,7 @@ aside {
 	padding: 1rem;
 	transition: 0.2s ease-in-out;
 
+	font-family: 'Poppins', sans-serif;
 	.logo {
 		margin-bottom: 1rem;
 		img {
@@ -148,7 +146,7 @@ aside {
 		}
 
 		.log {
-			background-image: linear-gradient(to right, #600FDF 0%, #2B0366 51%, #600FDF 100%);
+			background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
 			flex: 1 1 auto;
 			bottom: 0;
 			text-align: center;
