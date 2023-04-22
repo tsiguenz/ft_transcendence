@@ -1,21 +1,13 @@
 <template>
-  <v-app class="homepage">
-    <Navbar />
-    <main>
 			<h1>Home</h1>
 			<p>This is the Home page</p>
-	</main>
-  </v-app>
  
 </template>
 
 <script>
 
-import Navbar from '../components/Navbar.vue';
 
 export default {
-  name: 'App',
-  components: { Navbar },
   data () {
     return {
       

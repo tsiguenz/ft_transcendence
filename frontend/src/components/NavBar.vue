@@ -1,8 +1,9 @@
+import formatError from '../utils/lib';
 <template>
     <nav>
       <v-toolbar class="nav">
         <v-toolbar-title>
-          <span class="title">HOME</span>
+          <span class="title">{{ pageTitle }}</span>
         </v-toolbar-title>
       </v-toolbar>
     </nav>
@@ -10,11 +11,12 @@
   
   <script>
   export default {
-    data() {
-      return {
-      }
+  computed: {
+    pageTitle() {
+      return this.$route.name || 'Default Title';
     }
   }
+};
   </script>
   
 <style scoped>
@@ -33,6 +35,9 @@
 
 .title{
     font-weight: 500;
+    font-size: larger;
+    display: flex;
+    justify-content: center;
 }
 
 </style>

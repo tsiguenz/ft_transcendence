@@ -1,20 +1,11 @@
 <template>
-  <v-app class="gamepage">
-    <Navbar />
-    <main>
 			<h1>Game</h1>
 			<p>This is the GAME page</p>
-	</main>
-  </v-app>
 </template>
 
 <script>
 
-import Navbar from '../components/Navbar.vue';
-
 export default {
-  name: 'App',
-  components: { Navbar },
   data () {
     return {
       

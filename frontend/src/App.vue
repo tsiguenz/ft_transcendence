@@ -1,16 +1,22 @@
 <template>
-    <div class="app">
+  <div class="app">
     <AppHeader v-if="!hideHeader()"></AppHeader>
-    <router-view />
+    <AppSidebar />
+    <div class="content-wrapper">
+      <Navbar />
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 import AppHeader from './components/AppHeader.vue';
+import Navbar from './components/NavBar.vue';
 
 export default {
   components: {
-    AppHeader
+    AppHeader,
+    Navbar
   },
   data() {
     return {};
@@ -57,8 +63,16 @@ button {
 	background: none;
 }
 
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+
 .app {
-	display: flex;
+  display: flex;
+  width: 100%;
 	main {
 		flex: 1 1 0;
 		padding: 2rem;
