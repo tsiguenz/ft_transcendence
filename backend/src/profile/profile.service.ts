@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { EditProfileDto } from './dto';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { TwoFaService } from '../2fa/2fa.service';
 import { extname } from 'path';
 import * as fs from 'fs';
@@ -17,13 +17,30 @@ export class ProfileService {
     private twoFa: TwoFaService
   ) {}
   async getProfile(userId: string) {
-    const userProfile = await this.users.getUserById(userId);
-    return userProfile;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId
+        }
+      });
+      delete user.hash;
+      delete user.twoFactorSecret;
+      return user;
+    } catch (e) {
+      throw new NotFoundException('User not found');
+    }
   }
 
-  // TODO: refactor this function
   async editProfile(dto: EditProfileDto, userId: string) {
-    const user = await this.users.getUserById(userId);
+    const user = await this.prisma.user
+      .findUnique({
+        where: {
+          id: userId
+        }
+      })
+      .catch(() => {
+        throw new ForbiddenException('User not found');
+      });
     if (dto.twoFactorEnable && !user.twoFactorEnable) {
       if (!dto.twoFactorCode) {
         throw new ForbiddenException('Two factor code required');
