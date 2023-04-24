@@ -15,6 +15,13 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({
         where: {
           nickname: nickname
+        },
+        select: {
+          id: true,
+          nickname: true,
+          ladderPoints: true,
+          avatarPath: true,
+          createdAt: true
         }
       });
       return user;
@@ -28,6 +35,13 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({
         where: {
           id: userId
+        },
+        select: {
+          id: true,
+          nickname: true,
+          ladderPoints: true,
+          avatarPath: true,
+          createdAt: true
         }
       });
       return user;
@@ -39,6 +53,7 @@ export class UsersService {
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
       select: {
+        id: true,
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
@@ -149,9 +164,11 @@ export class UsersService {
         }
       },
       select: {
+        id: true,
         nickname: true,
         ladderPoints: true,
-        avatarPath: true
+        avatarPath: true,
+        createdAt: true
       }
     });
     return friends;
