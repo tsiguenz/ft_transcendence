@@ -17,11 +17,11 @@ class ChatService {
   }
 
   sendMessage(message: string) {
-    this.socketService.send(events.SEND_MESSAGE, message);
+    this.socketService.send(events.MESSAGE_TO_SERVER, message);
   }
 
   subscribeToMessages(callback: Function) {
-    this.socketService.subscribe(events.RECEIVE_MESSAGE, callback);
+    this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
   }
 
   subscribeToUsers(connectCb: Function, disconnectCb: Function) {
@@ -31,6 +31,10 @@ class ChatService {
 
   joinRoom(chatroomId: number) {
     this.socketService.send(events.JOIN_ROOM, { chatroomId: chatroomId });
+  }
+
+  leaveRoom(chatroomId: number) {
+    this.socketService.send(events.LEAVE_ROOM, { chatroomId: chatroomId });
   }
 
   getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {

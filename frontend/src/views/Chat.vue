@@ -12,6 +12,7 @@
           :id="currentChatroomId"
           title="Chat"
           :messages="messages[currentChatroomId]"
+          @leave="switchToDefaultChatroom"
         />
       </v-col>
       <v-col cols="3">
@@ -57,6 +58,9 @@ export default {
       ChatService.getRoomMessages(id, this.lastMessageTime(id));
       ChatService.joinRoom(id);
       // const users = await this.getChatroomUsers(id);
+    },
+    switchToDefaultChatroom() {
+      this.currentChatroomId = 0;
     },
     async getChatroomUsers(chatroomId) {
       try {

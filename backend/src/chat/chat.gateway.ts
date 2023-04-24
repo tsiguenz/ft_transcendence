@@ -31,7 +31,7 @@ export class ChatGateway
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
 
-  @SubscribeMessage('msgToServer')
+  @SubscribeMessage(events.MESSAGE_TO_SERVER)
   async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: number; message: string }
@@ -46,19 +46,19 @@ export class ChatGateway
         payload.message
       );
 
-      this.server.to(chatroom.slug).emit('msgToClient', {
+      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
         authorId: user.id,
         authorNickname: user.nickname,
         chatroomId: chatroom.id,
         sentAt: message.createdAt,
         data: payload.message
       });
-    } catch (error) {
-      this.logger.warn('HandleMessage error');
+    } catch (e) {
+      throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage('joinRoom')
+  @SubscribeMessage(events.JOIN_ROOM)
   async handleJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: number }
@@ -71,6 +71,25 @@ export class ChatGateway
     try {
       // await this.chatroom.join(client['decoded'].sub, chatroom.id);
       client.join(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.LEAVE_ROOM)
+  async handleLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: number }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    try {
+      await this.chatroom.leave(client['decoded'].sub, chatroom.id);
+      client.leave(chatroom.slug);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -103,7 +122,7 @@ export class ChatGateway
     client.emit('');
   }
 
-  @SubscribeMessage('getRoomMessages')
+  @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: number; newerThan: Date }
@@ -118,7 +137,7 @@ export class ChatGateway
       payload.newerThan
     );
     for (const id in messages) {
-      client.emit('msgToClient', {
+      client.emit(events.MESSAGE_TO_CLIENT, {
         authorId: messages[id].author.id,
         authorNickname: messages[id].author.nickname,
         chatroomId: chatroom.id,

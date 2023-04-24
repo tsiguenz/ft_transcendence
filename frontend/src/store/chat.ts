@@ -6,7 +6,7 @@ export const useChatStore = defineStore('chat', {
     return {
       messages: {},
       users: {}
-      // chatrooms: [],
+      chatrooms: [],
       // activeChatroom: undefined
     };
   },

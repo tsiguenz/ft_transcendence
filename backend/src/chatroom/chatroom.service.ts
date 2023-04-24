@@ -121,8 +121,20 @@ export class ChatroomService {
   }
 
   async leave(userId: number, chatroomId: number) {
-    // Check if user is able to leave chatroom
-    // Add user to chatroom users
+    const chatroom = await this.findOne(chatroomId);
+
+    if (!chatroom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+
+    const chatroomUser = await this.findUserInChatroom(userId, chatroomId);
+    if (!chatroomUser) {
+      throw new ForbiddenException('User not in room');
+    }
+
+
+
+    return await this.removeUserFromChatroom(userId, chatroomId);
   }
 
   async roomPasswordMatches(
@@ -210,6 +222,18 @@ export class ChatroomService {
     });
   }
 
+ async findUserInChatroom(
+    userId: number,
+    chatroomId: number
+  ): Promise<ChatRoomUser> {
+    return await this.prisma.chatRoomUser.findFirst({
+      where: {
+        chatRoomId: chatroomId,
+        userId: userId
+      }
+    });
+  }
+
   private async addUserToChatroom(
     userId: number,
     chatroomId: number,
@@ -224,11 +248,12 @@ export class ChatroomService {
     });
   }
 
-  private async findUserInChatroom(
+
+  private async removeUserFromChatroom(
     userId: number,
     chatroomId: number
-  ): Promise<ChatRoomUser> {
-    return await this.prisma.chatRoomUser.findFirst({
+  ) {
+    return await this.prisma.chatRoomUser.deleteMany({
       where: {
         chatRoomId: chatroomId,
         userId: userId

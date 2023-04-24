@@ -19,11 +19,18 @@
 </template>
 
 <script>
+import axios from 'axios';
+import * as constants from '@/constants';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
 export default {
+  emits: [
+    'leave',
+  ],
   props: [
   	'id',
   	'title',
@@ -74,8 +81,9 @@ export default {
       this.newMessage = '';
     },
     leaveRoom() {
+      this.$emit('leave');
 			ChatService.leaveRoom(this.id);
-		}
+    }
 	},
 }
 </script>
