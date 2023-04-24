@@ -1,4 +1,5 @@
 import SocketioService from './socketio.service';
+import * as events from '@/socketioEvents';
 import { useChatStore } from '@/store/chat';
 
 class ChatService {
@@ -16,26 +17,45 @@ class ChatService {
   }
 
   sendMessage(message: string) {
-    this.socketService.send('msgToServer', message);
+    this.socketService.send(events.SEND_MESSAGE, message);
   }
 
   subscribeToMessages(callback: Function) {
-    this.socketService.subscribe('msgToClient', callback);
+    this.socketService.subscribe(events.RECEIVE_MESSAGE, callback);
+  }
+
+  subscribeToUsers(connectCb: Function, disconnectCb: Function) {
+    this.socketService.subscribe(events.USER_CONNECT, connectCb);
+    this.socketService.subscribe(events.USER_DISCONNECT, disconnectCb);
   }
 
   joinRoom(chatroomId: number) {
-    this.socketService.send('joinRoom', { chatroomId: chatroomId });
+    this.socketService.send(events.JOIN_ROOM, { chatroomId: chatroomId });
   }
 
   getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {
-    this.socketService.send('getRoomMessages', {
+    this.socketService.send(events.GET_MESSAGES, {
       chatroomId: chatroomId,
       newerThan: newerThan
     });
   }
 
+  getOnlineUsers(chatroomId: number) {
+    this.socketService.send(events.GET_CONNECTED_USERS, {
+      chatroomId: chatroomId
+    });
+  }
+
   storeMessage(message: string) {
     this.chatStore.storeMessage(message);
+  }
+
+  storeUser(payload: string) {
+    this.chatStore.storeUser(payload);
+  }
+
+  removeUserFromRoom(payload: string) {
+    this.chatStore.removeUser(payload);
   }
 }
 

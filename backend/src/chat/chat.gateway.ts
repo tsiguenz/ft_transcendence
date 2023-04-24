@@ -15,6 +15,7 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
 import { UsersService } from '../users/users.service';
+import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
@@ -84,15 +85,20 @@ export class ChatGateway
   //   this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
   // }
 
-  @SubscribeMessage('getRoomUsers')
-  async getRoomUsers(
+  @SubscribeMessage(events.GET_CONNECTED_USERS)
+  async getConnectedUsers(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: number }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
-    if (!chatroom) {
-      return;
+    if (
+      !chatroom ||
+      !chatroom.users.find((user) => user.userId === client['decoded'].sub)
+    ) {
+      throw new WsException('Forbidden');
     }
+    // const rooms = this.server.sockets.adapter.sids;
+    // console.log(rooms);
 
     client.emit('');
   }

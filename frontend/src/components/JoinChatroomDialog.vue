@@ -65,6 +65,8 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   emits: [
@@ -89,7 +91,10 @@ export default {
         this.$emit('join', chatroom);
         this.closeDialog();
       } catch (error) {
-        alert(error.response.data.message);
+      	swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
 		async getJoinableRooms() {
@@ -97,7 +102,10 @@ export default {
         const response = await axios.get(constants.API_URL + '/chatrooms/joinable');
         this.chatrooms = response.data;
       } catch (error) {
-        alert(error.response.data.message);
+      	swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
   }

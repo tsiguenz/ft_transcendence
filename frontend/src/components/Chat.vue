@@ -1,6 +1,11 @@
 <template>
 	<v-list ref="chat" height="1000" class="overflow-y-auto">
-	  <v-list-subheader>{{ title }}</v-list-subheader>
+		<v-toolbar color="">
+			<v-toolbar-title>{{ title }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn v-if="currentUserIsAdmin" icon="mdi-cog"></v-btn>
+      <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
+		</v-toolbar>
 	  <div v-for="item in messages" :key="item.sentAt">
 	    <p class="text-right ma-2" ><a v-if="item.authorId === currentUserId" class="rounded-pill pa-1 bg-blue">{{ item.data }}</a></p>
 	    <p class="text-left ma-2"><a v-if="item.authorId !== currentUserId" class="rounded-pill pa-1 bg-green" >{{ item.authorNickname }}: {{ item.data }}</a></p>
@@ -33,6 +38,9 @@ export default {
 	  ...mapStores(useSessionStore),
 	  currentUserId() {
 	    return this.sessionStore.userId;
+	  },
+	  currentUserIsAdmin() {
+	  	return true;
 	  }
 	},
   watch: {
@@ -65,6 +73,9 @@ export default {
       });
       this.newMessage = '';
     },
+    leaveRoom() {
+			ChatService.leaveRoom(this.id);
+		}
 	},
 }
 </script>

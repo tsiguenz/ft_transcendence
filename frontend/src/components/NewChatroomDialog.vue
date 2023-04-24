@@ -38,7 +38,6 @@
 	              label="Password*"
 	              type="password"
 	              required
-	              active="true"
 	            ></v-text-field>
 	          </v-col>
 	        </v-row>
@@ -69,6 +68,8 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 
 export default {
   emits: [
@@ -92,10 +93,13 @@ export default {
           ...this.newChatroomObject
         });
         this.$emit('create', response.data);
+      	this.closeDialog();
       } catch (error) {
-        alert(error.response.data.message);
+      	swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
-      this.closeDialog();
     },
   }
 }

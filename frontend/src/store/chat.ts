@@ -4,7 +4,8 @@ import { defineStore } from 'pinia';
 export const useChatStore = defineStore('chat', {
   state() {
     return {
-      messages: {}
+      messages: {},
+      users: {}
       // chatrooms: [],
       // activeChatroom: undefined
     };
@@ -26,6 +27,30 @@ export const useChatStore = defineStore('chat', {
         this.messages[chatroomId] = [];
       }
       this.messages[chatroomId].push(message);
+    },
+
+    storeUser(payload) {
+      const chatroomId: number = payload.chatroomId;
+
+      if (!this.users.hasOwnProperty(chatroomId)) {
+        this.users[chatroomId] = [];
+      }
+      this.users[chatroomId].push(payload);
+    },
+
+    removeUser(payload) {
+      const chatroomId: number = payload.chatroomId;
+      if (this.users.hasOwnProperty(chatroomId)) {
+        this.users[chatroomId] = this.users[chatroomId].filter(
+          (user) => user.id !== payload.id
+        );
+      }
+    },
+    isUserOnline(userId: number, chatroomId: number) {
+      if (this.users.hasOwnProperty(chatroomId)) {
+        return this.users[chatroomId].find((user) => user.id === userId);
+      }
+      return false;
     }
   }
 });

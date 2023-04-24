@@ -9,7 +9,13 @@ import {
   UseGuards,
   Req
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+  ApiParam
+} from '@nestjs/swagger';
 
 import { Request } from 'express';
 import { JwtGuard } from '../auth/guard';
@@ -21,6 +27,7 @@ import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 export class ChatroomController {
   constructor(private readonly chatroomService: ChatroomService) {}
 
+  @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
@@ -31,7 +38,6 @@ export class ChatroomController {
       }
     }
   })
-  @UseGuards(JwtGuard)
   @Post()
   async create(
     @Body() createChatroomDto: CreateChatroomDto,
@@ -43,22 +49,22 @@ export class ChatroomController {
     );
   }
 
-  @ApiBearerAuth()
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Get()
   async findAll() {
     return await this.chatroomService.findAll();
   }
 
-  @ApiBearerAuth()
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Get('mine')
   async findChatroomsForUser(@Req() req: Request) {
     return await this.chatroomService.findChatroomsForUser(req.user['id']);
   }
 
-  @ApiBearerAuth()
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Get('joinable')
   async findJoinableChatroomsForUser(@Req() req: Request) {
     return await this.chatroomService.findJoinableChatroomsForUser(
@@ -66,12 +72,27 @@ export class ChatroomController {
     );
   }
 
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'Chatroom id'
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.chatroomService.findOne(+id);
   }
 
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'Chatroom id'
+  })
   @Get(':id/users')
   async findChatroomUsers(@Param('id') id: string) {
     const users = await this.chatroomService.findChatroomUsers(+id);
@@ -83,6 +104,14 @@ export class ChatroomController {
     return formattedUsers;
   }
 
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'Chatroom id'
+  })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -91,13 +120,27 @@ export class ChatroomController {
     return this.chatroomService.update(+id, updateChatroomDto);
   }
 
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'Chatroom id'
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.chatroomService.remove(+id);
   }
 
-  @ApiBearerAuth()
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    required: true,
+    description: 'Chatroom id'
+  })
   @Post(':id/join')
   async joinRoom(
     @Req() req: Request,
