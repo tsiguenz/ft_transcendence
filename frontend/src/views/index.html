@@ -1,0 +1,176 @@
+<!-- https://blog.devoreve.com/2018/06/06/creer-un-pong-en-javascript/ -->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rétro game - Pong</title>
+</head>
+<body>
+<main>
+    <canvas id="canvas"></canvas>
+</main>
+</body>
+</html>
+
+<script>
+
+	'use strict';
+
+	var canvas;
+	var game;
+
+	var player_height;
+	var player_width;
+
+	document.addEventListener('DOMContentLoaded', function () {
+		canvas = document.getElementById('canvas');
+		var width = window.innerWidth / 1.1;
+		var height = width / 3 * 2;
+		setCanvasSize(width, height);
+		setPlayerSize();
+		game = {
+			player: {
+				y: 50
+			},
+			computer: {
+				y: 50
+			},
+			ball: {
+				x: 50,
+				y: 50,
+				r: 0,
+				speed: {
+					x: 0.5,
+					y: 0
+				}
+			}
+		}
+		setBallSize();
+		draw();
+		canvas.addEventListener('mousemove', playerMove);
+		play();
+	});
+
+
+	function draw() {
+		var ctx = canvas.getContext('2d');
+
+		//background
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+		//middle line
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.moveTo(canvas.width / 2, 0);
+		ctx.lineTo(canvas.width / 2, canvas.height);
+		ctx.stroke();
+
+		//player
+		ctx.fillStyle = 'white';
+		//ctx.fillRect(0, game.player.y, player_width, player_height);
+		ctx.fillRect(0, convertScaleY(game.player.y) - player_height / 2, player_width, player_height);
+
+		//computer
+		ctx.fillRect(canvas.width - player_width, convertScaleY(game.computer.y) - player_height / 2, player_width, player_height);
+
+		//ball
+		ctx.beginPath();
+		ctx.fillStyle = 'white';
+		ctx.arc(convertScaleX(game.ball.x), convertScaleY(game.ball.y), game.ball.r, 0, Math.PI * 2, false);
+		ctx.fill();
+	}
+
+	function play() {
+		setSize();
+		draw();
+		computerMove();
+		ballMove();
+		requestAnimationFrame(play);
+	}
+
+	function setSize() {
+		var canvas = document.getElementById('canvas');
+		var width = window.innerWidth / 100 * 95;
+		var height = width / 3 * 2;
+
+		setCanvasSize(width, height);
+		setPlayerSize();
+		setBallSize();
+	}
+	
+	function setCanvasSize(width, height) {
+		canvas.width = width;
+		canvas.height = canvas.width / 3 * 2;
+		if (height > window.innerHeight / 100 * 90) {
+			canvas.height = window.innerHeight / 100 * 90;
+			canvas.width = canvas.height / 3 * 4;
+		}
+	}
+
+	function setPlayerSize() {
+		player_height = convertScaleY(20);
+		player_width = convertScaleX(1);
+	}
+
+	function setBallSize() {
+		game.ball.r = convertScaleX(1);
+	}
+
+	function convertScaleX(percent)
+	{
+		return (canvas.width / 100 * percent);
+	}
+
+	function convertScaleY(percent)
+	{
+		return (canvas.height / 100 * percent);
+	}
+
+	function playerMove(event) {
+		var canvasLocation = canvas.getBoundingClientRect();
+		var mouseLocation = (event.clientY - canvasLocation.y) / canvas.height * 100;
+
+		game.player.y = mouseLocation;
+	}
+
+	function ballMove() {
+		if (game.ball.y > 100 || game.ball.y < 0)
+			game.ball.speed.y *= -1;
+		if (game.ball.x > 99)
+			collide(game.computer);
+		if (game.ball.x < 1)
+			collide(game.player);
+		game.ball.x += game.ball.speed.x;
+		game.ball.y += game.ball.speed.y;
+	}
+
+	function collide(player) {
+		if (convertScaleY(game.ball.y) < convertScaleY(player.y) - player_height / 2 || convertScaleY(game.ball.y) > convertScaleY(player.y) + player_height / 2) {
+			game.ball.x = 50;
+			game.ball.y = 50;
+			game.player.y = 50;
+			game.computer.y = 50;
+			game.ball.speed.x = 0.5;
+			game.ball.speed.y = 0;
+		}
+		else {
+			if (game.ball.speed.x > 4.5 || game.ball.speed.x < -4.5)
+				game.ball.speed.x *= -1;
+			else
+				game.ball.speed.x *= -1.2;			
+			changeDirection(player.y);
+		}
+	}
+
+	function computerMove() {
+		game.computer.y += game.ball.speed.y * 0.70;
+}
+
+	function changeDirection(playerPosition) {
+		var impact = (game.ball.y / 100 * canvas.height) - (playerPosition / 100 * canvas.height);
+		var ratio = 10 / (player_height / 2);
+		game.ball.speed.y = impact * ratio / 10;
+	}
+
+</script>
