@@ -39,7 +39,6 @@
 								<v-btn @click="signup">Sign up</v-btn>
 							</v-row>
 						</v-form>
-	
 					</v-card-text>
 				</v-card>
 			</v-col>
@@ -53,7 +52,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import swal from 'sweetalert';
+import swal from 'sweetalert2';
 import formatError from '@/utils/lib';
 
 export default {
@@ -88,7 +87,8 @@ export default {
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/profile');
       } catch (error) {
-			alert(formatError(error.response.data.message));
+				swal.fire('Hehe, this is a test');
+//			alert(formatError(error.response.data.message));
         // TODO: Handle error with a snackbar
 //        swal({
 //          icon: 'error',
@@ -114,23 +114,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>
