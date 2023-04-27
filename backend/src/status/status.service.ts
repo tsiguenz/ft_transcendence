@@ -9,19 +9,20 @@ export class StatusService {
 
   async addNewUser(socket: Socket, connectedUsers: string[]) {
     const userId = await this.getUserIdFromSocket(socket);
-    console.log('userId', userId);
-    if (!userId || connectedUsers.includes(userId)) return;
+    if (!userId || connectedUsers.includes(userId)) return undefined;
     connectedUsers.push(userId);
     console.log('in connect', connectedUsers);
+    return userId;
   }
 
   async removeUser(socket: Socket, connectedUsers: string[]) {
     const userId = await this.getUserIdFromSocket(socket);
-    if (!userId) return;
+    if (!userId) return undefined;
     const index = connectedUsers.indexOf(userId);
     if (index > -1) {
       connectedUsers.splice(index, 1);
     }
+    return userId;
   }
 
   async getUserIdFromSocket(socket: Socket) {

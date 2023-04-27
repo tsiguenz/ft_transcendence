@@ -14,7 +14,7 @@ export const useConnectedUsersStore = defineStore('connectedUsers', {
   actions: {
     connect(jwt) {
       console.log('socketConnected:', this.socketConnected);
-      if (this.socketConnected) return;
+      if (this.socketConnected || !jwt) return;
       this.statusSocket = io(STATUS_SOCKET_URL, {
         auth: { token: jwt }
       });

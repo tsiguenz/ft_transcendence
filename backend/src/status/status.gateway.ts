@@ -19,7 +19,11 @@ export class StatusGateway {
   @SubscribeMessage('connect')
   async handleConnection(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
-    await this.statusService.addNewUser(client, this.connectedUsers);
+    const userId = await this.statusService.addNewUser(
+      client,
+      this.connectedUsers
+    );
+    if (!userId) return;
     this.server.emit('connectedUsers', this.connectedUsers);
     console.log('after connect', this.connectedUsers);
   }
@@ -27,7 +31,11 @@ export class StatusGateway {
   @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    await this.statusService.removeUser(client, this.connectedUsers);
+    const userId = await this.statusService.removeUser(
+      client,
+      this.connectedUsers
+    );
+    if (!userId) return;
     this.server.emit('connectedUsers', this.connectedUsers);
     console.log('after disconnect', this.connectedUsers);
   }
