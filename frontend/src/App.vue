@@ -2,7 +2,7 @@
   <v-app>
     <h1>Connected Users</h1>
     <ul>
-      <li v-for="user in sessionStore.connectedUsers" :key="user">
+      <li v-for="user in connectedUsersStore.connectedUsers" :key="user">
         {{ user }}
       </li>
     </ul>
@@ -14,7 +14,7 @@
 <script>
 import AppHeader from './components/AppHeader.vue';
 import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 
 export default {
   components: {
@@ -24,18 +24,15 @@ export default {
     return {};
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useConnectedUsersStore)
   },
-  created() {
-    this.jwt = this.$cookie.getCookie('jwt');
-    if (!this.jwt || !this.sessionStore.loggedIn) return;
-    this.sessionStore.connectStatusSocket(this.jwt);
-  },
+  created() {},
   mounted() {
-    this.sessionStore.listenConnectedUsers();
+    //    this.connectedUsersStore.connectStatusSocket(this.$cookie.getCookie('jwt'));
+    //    this.connectedUsersStore.listenConnectedUsers();
   },
   beforeUnmount() {
-    this.sessionStore.disconnectStatusSocket();
+    //    this.connectedUsersStore.disconnectStatusSocket();
   },
   methods: {
     hideHeader() {

@@ -33,6 +33,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -50,7 +51,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signin() {
@@ -64,8 +66,11 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
+        const jwt = response.data.access_token;
         this.sessionStore.signin(this.nickname);
-        this.$cookie.setCookie('jwt', response.data.access_token);
+        this.$cookie.setCookie('jwt', jwt);
+        this.connectedUsersStore.connectStatusSocket(jwt);
+        this.connectedUsersStore.listenConnectedUsers();
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar

@@ -21,6 +21,7 @@ export class StatusGateway {
     this.logger.log(`Client connected: ${client.id}`);
     await this.statusService.addNewUser(client, this.connectedUsers);
     this.server.emit('connectedUsers', this.connectedUsers);
+    console.log('after connect', this.connectedUsers);
   }
 
   @SubscribeMessage('disconnect')
@@ -28,5 +29,6 @@ export class StatusGateway {
     this.logger.log(`Client disconnected: ${client.id}`);
     await this.statusService.removeUser(client, this.connectedUsers);
     this.server.emit('connectedUsers', this.connectedUsers);
+    console.log('after disconnect', this.connectedUsers);
   }
 }
