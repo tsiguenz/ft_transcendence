@@ -43,6 +43,7 @@ export default {
 	}
 };
 </script>
+
 <script setup>
 
 import { ref } from 'vue';

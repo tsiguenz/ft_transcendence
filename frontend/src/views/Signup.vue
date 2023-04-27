@@ -97,23 +97,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>
