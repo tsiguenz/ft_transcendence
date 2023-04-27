@@ -1,5 +1,11 @@
 <template>
   <v-app>
+    <h1>Connected Users</h1>
+    <ul>
+      <li v-for="user in sessionStore.connectedUsers" :key="user">
+        {{ user }}
+      </li>
+    </ul>
     <AppHeader v-if="!hideHeader()"></AppHeader>
     <router-view />
   </v-app>
@@ -7,6 +13,8 @@
 
 <script>
 import AppHeader from './components/AppHeader.vue';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
@@ -14,6 +22,20 @@ export default {
   },
   data() {
     return {};
+  },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
+  created() {
+    this.jwt = this.$cookie.getCookie('jwt');
+    if (!this.jwt || !this.sessionStore.loggedIn) return;
+    this.sessionStore.connectStatusSocket(this.jwt);
+  },
+  mounted() {
+    this.sessionStore.listenConnectedUsers();
+  },
+  beforeUnmount() {
+    this.sessionStore.disconnectStatusSocket();
   },
   methods: {
     hideHeader() {
