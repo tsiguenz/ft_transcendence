@@ -35,9 +35,9 @@
 								<v-btn @click="signin">Sign In</v-btn>
 								<v-btn @click="signin42">Sign in with 42</v-btn>
 							</v-row>
-							<v-row justify="space-between">
+<!--							<v-row justify="space-between">
 								<v-btn @click="signup">Sign up</v-btn>
-							</v-row>
+							</v-row> -->
 						</v-form>
 					</v-card-text>
 				</v-card>
