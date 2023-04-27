@@ -22,7 +22,7 @@ export default {
       if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
       this.sessionStore.logout();
-      this.connectedUsersStore.disconnectStatusSocket();
+      this.connectedUsersStore.disconnect();
     }
   }
 };

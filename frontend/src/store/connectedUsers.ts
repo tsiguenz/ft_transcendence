@@ -12,7 +12,8 @@ export const useConnectedUsersStore = defineStore('connectedUsers', {
     };
   },
   actions: {
-    connectStatusSocket(jwt) {
+    connect(jwt) {
+      console.log('socketConnected:', this.socketConnected);
       if (this.socketConnected) return;
       this.statusSocket = io(STATUS_SOCKET_URL, {
         auth: { token: jwt }
@@ -20,18 +21,27 @@ export const useConnectedUsersStore = defineStore('connectedUsers', {
       this.statusSocket.connect();
       this.socketConnected = true;
     },
-    disconnectStatusSocket() {
+    disconnect() {
       this.connectedUsers = [];
       if (!this.socketConnected) return;
+      this.unsubscribeConnectedUsers();
       this.statusSocket.disconnect();
       this.statusSocket = null;
       this.socketConnected = false;
     },
-    listenConnectedUsers() {
+    subscribeConnectedUsers() {
       if (!this.statusSocket) return;
       this.statusSocket.on('connectedUsers', (connectedUsers) => {
         this.connectedUsers = connectedUsers;
       });
+    },
+    connectAndSubscribe(jwt) {
+      this.connect(jwt);
+      this.subscribeConnectedUsers();
+    },
+    unsubscribeConnectedUsers() {
+      if (!this.statusSocket) return;
+      this.statusSocket.off('connectedUsers');
     }
   }
 });

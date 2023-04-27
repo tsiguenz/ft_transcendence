@@ -26,13 +26,15 @@ export default {
   computed: {
     ...mapStores(useConnectedUsersStore)
   },
-  created() {},
+  created() {
+    //console.log(this.$cookie.getCookie('jwt'));
+    this.connectedUsersStore.connect(this.$cookie.getCookie('jwt'));
+  },
   mounted() {
-    //    this.connectedUsersStore.connectStatusSocket(this.$cookie.getCookie('jwt'));
-    //    this.connectedUsersStore.listenConnectedUsers();
+    this.connectedUsersStore.subscribeConnectedUsers();
   },
   beforeUnmount() {
-    //    this.connectedUsersStore.disconnectStatusSocket();
+    this.connectedUsersStore.disconnect();
   },
   methods: {
     hideHeader() {
