@@ -20,17 +20,6 @@
 			<router-link v-if="isLog()" class="button" to="/profile"><v-avatar  rounded="0" size="25px">
 						<v-img  class="icons-avatar" src="./icons/user.png"></v-img></v-avatar><span class="text">Profile</span></router-link>
 		</div>
-		<div class="flex"></div>
-		<div>
-			<router-link to="/logout" class="logbutton">
-				<v-btn v-if="isLog()" class="log"  block to="/logout">Logout</v-btn>
-				<v-btn v-if="isLog()" class="logimg"  block to="/logout"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/logout.png"></v-img></v-avatar></v-btn>
-				<v-btn v-if="!isLog()" class="log"  block to="/signin">Sign In</v-btn>
-				<v-btn v-if="!isLog()" class="logimg"  block to="/signin"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/sign-in.png"></v-img></v-avatar></v-btn>
-			</router-link>
-		</div>
 </aside>
 </template>
 
@@ -74,26 +63,6 @@ const ToggleMenu = () => {
 	--sidebar-width: 300px;
 }
 
-.log:hover {
-	background-position: right center;
-}
-
-.log {
-	display: none;
-}
-
-.logimg {
-			background-image: linear-gradient(to right,var(--light) 0%, var(--medium-purple) 51%, var(--light) 100%);
-			flex: 1 1 auto;
-			bottom: 0;
-			text-align: center;
-			text-transform: uppercase;
-			transition: 0.5s;
-			background-size: 200% auto;
-			border-radius: 10px;
-			display: flex;
-		}
-
 aside {
 	display: flex;
 	flex-direction: column;
@@ -127,9 +96,6 @@ aside {
 			transition: 0.2s ease-in-out;
 		}
 	}
-	.flex {
-		flex: 1 1 0%;
-	}
 
 	&.is-expanded {
 		width: var(--sidebar-width);
@@ -140,24 +106,6 @@ aside {
 			.menu-toggle {
 				transform: rotate(-180deg);
 			}
-		}
-		.log:hover {
-			background-position: right center;
-		}
-
-		.log {
-			background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
-			flex: 1 1 auto;
-			bottom: 0;
-			text-align: center;
-			text-transform: uppercase;
-			transition: 0.5s;
-			background-size: 200% auto;
-			border-radius: 10px;
-			display: flex;
-		}
-		.logimg{
-			display: none;
 		}
 	}
 
