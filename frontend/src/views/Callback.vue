@@ -45,7 +45,6 @@ export default {
         const jwt = response.data.access_token;
         this.$cookie.setCookie('jwt', jwt);
         this.sessionStore.signin(response.data.nickname);
-        console.log('in sigin', jwt);
         this.connectedUsersStore.connectAndSubscribe(jwt);
         this.$router.push('/home');
       } catch (error) {

@@ -11,7 +11,6 @@ export class StatusService {
     const userId = await this.getUserIdFromSocket(socket);
     if (!userId || connectedUsers.includes(userId)) return undefined;
     connectedUsers.push(userId);
-    console.log('in connect', connectedUsers);
     return userId;
   }
 

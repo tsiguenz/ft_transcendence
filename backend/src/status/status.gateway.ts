@@ -25,7 +25,6 @@ export class StatusGateway {
     );
     if (!userId) return;
     this.server.emit('connectedUsers', this.connectedUsers);
-    console.log('after connect', this.connectedUsers);
   }
 
   @SubscribeMessage('disconnect')
@@ -37,6 +36,5 @@ export class StatusGateway {
     );
     if (!userId) return;
     this.server.emit('connectedUsers', this.connectedUsers);
-    console.log('after disconnect', this.connectedUsers);
   }
 }

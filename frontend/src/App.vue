@@ -27,7 +27,6 @@ export default {
     ...mapStores(useConnectedUsersStore)
   },
   created() {
-    //console.log(this.$cookie.getCookie('jwt'));
     this.connectedUsersStore.connect(this.$cookie.getCookie('jwt'));
   },
   mounted() {
