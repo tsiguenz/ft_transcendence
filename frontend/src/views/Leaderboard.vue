@@ -7,6 +7,7 @@
         <th class="text-left">Id</th>
         <th class="text-left">Nickname</th>
         <th class="text-left">Ladder points</th>
+        <th class="text-left">Status</th>
       </tr>
     </thead>
     <tbody>
@@ -14,6 +15,7 @@
         <td>{{ user.id }}</td>
         <td>{{ user.nickname }}</td>
         <td>{{ user.ladderPoints }}</td>
+        <td>{{ userStatus(user) }}</td>
         <td>
           <v-btn size="small" @click="addFriend(user.nickname)"
             >Add friend</v-btn
@@ -25,21 +27,26 @@
 </template>
 
 <script>
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
+  inject: ['connectedUsersStore', 'sessionStore'],
   data() {
     return {
-      users: []
+      users: [],
+      connectedUsers: this.connectedUsersStore.connectedUsers
     };
   },
-  computed: {
-    ...mapStores(useSessionStore)
+  watch: {
+    connectedUsersStore: {
+      handler() {
+        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+      },
+      deep: true
+    }
   },
   async mounted() {
     await this.getUsers();
@@ -86,6 +93,11 @@ export default {
           button: 'OK'
         });
       }
+    },
+    userStatus(user) {
+      return this.connectedUsers.includes(user.id)
+        ? 'Connected'
+        : 'Disconnected';
     }
   }
 };

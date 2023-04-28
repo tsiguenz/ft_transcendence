@@ -23,6 +23,12 @@ export default {
   components: {
     AppHeader
   },
+  provide() {
+    return {
+      connectedUsersStore: this.connectedUsersStore,
+      sessionStore: this.sessionStore
+    };
+  },
   data() {
     return {
       socketioStatus: new SocketioService(STATUS_SOCKET_URL)
