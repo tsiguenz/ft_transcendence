@@ -1,11 +1,5 @@
 <template>
   <v-app>
-    <h1>Connected Users</h1>
-    <ul>
-      <li v-for="user in connectedUsersStore.connectedUsers" :key="user">
-        {{ user }}
-      </li>
-    </ul>
     <AppHeader v-if="!hideHeader()"></AppHeader>
     <router-view />
   </v-app>
