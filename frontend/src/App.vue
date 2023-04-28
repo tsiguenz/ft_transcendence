@@ -15,25 +15,34 @@
 import AppHeader from './components/AppHeader.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import { useSessionStore } from '@/store/session';
+import SocketioService from '@/services/socketio.service';
+import { STATUS_SOCKET_URL } from './constants';
 
 export default {
   components: {
     AppHeader
   },
   data() {
-    return {};
+    return {
+      socketioStatus: new SocketioService(STATUS_SOCKET_URL)
+    };
   },
   computed: {
-    ...mapStores(useConnectedUsersStore)
+    ...mapStores(useConnectedUsersStore),
+    ...mapStores(useSessionStore)
   },
   created() {
-    this.connectedUsersStore.connect(this.$cookie.getCookie('jwt'));
+    if (!this.sessionStore.isLoggedIn) {
+      this.connectedUsersStore.reset();
+    }
+    this.connectStatusSocket();
   },
   mounted() {
-    this.connectedUsersStore.subscribeConnectedUsers();
+    this.subscribeStatusSocket();
   },
   beforeUnmount() {
-    this.connectedUsersStore.disconnect();
+    this.disconnectStatusSocket();
   },
   methods: {
     hideHeader() {
@@ -41,6 +50,28 @@ export default {
         this.$route.path === '/42/callback' ||
         this.$route.path === '/2fa/verify'
       );
+    },
+    connectStatusSocket() {
+      this.socketioStatus.setupSocketConnection(this.$cookie.getCookie('jwt'));
+    },
+    subscribeStatusSocket() {
+      this.socketioStatus.subscribe('connectedUsers', (connectedUsers) => {
+        this.connectedUsersStore.setConnectedUsers(connectedUsers);
+      });
+    },
+    unsubscribeStatusSocket() {
+      this.socketioStatus.unsubscribe('connectedUsers');
+    },
+    disconnectStatusSocket() {
+      this.socketioStatus.disconnect();
+    },
+    connectAndSubscribeStatusSocket() {
+      this.connectStatusSocket();
+      this.subscribeStatusSocket();
+    },
+    unsubscribeAndDisconnectStatusSocket() {
+      this.unsubscribeStatusSocket();
+      this.disconnectStatusSocket();
     }
   }
 };

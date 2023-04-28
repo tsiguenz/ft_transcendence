@@ -69,7 +69,7 @@ export default {
         const jwt = response.data.access_token;
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', jwt);
-        this.connectedUsersStore.connectAndSubscribe(jwt);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar

@@ -88,7 +88,7 @@ export default {
         const jwt = response.data.access_token;
         this.$cookie.setCookie('jwt', jwt);
         this.sessionStore.signin(this.nickname);
-        this.connectedUsersStore.connectAndSubscribe(jwt);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({

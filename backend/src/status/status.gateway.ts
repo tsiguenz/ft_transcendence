@@ -23,12 +23,17 @@ export class StatusGateway {
       client,
       this.connectedUsers
     );
-    if (!userId) return;
+    if (!userId) client.disconnect();
     this.server.emit('connectedUsers', this.connectedUsers);
   }
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() client: Socket) {
+    const sockets = await this.server.fetchSockets();
+    const clientJwt = client.handshake.auth.token;
+    for (let socket of sockets) {
+      if (clientJwt == socket.handshake.auth.token) return;
+    }
     this.logger.log(`Client disconnected: ${client.id}`);
     const userId = await this.statusService.removeUser(
       client,

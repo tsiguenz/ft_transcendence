@@ -21,8 +21,9 @@ export default {
     logout() {
       if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
+      this.$root.unsubscribeAndDisconnectStatusSocket();
       this.sessionStore.logout();
-      this.connectedUsersStore.disconnect();
+      this.connectedUsersStore.reset();
     }
   }
 };

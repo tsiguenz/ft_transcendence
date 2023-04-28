@@ -9,8 +9,8 @@ export class StatusService {
 
   async addNewUser(socket: Socket, connectedUsers: string[]) {
     const userId = await this.getUserIdFromSocket(socket);
-    if (!userId || connectedUsers.includes(userId)) return undefined;
-    connectedUsers.push(userId);
+    if (!userId) return undefined;
+    if (!connectedUsers.includes(userId)) connectedUsers.push(userId);
     return userId;
   }
 
