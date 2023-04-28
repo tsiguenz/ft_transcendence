@@ -55,8 +55,8 @@ export default {
   methods: {
     async joinChatroom(id) {
       this.currentChatroomId = id;
-      ChatService.getRoomMessages(id, this.lastMessageTime(id));
       ChatService.joinRoom(id);
+      ChatService.getRoomMessages(id, this.lastMessageTime(id));
       // const users = await this.getChatroomUsers(id);
     },
     switchToDefaultChatroom() {

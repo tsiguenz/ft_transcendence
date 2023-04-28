@@ -63,13 +63,17 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: number }
   ) {
+    // TODO: refactor these checks
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
     if (!chatroom) {
       return;
     }
+
+    const isUserInChatroom = await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id);
+    if (!isUserInChatroom) { return ; }
+
     try {
-      // await this.chatroom.join(client['decoded'].sub, chatroom.id);
       client.join(chatroom.slug);
     } catch (e) {
       throw new WsException((e as Error).message);
@@ -90,19 +94,11 @@ export class ChatGateway
     try {
       await this.chatroom.leave(client['decoded'].sub, chatroom.id);
       client.leave(chatroom.slug);
+      console.log("Client:" + client['decoded'].sub + " left room: " + chatroom.slug)
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
-
-  // @SubscribeMessage('leaveRoom')
-  // async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() payload: { chatroomId: number }) {
-  //   const chatroom = await this.chatroom.findOne(payload.chatroomId)
-
-  //   if (!chatroom) { return ; }
-  //   client.join(chatroom.slug);
-  //   this.logger.log(`Client: ${client['decoded'].sub} joined room #${payload.chatroomId}`);
-  // }
 
   @SubscribeMessage(events.GET_CONNECTED_USERS)
   async getConnectedUsers(
@@ -132,6 +128,9 @@ export class ChatGateway
     if (!chatroom) {
       return;
     }
+
+    const isUserInChatroom = await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id);
+    if (!isUserInChatroom) { return ; }
     const messages = await this.chat.getMessages(
       chatroom.id,
       payload.newerThan

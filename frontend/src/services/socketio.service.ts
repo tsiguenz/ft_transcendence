@@ -19,10 +19,15 @@ class SocketioService {
   }
 
   subscribe(event: string, callback: Function) {
-    if (!this.socket) return(true);
+    if (!this.socket) return;
     this.socket.on(event, message => {
       return callback(message);
     });
+  }
+
+  unsubscribe(event: string) {
+    if (!this.socket) return;
+    this.socket.off(event);
   }
 }
 

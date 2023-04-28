@@ -132,8 +132,6 @@ export class ChatroomService {
       throw new ForbiddenException('User not in room');
     }
 
-
-
     return await this.removeUserFromChatroom(userId, chatroomId);
   }
 
@@ -222,7 +220,11 @@ export class ChatroomService {
     });
   }
 
- async findUserInChatroom(
+  async isUserInChatroom(userId: number, chatroomId: number) {
+    return !!(await this.findUserInChatroom(userId, chatroomId));
+  }
+
+  async findUserInChatroom(
     userId: number,
     chatroomId: number
   ): Promise<ChatRoomUser> {
