@@ -4,6 +4,7 @@
       <v-col cols="3">
         <Chatrooms
           :id="currentChatroomId"
+          :deleteRoomId="roomToDelete"
           @join="joinChatroom"
         />
       </v-col>
@@ -12,7 +13,7 @@
           :id="currentChatroomId"
           title="Chat"
           :messages="messages[currentChatroomId]"
-          @leave="switchToDefaultChatroom"
+          @leave="leaveRoom"
         />
       </v-col>
       <v-col cols="3">
@@ -43,7 +44,8 @@ export default {
     return {
       users: [],
       message: '',
-      currentChatroomId: 0
+      currentChatroomId: 0,
+      roomToDelete: 0
     };
   },
   computed: {
@@ -59,8 +61,8 @@ export default {
       ChatService.getRoomMessages(id, this.lastMessageTime(id));
       // const users = await this.getChatroomUsers(id);
     },
-    switchToDefaultChatroom() {
-      this.currentChatroomId = 0;
+    leaveRoom(id) {
+      this.roomToDelete = id;
     },
     async getChatroomUsers(chatroomId) {
       try {

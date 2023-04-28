@@ -94,7 +94,6 @@ export class ChatGateway
     try {
       await this.chatroom.leave(client['decoded'].sub, chatroom.id);
       client.leave(chatroom.slug);
-      console.log("Client:" + client['decoded'].sub + " left room: " + chatroom.slug)
     } catch (e) {
       throw new WsException((e as Error).message);
     }

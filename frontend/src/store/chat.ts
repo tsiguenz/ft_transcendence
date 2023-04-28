@@ -6,7 +6,7 @@ export const useChatStore = defineStore('chat', {
     return {
       messages: {},
       users: {},
-      chatrooms: [],
+      // chatrooms: [],
       // activeChatroom: undefined
     };
   },
@@ -17,6 +17,10 @@ export const useChatStore = defineStore('chat', {
     //   }
     //   return this.chatrooms.find((room) => room.id === this.activeChatroom);
     // }
+
+    defaultChatroom() {
+      return this.chatrooms[0];
+    }
   },
   actions: {
     // joinChatroom(chatroomId: number) {},
@@ -46,6 +50,7 @@ export const useChatStore = defineStore('chat', {
         );
       }
     },
+
     isUserOnline(userId: number, chatroomId: number) {
       if (this.users.hasOwnProperty(chatroomId)) {
         return this.users[chatroomId].find((user) => user.id === userId);

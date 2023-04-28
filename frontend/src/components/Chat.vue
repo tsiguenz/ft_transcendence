@@ -81,7 +81,7 @@ export default {
       this.newMessage = '';
     },
     leaveRoom() {
-      this.$emit('leave');
+      this.$emit('leave', this.id);
 			ChatService.leaveRoom(this.id);
     }
 	},

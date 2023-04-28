@@ -35,6 +35,7 @@ export default {
   },
   props: [
     'id',
+    'deleteRoomId'
   ],
   emits: [
     'join'
@@ -69,6 +70,15 @@ export default {
         alert(error.response.data.message);
       }
     },
+  },
+  watch: {
+    deleteRoomId: {
+      handler() {
+        console.log("ROOM TO DELETE: "+this.deleteRoomId);
+        const newChatrooms = this.chatrooms.filter((room) => (room.id !== this.deleteRoomId));
+        console.table(newChatrooms);
+      }
+    }
   }
 }
 
