@@ -12,7 +12,6 @@
 					<v-card-text>
 						<v-form v-model="isFormValid">
 						  <v-text-field
-								autofocus
 						    v-model="nickname"
 						    class="mb-5"
 						    label="Nickname"
@@ -82,17 +81,19 @@ export default {
   methods: {
     async signup() {
       if (this.password !== this.passwordVerify) {
-        swal({
-          icon: 'error',
-          text: 'Passwords do not match !'
-        });
+          alert('Passwords do not match !');
+//        swal({
+//          icon: 'error',
+//          text: 'Passwords do not match !'
+//        });
         return;
       }
       if (!this.isFormValid) {
-        swal({
-          icon: 'error',
-          text: 'Invalid character or length in nickname'
-        });
+				alert('Invalid character or length in nickname');
+//        swal({
+//          icon: 'error',
+//          text: 'Invalid character or length in nickname'
+//        });
         return;
       }
       try {
@@ -104,10 +105,11 @@ export default {
         this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
+				alert(error.response.data.message);
+//        swal({
+//          icon: 'error',
+//          text: formatError(error.response.data.message)
+//        });
         // TODO: Handle error with a snackbar
       }
 		},

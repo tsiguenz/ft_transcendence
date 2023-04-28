@@ -1,18 +1,21 @@
 <template>
 <v-dialog v-if="!isLog()" width="100%">
 	<template v-slot:activator="{ props }">
-		<v-btn v-bind="props">login</v-btn>
+		<v-btn @click='setErrorMessage' v-bind="props">login</v-btn>
 	</template>
 	<v-container>
 		<v-row align="center" justify="center">
 			<v-col cols="5">
 				<v-card height="100%" width="100%">
-					<v-card-title class="justify-center">LOG IN</v-card-title>
+					<v-card-title class="justify-center">Sign In</v-card-title>
 					<v-divider></v-divider>
 					<v-card-text>
+					<div v-for="message in errorMessage" class="d-block mb-5">
+						<v-icon icon="mdi-alert-box"></v-icon>
+						{{ message }}
+					</div>
 						<v-form>
 							<v-text-field
-								autofocus
 								v-model="nickname"
 								class="mb-5"
 								label="Nickname"
@@ -35,9 +38,6 @@
 								<v-btn @click="signin">Sign In</v-btn>
 								<v-btn @click="signin42">Sign in with 42</v-btn>
 							</v-row>
-<!--							<v-row justify="space-between">
-								<v-btn @click="signup">Sign up</v-btn>
-							</v-row> -->
 						</v-form>
 					</v-card-text>
 				</v-card>
@@ -58,6 +58,7 @@ import formatError from '@/utils/lib';
 export default {
   data() {
     return {
+			errorMessage: '',
       nickname: '',
       password: '',
       twoFactorCode: '',
@@ -85,10 +86,14 @@ export default {
         }
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', response.data.access_token);
-        this.$router.push('/profile');
+        this.$router.push('/home');
       } catch (error) {
-				swal.fire('Hehe, this is a test');
-//			alert(formatError(error.response.data.message));
+				this.errorMessage = error.response.data.message;
+//				swal.fire({ customClass: { container: 'my-swal' }, text: formatError(error.response.data.message) } );
+//				swal.fire(formatError(error.response.data.message));
+//				Swal.fire({
+//            target: document.getElementById('form-modal')});
+//				alert(formatError(error.response.data.message));
         // TODO: Handle error with a snackbar
 //        swal({
 //          icon: 'error',
@@ -105,12 +110,18 @@ export default {
     signin42() {
       window.location.href = this.auth42;
     },
-		signup() {
-			this.$router.push('/signup');
-		},
 		isLog() {
 			return this.sessionStore.loggedIn;
+		},
+		setErrorMessage() {
+			this.errorMessage = '';
 		}
   }
 };
 </script>
+
+<style>
+	.swal2-container{
+		z-index: 300000!important;
+	}
+</style>
