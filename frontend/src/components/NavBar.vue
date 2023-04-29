@@ -3,7 +3,6 @@
       <v-toolbar class="nav">
           <v-form v-if="isLog()" :class="`${is_expanded ? 'is-expanded' : ''}`" @submit.prevent >
             <v-text-field
-              v-model="newFriend"
               placeholder="Search"
               class="expanding-search mt-1"
               prepend-inner-icon="mdi-magnify"
@@ -109,20 +108,21 @@ const searchClosed = () => {
 
 .v-form{
   display: flex;
-  margin-top: 1%;
+  margin-top: 1.25%;
   width: 45px;
-  ::v-deep .v-text-field .v-input__control .v-field__outline::before{
-    border-style: none !important;
-  }
-  ::v-deep .v-field--variant-filled .v-field__overlay{
-    background-color: transparent;
-  }
+  :deep .v-text-field .v-input__control .v-field__outline::before{
+    border :solid;
+    border-radius: 5px;
 
-  ::v-deep .mdi-magnify{
+  }
+  :deep .v-text-field .v-input__control .v-field__outline::after{
+    border :none;
+  }
+  :deep .mdi-magnify{
     cursor: pointer;
   }
   .addButton{
-    display: none;
+    display: none ;
   }
   &.is-expanded {
       .addButton{
@@ -131,9 +131,8 @@ const searchClosed = () => {
     }
     width: 300px;
     transition: width 0.3s;
-    ::v-deep .v-field--variant-filled .v-field__overlay{
-    background-color: var(--light);
-    border-radius: 5px;
+    :deep .v-field--variant-filled .v-field__overlay{
+      background-color: var(--light);
     }
   }
 }

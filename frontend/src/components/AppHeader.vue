@@ -84,9 +84,8 @@ aside {
 			width: 2rem;
 		}
 	}
-
 	.button:hover{
-		background-color: #600FDF;
+		background-color: var(--light);
 	}
 	.menu-toggle-wrap {
 		display: flex;
