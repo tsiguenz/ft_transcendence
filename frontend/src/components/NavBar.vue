@@ -55,14 +55,6 @@ const searchClosed = () => {
   
 <style lang="scss" scoped>
 
-:root {
-	--light: #600FDF;
-	--light-purple: #4508A0;
-	--medium-purple: #2B0366;
-	--dark-purple: #1F024A;
-	--dark-alt: #0F0124;
-}
-
 .nav{
     background: var(--dark-alt);
     padding-right: 1%;
@@ -72,38 +64,6 @@ const searchClosed = () => {
     font-size: larger;
     display: flex;
     flex:1 0 auto;
-}
-.log:hover {
-    background-position: right center;
-}
-
-.log {
-    background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
-    flex: 1 1 auto;
-    bottom: 0;
-    text-align: center;
-    text-transform: uppercase;
-    transition: 0.5s;
-    background-size: 200% auto;
-    border-radius: 5px;
-    display: flex;
-
-}
-
-.signup {
-    text-align: center;
-    text-transform: uppercase;
-    border-radius: 10px;
-    display: flex;
-}
-
-.button-group {
-  display: flex;
-  align-items: center;
-}
-
-.log, .signup {
-  margin-left: 8px;
 }
 
 .v-form{

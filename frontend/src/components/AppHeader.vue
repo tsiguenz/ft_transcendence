@@ -1,7 +1,7 @@
 <template>
 	<aside :class="`${is_expanded ? 'is-expanded' : ''}`">
 		
-		<div class="logo"><img to="/home" src="../../icons/pong.png"></div>
+		<div class="logo"><img to="/home" src="../../assets/icons/pong.png"></div>
 
 		<div class="menu-toggle-wrap">
 			<button class="menu-toggle" @click="ToggleMenu">
@@ -10,17 +10,17 @@
 		</div>
 		<div class="menu">
 			<router-link class="button" to="/home"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/house.png"></v-img></v-avatar><span class="text">Home</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/house.png"></v-img></v-avatar><span class="text">Home</span></router-link>
 			<router-link v-if="isLog()" class="button" to="/game"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/joystick.png"></v-img></v-avatar><span class="text">Game</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/joystick.png"></v-img></v-avatar><span class="text">Game</span></router-link>
 			<router-link v-if="isLog()" class="button" to="/chat"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/chat.png"></v-img></v-avatar><span class="text">Chat</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/chat.png"></v-img></v-avatar><span class="text">Chat</span></router-link>
 			<router-link v-if="isLog()" class="button" to="/friends"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/friends.png"></v-img></v-avatar><span class="text">Social</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/friends.png"></v-img></v-avatar><span class="text">Social</span></router-link>
 			<router-link v-if="isLog()" class="button" to="/leaderboard"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/trophy.png"></v-img></v-avatar><span class="text">LeaderBoard</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/trophy.png"></v-img></v-avatar><span class="text">LeaderBoard</span></router-link>
 			<router-link v-if="isLog()" class="button" to="/profile"><v-avatar  rounded="0" size="25px">
-						<v-img  class="icons-avatar" src="./icons/user.png"></v-img></v-avatar><span class="text">Profile</span></router-link>
+						<v-img  class="icons-avatar" src="./assets/icons/user.png"></v-img></v-avatar><span class="text">Profile</span></router-link>
 		</div>
 </aside>
 </template>
@@ -56,15 +56,6 @@ const ToggleMenu = () => {
 }
 </script>
 <style lang="scss" scoped>
-
-:root {
-	--light: #600FDF;
-	--light-purple: #4508A0;
-	--medium-purple: #2B0366;
-	--dark-purple: #1F024A;
-	--dark-alt: #0F0124;
-	--sidebar-width: 300px;
-}
 
 aside {
 	display: flex;
