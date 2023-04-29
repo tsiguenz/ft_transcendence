@@ -29,6 +29,11 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
 export default {
+  data() {
+		return {
+      is_expanded : false
+		};
+  },
   computed: {
     pageTitle() {
       return this.$route.name || 'Default Title';
@@ -38,19 +43,12 @@ export default {
 	methods: {
 		isLog() {
 			return this.sessionStore.loggedIn;
-		}
+		},
+    searchClosed() {
+	    this.is_expanded = !this.is_expanded;
+    }
 	},
 };
-</script>
-
-<script setup>
-
-import { ref } from 'vue';
-
-const is_expanded = ref(false)
-const searchClosed = () => {
-  is_expanded.value = !is_expanded.value;
-}
 </script>
   
 <style lang="scss" scoped>
@@ -59,16 +57,9 @@ const searchClosed = () => {
     background: var(--dark-alt);
     padding-right: 1%;
 }
-.title{
-    font-weight: 500;
-    font-size: larger;
-    display: flex;
-    flex:1 0 auto;
-}
-
 .v-form{
   display: flex;
-  margin-top: 1.25%;
+  margin-top: 18px;
   width: 45px;
   :deep .v-text-field .v-input__control .v-field__outline::before{
     border :solid;
@@ -81,14 +72,7 @@ const searchClosed = () => {
   :deep .mdi-magnify{
     cursor: pointer;
   }
-  .addButton{
-    display: none ;
-  }
   &.is-expanded {
-      .addButton{
-      display: flex;
-      align-items: center;
-    }
     width: 300px;
     transition: width 0.3s;
     :deep .v-field--variant-filled .v-field__overlay{

@@ -32,7 +32,8 @@ import { useSessionStore } from '@/store/session';
 export default {
 	data() {
 		return {
-			drawer: true
+			drawer: true,
+      is_expanded : false
 		};
 	},
 	computed: {
@@ -41,20 +42,14 @@ export default {
 	methods: {
 		isLog() {
 			return this.sessionStore.loggedIn;
-		}
+		},
+    ToggleMenu() {
+	    this.is_expanded = !this.is_expanded;
+    }
 	}
 };
 </script>
 
-<script setup>
-
-import { ref } from 'vue';
-
-const is_expanded = ref(false)
-const ToggleMenu = () => {
-	is_expanded.value = !is_expanded.value;
-}
-</script>
 <style lang="scss" scoped>
 
 aside {
@@ -95,7 +90,6 @@ aside {
 
 		.menu-toggle-wrap {
 			top: -3rem;
-			
 			.menu-toggle {
 				transform: rotate(-180deg);
 			}
@@ -125,9 +119,6 @@ aside {
 			&.router-link-exact-active {
 				background-color: var(--dark-purple);
 				border-right: 5px solid var(--light);
-				.icons-avatar, .text {
-					color: var(--primary);
-				}
 			}
 		}
 	}

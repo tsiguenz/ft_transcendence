@@ -1,14 +1,11 @@
 <template>
-  <div class="full">
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
   <img :src="avatarPath" alt="avatar" width="100" height="100" />
   <p>Avatar path: {{ avatarPath }}</p>
-
   <br />
-
   <h1>Edit profile</h1>
   <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
@@ -18,7 +15,6 @@
       required
       @keydown.enter.prevent="dispatchEditProfile"
     ></v-text-field>
-
     <input
       v-model="newTwoFactorEnable"
       type="checkbox"
@@ -27,18 +23,13 @@
       required
     />
     <label for="newTwoFactorEnable">2fa</label>
-
     <br />
-
     <input type="file" name="avatar" @change="onFileChange" />
-
     <br />
-
     <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
       submit
     </v-btn>
   </v-form>
-
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <v-form v-if="qrcode">
     <v-text-field
@@ -52,7 +43,6 @@
 
   <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
   <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
-</div>
 </template>
 
 <script>

@@ -1,7 +1,6 @@
 <template>
   <div class="app">
-    <AppHeader v-if="!hideHeader()"></AppHeader>
-    <AppSidebar />
+    <AppHeader></AppHeader>
     <div class="content-wrapper">
       <Navbar />
       <router-view />
@@ -20,14 +19,6 @@ export default {
   },
   data() {
     return {};
-  },
-  methods: {
-    hideHeader() {
-      return (
-        this.$route.path === '/42/callback' ||
-        this.$route.path === '/2fa/verify'
-      );
-    }
   }
 };
 
@@ -36,15 +27,6 @@ export default {
 <style lang="scss">
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-
-:root {
-	--light: #600FDF;
-	--light-purple: #4508A0;
-	--medium-purple: #2B0366;
-	--dark-purple: #1F024A;
-	--dark-alt: #0F0124;
-	--sidebar-width: 300px;
-}
 
 * {
 	margin: 0;
@@ -76,9 +58,6 @@ button {
 	main {
 		flex: 1 1 0;
 		padding: 2rem;
-		@media (max-width: 1024px) {
-			padding-left: 6rem;
-		}
 	}
 }
 
