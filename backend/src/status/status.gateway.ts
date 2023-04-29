@@ -31,7 +31,7 @@ export class StatusGateway {
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     const sockets = await this.server.fetchSockets();
     const clientJwt = client.handshake.auth.token;
-    for (let socket of sockets) {
+    for (const socket of sockets) {
       if (clientJwt == socket.handshake.auth.token) return;
     }
     this.logger.log(`Client disconnected: ${client.id}`);
