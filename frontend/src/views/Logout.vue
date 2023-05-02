@@ -3,13 +3,15 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 
 export default {
   data() {
     return {};
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   mounted() {
     this.logout();
@@ -19,7 +21,9 @@ export default {
     logout() {
       if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
+      this.$root.unsubscribeAndDisconnectStatusSocket();
       this.sessionStore.logout();
+      this.connectedUsersStore.reset();
     }
   }
 };

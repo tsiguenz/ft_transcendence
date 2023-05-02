@@ -9,7 +9,7 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi';
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { VueCookieNext } from 'vue-cookie-next';
-import "../assets/style.scss"
+import '../assets/style.scss';
 
 const app = createApp(App);
 const pinia = createPinia();

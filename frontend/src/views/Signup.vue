@@ -41,6 +41,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -60,7 +61,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signup() {
@@ -83,8 +85,10 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-        this.$cookie.setCookie('jwt', response.data.access_token);
+        const jwt = response.data.access_token;
+        this.$cookie.setCookie('jwt', jwt);
         this.sessionStore.signin(this.nickname);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({
