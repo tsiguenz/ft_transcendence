@@ -1,0 +1,41 @@
+:root {
+	--light: #600FDF;
+	--light-purple: #4508A0;
+	--medium-purple: #2B0366;
+	--dark-purple: #1F024A;
+	--dark-alt: #0F0124;
+	--sidebar-width: 300px;
+}
+
+.log:hover {
+    background-position: right center;
+}
+
+.log {
+    background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
+    flex: 1 1 auto;
+    bottom: 0;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    border-radius: 5px;
+    display: flex;
+
+}
+
+.signup {
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 5px;
+    display: flex;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+}
+
+.log, .signup {
+    margin-left: 8px;
+  }
