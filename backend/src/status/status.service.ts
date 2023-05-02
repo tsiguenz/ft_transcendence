@@ -34,7 +34,7 @@ export class StatusService {
   async getUserIdFromJwt(token: string) {
     const payload = await this.jwt
       .verifyAsync(token, {
-        secret: process.env.JWT_SECRET
+        secret: process.env.JWT_ACCESS_SECRET
       })
       .catch(() => {
         return undefined;

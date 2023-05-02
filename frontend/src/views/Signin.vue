@@ -69,6 +69,7 @@ export default {
         const jwt = response.data.access_token;
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', jwt);
+        this.$cookie.setCookie('refresh_token', response.data.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
@@ -85,23 +86,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>
