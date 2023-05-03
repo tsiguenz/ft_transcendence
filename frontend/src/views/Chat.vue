@@ -4,7 +4,6 @@
       <v-col cols="3">
         <Chatrooms
           :id="currentChatroomId"
-          :deleteRoomId="roomToDelete"
           @join="joinChatroom"
         />
       </v-col>
@@ -12,7 +11,7 @@
         <Chat
           :id="currentChatroomId"
           title="Chat"
-          :messages="messages[currentChatroomId]"
+          :messages="messages"
           @leave="leaveRoom"
         />
       </v-col>
@@ -42,48 +41,27 @@ export default {
   },
   data() {
     return {
-      users: [],
-      message: '',
-      currentChatroomId: 0,
-      roomToDelete: 0
+      // currentChatroomId: 0,
     };
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
     messages() {
-      return this.chatStore.messages;
+      return this.chatStore.activeRoomMessages;
+    },
+    currentChatroomId() {
+      return this.chatStore.activeChatroom;
     }
   },
   methods: {
     async joinChatroom(id) {
-      this.currentChatroomId = id;
-      ChatService.joinRoom(id);
-      ChatService.getRoomMessages(id, this.lastMessageTime(id));
-      // const users = await this.getChatroomUsers(id);
+      this.chatStore.activeChatroom = id;
     },
     leaveRoom(id) {
-      this.roomToDelete = id;
+      this.chatStore.activeChatroom = this.chatStore.defaultChatroom.id;
+      this.chatStore.removeRoom(id);
     },
-    async getChatroomUsers(chatroomId) {
-      try {
-        const response = await axios.get(
-          constants.API_URL + '/chatrooms/' + chatroomId + '/users'
-        );
-        return response.data;
-      } catch (error) {
-        alert(error.response.data.message);
-      }
-    },
-    lastMessageTime(chatroomId) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (
-        !this.messages.hasOwnProperty(chatroomId) ||
-        this.messages[chatroomId].length < 1
-      ) {
-        return new Date(null);
-      }
-      return new Date(this.messages[chatroomId].at(-1).sentAt);
-    }
+   
   }
 };
 </script>

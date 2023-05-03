@@ -6,23 +6,37 @@ export const useChatStore = defineStore('chat', {
     return {
       messages: {},
       users: {},
-      // chatrooms: [],
-      // activeChatroom: undefined
+      chatrooms: [],
+      activeChatroom: undefined,
     };
   },
   getters: {
-    // currentChatroom(): any {
-    //   if (this.activeChatroom === undefined) {
-    //     return;
-    //   }
-    //   return this.chatrooms.find((room) => room.id === this.activeChatroom);
-    // }
+    currentChatroom(): any {
+      if (this.activeChatroom === undefined) {
+        return ;
+      }
+      return this.chatrooms.find((room) => room.id === this.activeChatroom);
+    },
 
     defaultChatroom() {
       return this.chatrooms[0];
-    }
+    },
+
+    activeRoomMessages() {
+      if (this.messages.hasOwnProperty(this.activeChatroom)) {
+        return this.messages[this.activeChatroom];
+      }
+      return [];
+    },
+
   },
   actions: {
+    addRoom(...room) {
+      this.chatrooms.push(...room);
+    },
+    removeRoom(roomId) {
+      this.chatrooms = this.chatrooms.filter((room) => (room.id !== roomId));
+    },
     // joinChatroom(chatroomId: number) {},
     storeMessage(message) {
       const chatroomId: number = message.chatroomId;
@@ -56,6 +70,7 @@ export const useChatStore = defineStore('chat', {
         return this.users[chatroomId].find((user) => user.id === userId);
       }
       return false;
-    }
+    },
+
   }
 });

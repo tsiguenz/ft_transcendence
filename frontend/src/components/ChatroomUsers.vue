@@ -27,6 +27,8 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -58,6 +60,7 @@ export default {
   watch: {
     id: {
       handler() {
+        if (!this.currentChatroomId) { return; }
         this.getChatroomUsers(this.id).then((users) => {
           this.users = users;
         });
@@ -82,7 +85,10 @@ export default {
         const response = await axios.get(constants.API_URL + '/chatrooms/' + chatroomId + '/users');
         return response.data;
       } catch (error) {
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
     isCurrentUser(userId) {

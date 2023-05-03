@@ -7,7 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req
+  Req,
+  ForbiddenException
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -49,12 +50,12 @@ export class ChatroomController {
     );
   }
 
-  @UseGuards(JwtGuard)
-  @ApiBearerAuth()
-  @Get()
-  async findAll() {
-    return await this.chatroomService.findAll();
-  }
+  // @UseGuards(JwtGuard)
+  // @ApiBearerAuth()
+  // @Get()
+  // async findAll() {
+  //   return await this.chatroomService.findAll();
+  // }
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
@@ -94,8 +95,12 @@ export class ChatroomController {
     description: 'Chatroom id'
   })
   @Get(':id/users')
-  async findChatroomUsers(@Param('id') id: string) {
+  async findChatroomUsers(@Req() req: Request, @Param('id') id: string) {
+    const currentUserId = req.user['id'];
     const users = await this.chatroomService.findChatroomUsers(+id);
+    if (!users.find(u => u.id == currentUserId)) {
+      throw new ForbiddenException('Unauthorized to list users');
+    }
     const formattedUsers = users.map((user) => ({
       id: user.id,
       nickname: user.nickname,
@@ -120,18 +125,18 @@ export class ChatroomController {
     return this.chatroomService.update(+id, updateChatroomDto);
   }
 
-  @UseGuards(JwtGuard)
-  @ApiBearerAuth()
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    required: true,
-    description: 'Chatroom id'
-  })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chatroomService.remove(+id);
-  }
+  // @UseGuards(JwtGuard)
+  // @ApiBearerAuth()
+  // @ApiParam({
+  //   name: 'id',
+  //   type: Number,
+  //   required: true,
+  //   description: 'Chatroom id'
+  // })
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.chatroomService.remove(+id);
+  // }
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()

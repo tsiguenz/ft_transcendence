@@ -25,8 +25,13 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 import NewChatroomDialog from '../components/NewChatroomDialog.vue';
 import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
+
+import { mapStores } from 'pinia';
+import { useChatStore } from '@/store/chat';
 
 export default {
   components: {
@@ -35,17 +40,18 @@ export default {
   },
   props: [
     'id',
-    'deleteRoomId'
   ],
   emits: [
     'join'
   ],
-  data() {
-    return {
-      chatrooms: [],
+  computed: {
+    ...mapStores(useChatStore),
+    chatrooms() {
+      return this.chatStore.chatrooms;
     }
   },
   mounted() {
+    // if (this.chatrooms.length > 0) { return ; }
     this.loadChatrooms().then((chatrooms) => {
       this.join(chatrooms[0].id);
     });
@@ -55,11 +61,11 @@ export default {
       this.$emit('join', id);
     },
     pushChatroom(chatroom) {
-      this.chatrooms.push(chatroom);
+      this.chatStore.addRoom(chatroom);
     },
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
-      this.chatrooms.push(...chatrooms);
+      this.chatStore.addRoom(...chatrooms);
       return chatrooms;
     },
     async getChatrooms() {
@@ -67,18 +73,12 @@ export default {
         const response = await axios.get(constants.API_URL + '/chatrooms/mine');
         return response.data;
       } catch (error) {
-        alert(error.response.data.message);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
-  },
-  watch: {
-    deleteRoomId: {
-      handler() {
-        console.log("ROOM TO DELETE: "+this.deleteRoomId);
-        const newChatrooms = this.chatrooms.filter((room) => (room.id !== this.deleteRoomId));
-        console.table(newChatrooms);
-      }
-    }
   }
 }
 

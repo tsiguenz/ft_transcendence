@@ -19,10 +19,7 @@
 </template>
 
 <script>
-import axios from 'axios';
 import * as constants from '@/constants';
-import swal from 'sweetalert';
-import formatError from '@/utils/lib';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -59,6 +56,12 @@ export default {
 	    },
 	    deep: true
 	  },
+    id: {
+      handler() {
+        ChatService.joinRoom(this.id);
+        ChatService.getRoomMessages(this.id, this.lastMessageTime());
+      }
+    }
 	},
 	created() {
     ChatService.setup(this.$cookie.getCookie('jwt'));
@@ -83,6 +86,16 @@ export default {
     leaveRoom() {
       this.$emit('leave', this.id);
 			ChatService.leaveRoom(this.id);
+    },
+    lastMessageTime() {
+      // eslint-disable-next-line no-prototype-builtins
+      if (
+        !this.messages ||
+        this.messages.length < 1
+      ) {
+        return new Date(null);
+      }
+      return new Date(this.messages.at(-1).sentAt);
     }
 	},
 }
