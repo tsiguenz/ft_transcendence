@@ -69,16 +69,7 @@ export default {
           icon: 'error',
           button: 'OK'
         });
-        const tokens = await axios
-          .post(constants.API_URL + `/auth/refresh`, {
-            Authorization: 'Bearer ' + this.$cookie.getCookie('refresh_token')
-          })
-          .catch(() => {
-            console.log('Error while refreshing token');
-            this.$router.push('/logout');
-          });
-        console.log('tokens are refreshed');
-        console.log(tokens);
+        this.$router.push('/logout');
       }
     },
     async addFriend(friend) {

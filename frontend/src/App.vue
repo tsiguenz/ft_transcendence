@@ -10,12 +10,12 @@
 
 <script>
 import AppHeader from './components/AppHeader.vue';
+import Navbar from './components/NavBar.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
 import { STATUS_SOCKET_URL } from './constants';
-import Navbar from './components/NavBar.vue';
 
 export default {
   components: {

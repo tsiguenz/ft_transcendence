@@ -13,13 +13,13 @@ export class RefreshTokenStrategy extends PassportStrategy(
   constructor(private prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_REFRESH_SECRET
+      secretOrKey: process.env.JWT_REFRESH_SECRET,
+      passReqToCallback: true
     });
   }
 
   async validate(req: Request, payload: Payload) {
-    console.log('refresh token strategy');
     const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
-    return { payload, refreshToken };
+    return { id: payload.sub, refreshToken };
   }
 }
