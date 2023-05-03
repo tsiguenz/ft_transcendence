@@ -1,6 +1,6 @@
 <template>
   <aside :class="`${is_expanded ? 'is-expanded' : ''}`">
-    <div class="logo"><img to="/home" src="../../assets/icons/pong.png" /></div>
+    <div class="logo"><img to="/home" src="/assets/icons/pong.png" /></div>
 
     <div class="menu-toggle-wrap">
       <button class="menu-toggle" @click="ToggleMenu">
@@ -12,7 +12,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/house.png"
+            src="/assets/icons/house.png"
           ></v-img></v-avatar
         ><span class="text">Home</span></router-link
       >
@@ -20,7 +20,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/joystick.png"
+            src="/assets/icons/joystick.png"
           ></v-img></v-avatar
         ><span class="text">Game</span></router-link
       >
@@ -28,7 +28,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/chat.png"
+            src="/assets/icons/chat.png"
           ></v-img></v-avatar
         ><span class="text">Chat</span></router-link
       >
@@ -36,7 +36,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/friends.png"
+            src="/assets/icons/friends.png"
           ></v-img></v-avatar
         ><span class="text">Social</span></router-link
       >
@@ -44,7 +44,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/trophy.png"
+            src="/assets/icons/trophy.png"
           ></v-img></v-avatar
         ><span class="text">LeaderBoard</span></router-link
       >
@@ -52,7 +52,7 @@
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
-            src="./assets/icons/user.png"
+            src="/assets/icons/user.png"
           ></v-img></v-avatar
         ><span class="text">Profile</span></router-link
       >

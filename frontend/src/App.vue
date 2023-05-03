@@ -50,12 +50,6 @@ export default {
     this.disconnectStatusSocket();
   },
   methods: {
-    hideHeader() {
-      return (
-        this.$route.path === '/42/callback' ||
-        this.$route.path === '/2fa/verify'
-      );
-    },
     connectStatusSocket() {
       this.socketioStatus.setupSocketConnection(this.$cookie.getCookie('jwt'));
     },
