@@ -1,7 +1,7 @@
 <template>
 <v-dialog v-if="!isLog()" width="100%">
 	<template v-slot:activator="{ props }">
-		<v-btn v-bind="props">sign up</v-btn>
+		<v-btn variant="outlined" class="signup" v-bind="props">sign up</v-btn>
 	</template>
 	<v-container>
 		<v-row align="center" justify="center">

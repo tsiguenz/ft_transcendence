@@ -1,13 +1,15 @@
 <template>
-<v-dialog v-if="!isLog()" width="100%">
-	<template v-slot:activator="{ props }">
-		<v-btn @click='setErrorMessage' v-bind="props">login</v-btn>
-	</template>
+		<v-btn v-if="!isLog()" class="log">Sign In
+<v-dialog v-model="dialog" activator="parent">
 	<v-container>
 		<v-row align="center" justify="center">
-			<v-col cols="5">
-				<v-card height="100%" width="100%">
-					<v-card-title class="justify-center">Sign In</v-card-title>
+				<v-card class="card" height="100%" width="400px">
+					<v-card-title>
+					<div class="d-flex justify-space-between mb-6">
+							Sign In
+						<v-btn class="card" @click="dialog = false"><v-icon icon="mdi-close"></v-icon></v-btn>
+					</div>
+					</v-card-title>
 					<v-divider></v-divider>
 					<v-card-text>
 					<div v-for="message in errorMessage" class="d-block mb-5">
@@ -26,7 +28,6 @@
 							></v-text-field>
 							<v-text-field
 								v-model="password"
-								class="mb-5"
 								label="Password"
 								type="password"
 								variant="outlined"
@@ -34,17 +35,18 @@
 								required
 								@keydown.enter.prevent="signin"
 							></v-text-field>
-							<v-row justify="space-between">
-								<v-btn @click="signin">Sign In</v-btn>
-								<v-btn @click="signin42">Sign in with 42</v-btn>
-							</v-row>
 						</v-form>
 					</v-card-text>
+						<v-card-actions>
+									<v-btn class="btn" @click="signin">Sign In</v-btn>
+							<v-spacer />
+									<v-btn class="btn" @click="signin42">Sign in with 42</v-btn>
+						</v-card-actions>
 				</v-card>
-			</v-col>
 		</v-row>
 	</v-container>
 </v-dialog>
+	</v-btn>
 </template>
 
 <script>
@@ -57,7 +59,8 @@ import formatError from '@/utils/lib';
 export default {
   data() {
     return {
-			errorMessage: '',
+			errorMessage: [],
+			dialog: false,
       nickname: '',
       password: '',
       twoFactorCode: '',
@@ -87,23 +90,11 @@ export default {
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-				this.errorMessage = error.response.data.message;
-//				swal.fire({ customClass: { container: 'my-swal' }, text: formatError(error.response.data.message) } );
-//				swal.fire(formatError(error.response.data.message));
-//				Swal.fire({
-//            target: document.getElementById('form-modal')});
-//				alert(formatError(error.response.data.message));
-        // TODO: Handle error with a snackbar
-//        swal({
-//          icon: 'error',
-//          text: formatError(error.response.data.message),
-//					buttons: {
-//						confirm: {
-//							text: "Try again"
-//						}
-//					},
-//					focusConfirm: true,
-//        });
+			this.errorMessage = [];
+				if (typeof error.response.data.message === 'string')
+					this.errorMessage.push(error.response.data.message);
+				else
+					this.errorMessage = error.response.data.message;
       }
     },
     signin42() {
@@ -111,16 +102,26 @@ export default {
     },
 		isLog() {
 			return this.sessionStore.loggedIn;
-		},
-		setErrorMessage() {
-			this.errorMessage = '';
 		}
   }
 };
 </script>
 
-<style>
-	.swal2-container{
-		z-index: 300000!important;
-	}
+<style lang="scss" scoped>
+.card{
+  background: var(--dark-alt);
+}
+.btn{
+    background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
+		width: 180px;
+    bottom: 0;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    border-radius: 5px;
+    display: flex;
+
+}
+
 </style>
