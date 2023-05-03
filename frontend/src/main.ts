@@ -56,6 +56,10 @@ axios.interceptors.response.use(
         VueCookieNext.setCookie('refresh_token', response.data.refresh_token);
         error.config.headers['Authorization'] =
           'Bearer ' + response.data.access_token;
+        // TODO: is this good for spa ?
+        // its really slow
+        // reload page to restart the sockets with the new token
+        // window.location.reload();
         return axios.request(error.config);
       } catch (e) {
         window.location.href = '/logout';

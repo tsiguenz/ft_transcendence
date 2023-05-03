@@ -66,10 +66,10 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
-        const jwt = response.data.access_token;
+        const tokens = response.data;
         this.sessionStore.signin(this.nickname);
-        this.$cookie.setCookie('jwt', jwt);
-        this.$cookie.setCookie('refresh_token', response.data.refresh_token);
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {

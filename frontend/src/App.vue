@@ -38,9 +38,7 @@ export default {
     ...mapStores(useSessionStore)
   },
   created() {
-    if (!this.sessionStore.isLoggedIn) {
-      this.connectedUsersStore.reset();
-    }
+    if (!this.sessionStore.loggedIn) this.connectedUsersStore.reset();
     this.connectStatusSocket();
   },
   mounted() {

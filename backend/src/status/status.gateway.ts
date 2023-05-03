@@ -18,12 +18,13 @@ export class StatusGateway {
 
   @SubscribeMessage('connect')
   async handleConnection(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
     const userId = await this.statusService.addNewUser(
       client,
       this.connectedUsers
     );
+    if (!userId) console.log('client disconnected before connection');
     if (!userId) client.disconnect();
+    this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
   }
 
@@ -34,12 +35,12 @@ export class StatusGateway {
     for (const socket of sockets) {
       if (clientJwt == socket.handshake.auth.token) return;
     }
-    this.logger.log(`Client disconnected: ${client.id}`);
     const userId = await this.statusService.removeUser(
       client,
       this.connectedUsers
     );
     if (!userId) return;
+    this.logger.log(`Client disconnected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
   }
 }
