@@ -9,7 +9,7 @@ export class ChatService {
     return await this.prisma.message.findMany({ include: { author: true } });
   }
 
-  async saveMessage(userId: number, message: string) {
+  async saveMessage(userId: string, message: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new Error('User not found');

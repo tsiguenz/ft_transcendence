@@ -52,7 +52,6 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import swal from 'sweetalert2';
 import formatError from '@/utils/lib';
 
 export default {

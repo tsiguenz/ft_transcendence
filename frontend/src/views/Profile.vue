@@ -5,9 +5,7 @@
   <p>Created at: {{ user.createdAt }}</p>
   <img :src="avatarPath" alt="avatar" width="100" height="100" />
   <p>Avatar path: {{ avatarPath }}</p>
-
   <br />
-
   <h1>Edit profile</h1>
   <v-form v-if="!qrcode" v-model="isFormValid">
     <v-text-field
@@ -17,7 +15,6 @@
       required
       @keydown.enter.prevent="dispatchEditProfile"
     ></v-text-field>
-
     <input
       v-model="newTwoFactorEnable"
       type="checkbox"
@@ -26,18 +23,13 @@
       required
     />
     <label for="newTwoFactorEnable">2fa</label>
-
     <br />
-
     <input type="file" name="avatar" @change="onFileChange" />
-
     <br />
-
     <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
       submit
     </v-btn>
   </v-form>
-
   <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
   <v-form v-if="qrcode">
     <v-text-field
@@ -227,23 +219,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>

@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
+import { StatusModule } from './status/status.module';
 import { TwoFaService } from './2fa/2fa.service';
 import { TwoFaModule } from './2fa/2fa.module';
 import { UsersService } from './users/users.service';
@@ -20,6 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     UsersModule,
     ProfileModule,
     TwoFaModule,
+    StatusModule,
     ServeStaticModule.forRoot({
       rootPath: '/app/public',
       serveRoot: '/'

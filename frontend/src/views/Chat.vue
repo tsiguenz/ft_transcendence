@@ -27,13 +27,17 @@ export default {
       users: [],
       message: '',
       messages: [],
+      socketioChat: new SocketioService(constants.CHAT_SOCKET_URL)
     };
   },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
   created() {
-    SocketioService.setupSocketConnection(this.$cookie.getCookie('jwt'));
+    this.socketioChat.setupSocketConnection(this.$cookie.getCookie('jwt'));
   },
   mounted() {
-    SocketioService.subscribe("msgToClient", (message) => {
+    this.socketioChat.subscribe('msgToClient', (message) => {
       if (message.author === this.sessionStore.nickname) {
         message.author = 'Me';
       }
@@ -41,20 +45,17 @@ export default {
     });
   },
   beforeUnmount() {
-    SocketioService.disconnect();
-  },
-  computed: {
-    ...mapStores(useSessionStore),
+    this.socketioChat.disconnect();
   },
   methods: {
     sendMessage() {
-      if (this.message == '') { return; }
-      SocketioService.sendMessage("msgToServer", this.message);
-      // SocketioService.sendMessage("testChannel", this.message);
+      if (this.message == '') {
+        return;
+      }
+      this.socketioChat.sendMessage('msgToServer', this.message);
       this.messages.push({ author: 'Me', data: this.message });
       this.message = '';
     }
   }
 };
-
 </script>
