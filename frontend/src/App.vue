@@ -38,11 +38,10 @@ export default {
     ...mapStores(useSessionStore)
   },
   created() {
-    if (!this.sessionStore.loggedIn) this.connectedUsersStore.reset();
-    this.connectStatusSocket();
+    if (this.sessionStore.loggedIn) this.connectStatusSocket();
   },
   mounted() {
-    this.subscribeStatusSocket();
+    if (this.sessionStore.loggedIn) this.subscribeStatusSocket();
   },
   beforeUnmount() {
     this.disconnectStatusSocket();

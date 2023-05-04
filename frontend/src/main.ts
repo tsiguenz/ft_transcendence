@@ -56,10 +56,10 @@ axios.interceptors.response.use(
         VueCookieNext.setCookie('refresh_token', response.data.refresh_token);
         error.config.headers['Authorization'] =
           'Bearer ' + response.data.access_token;
-        // TODO: is this good for spa ?
-        // its really slow
+        // fix socket disconnected when refresh page and jwt is expired
         // reload page to restart the sockets with the new token
-        // window.location.reload();
+        // its bad but idk how to do it better
+        window.location.reload();
         return axios.request(error.config);
       } catch (e) {
         window.location.href = '/logout';

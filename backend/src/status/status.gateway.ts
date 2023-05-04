@@ -22,7 +22,6 @@ export class StatusGateway {
       client,
       this.connectedUsers
     );
-    if (!userId) console.log('client disconnected before connection');
     if (!userId) client.disconnect();
     this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
@@ -39,7 +38,7 @@ export class StatusGateway {
       client,
       this.connectedUsers
     );
-    if (!userId) return;
+    if (!userId) client.disconnect();
     this.logger.log(`Client disconnected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
   }
