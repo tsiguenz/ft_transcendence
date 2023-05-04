@@ -65,6 +65,6 @@ axios.interceptors.response.use(
         window.location.href = '/logout';
       }
     }
-    return error;
+    return Promise.reject(error);
   }
 );
