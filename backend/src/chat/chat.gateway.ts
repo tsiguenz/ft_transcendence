@@ -36,7 +36,6 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string, message: string }
   ) {
-      this.logger.log("RECEIVED MESSAGE: " + payload.message)
     try {
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
@@ -173,18 +172,15 @@ export class ChatGateway
         }
         this.logger.log(`AUTHENTICATION ERROR [${message}]`);
         client.disconnect();
-      this.logger.log("CLIENT DISCONNECTED")
         return;
       }
     } else {
       client.disconnect();
-      this.logger.log("CLIENT DISCONNECTED")
       return;
     }
 
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
-      this.logger.log("CLIENT DISCONNECTED")
       client.disconnect();
     }
   }

@@ -51,9 +51,9 @@ export default {
     }
   },
   mounted() {
-    // if (this.chatrooms.length > 0) { return ; }
+    if (this.chatStore.chatrooms.length > 0) { return ; }
     this.loadChatrooms().then((chatrooms) => {
-      this.join(chatrooms[0].id);
+      this.chatStore.switchToDefaultChatroom();
     });
   },
   methods: {

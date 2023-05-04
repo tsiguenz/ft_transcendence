@@ -60,7 +60,10 @@ export default {
   watch: {
     id: {
       handler() {
-        if (!this.currentChatroomId) { return; }
+        if (!this.id) {
+          this.users = [];
+          return;
+        }
         this.getChatroomUsers(this.id).then((users) => {
           this.users = users;
         });

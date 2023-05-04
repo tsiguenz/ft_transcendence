@@ -19,6 +19,9 @@ export class ChatService {
 					gt: newerThan
 				}
 			},
+			orderBy: {
+				createdAt: 'asc'
+			},
 			include: { author: true }
 		});
 	}

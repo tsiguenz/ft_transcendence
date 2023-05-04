@@ -18,10 +18,6 @@ export const useChatStore = defineStore('chat', {
       return this.chatrooms.find((room) => room.id === this.activeChatroom);
     },
 
-    defaultChatroom() {
-      return this.chatrooms[0];
-    },
-
     activeRoomMessages() {
       if (this.messages.hasOwnProperty(this.activeChatroom)) {
         return this.messages[this.activeChatroom];
@@ -36,6 +32,7 @@ export const useChatStore = defineStore('chat', {
     },
     removeRoom(roomId) {
       this.chatrooms = this.chatrooms.filter((room) => (room.id !== roomId));
+      delete this.messages[roomId];
     },
     // joinChatroom(chatroomId: number) {},
     storeMessage(message) {
@@ -72,5 +69,12 @@ export const useChatStore = defineStore('chat', {
       return false;
     },
 
+    switchToDefaultChatroom() {
+      if (this.chatrooms.length > 0) {
+        this.activeChatroom = this.chatrooms[0].id;
+      } else {
+        this.activeChatroom = undefined;
+      }
+    }
   }
 });

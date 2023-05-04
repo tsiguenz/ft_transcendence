@@ -181,9 +181,6 @@ export class ChatroomService {
                 user: { id: userId }
               }
             }
-          },
-          {
-            name: 'general'
           }
         ]
       },
@@ -199,18 +196,11 @@ export class ChatroomService {
   async findChatroomsForUser(userId: string) {
     return await this.prisma.chatRoom.findMany({
       where: {
-        OR: [
-          {
-            name: 'general'
-          },
-          {
-            users: {
-              some: {
-                user: { id: userId }
-              }
-            }
+        users: {
+          some: {
+            user: { id: userId }
           }
-        ]
+        }
       },
       select: {
         id: true,
