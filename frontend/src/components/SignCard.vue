@@ -1,0 +1,205 @@
+<template>
+	<v-btn v-if="!isLog()" class="log">
+		<div v-if="toSignin">Sign In</div>
+		<div v-else>Sign up</div>
+		<v-dialog v-model="dialog" activator="parent">
+			<v-container>
+				<v-row align="center" justify="center">
+					<v-card class="card" height="100%" width="400px">
+						<v-card-title>
+							<div class="d-flex justify-space-between">
+								Sign In
+								<v-btn class="card" @click="dialog = false"><v-icon icon="mdi-close"></v-icon></v-btn>
+							</div>
+						</v-card-title>
+						<v-divider></v-divider>
+						<v-card-text>
+							<div v-for="message in errorMessage" class="d-block mb-5">
+								<v-icon icon="mdi-alert-box"></v-icon>
+								{{ message }}
+							</div>
+							<v-form v-if="toSignin">
+								<v-text-field
+									v-model="nickname"
+									class="mb-5"
+									label="Nickname"
+									variant="outlined"
+									autocomplete="username"
+									required
+									@keydown.enter.prevent="signin"
+								></v-text-field>
+								<v-text-field
+									v-model="password"
+									label="Password"
+									type="password"
+									variant="outlined"
+									autocomplete="current-password"
+									required
+									@keydown.enter.prevent="signin"
+								></v-text-field>
+							</v-form>
+							<v-form v-else v-model="isFormValid">
+							  <v-text-field
+							    v-model="nickname"
+							    class="mb-5"
+							    label="Nickname"
+							    variant="outlined"
+							    autocomplete="username"
+							    required
+							    :rules="[rules.nicknameCharacters]"
+							    @keydown.enter.prevent="signup"
+							  ></v-text-field>
+							  <v-text-field
+							    v-model="password"
+							    class="mb-5"
+							    label="Password"
+							    type="password"
+							    variant="outlined"
+							    autocomplete="new-password"
+							    required
+							    @keydown.enter.prevent="signup"
+							  ></v-text-field>
+							  <v-text-field
+							    v-model="passwordVerify"
+							    class="mb-5"
+							    label="Verify password"
+							    type="password"
+							    variant="outlined"
+							    autocomplete="new-password"
+							    required
+							    :rules="[rules.passwordCheck]"
+							    @keydown.enter.prevent="signup"
+							  ></v-text-field>
+							</v-form>
+						</v-card-text>
+						<v-card-actions v-if="toSignin">
+							<v-btn class="btn" @click="signin">Sign In</v-btn>
+							<v-spacer />
+							<v-btn class="btn" @click="signin42">Sign in with 42</v-btn>
+						</v-card-actions>
+						<v-card-actions v-else>
+						  <v-btn class="btn" :disabled="!isFormValid" @click="signup">Sign Up</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-row>
+			</v-container>
+		</v-dialog>
+	</v-btn>
+</template>
+
+<script>
+import axios from 'axios';
+import * as constants from '@/constants.ts';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
+import formatError from '@/utils/lib';
+
+export default {
+	props: {
+			toSignin: false
+	},
+  data() {
+    return {
+      nickname: '',
+      password: '',
+      passwordVerify: '',
+      twoFactorCode: '',
+			errorMessage: [],
+			dialog: false,
+      auth42: `https://api.intra.42.fr/oauth/authorize?client_id=${
+        import.meta.env.VITE_APP42_ID
+      }&redirect_uri=${
+        import.meta.env.VITE_CALLBACK_URL
+      }&response_type=code&scope=public`,
+      isFormValid: false,
+      rules: {
+        nicknameCharacters: (v) =>
+          /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
+          "Must contain only alphanumeric, '-' and have a length between 1 and 8",
+        passwordCheck: (v) => v === this.password || 'Passwords do not match !'
+      }
+    };
+  },
+  computed: {
+    ...mapStores(useSessionStore)
+  },
+  methods: {
+    async signin() {
+      try {
+        const response = await axios.post(constants.API_URL + '/auth/signin', {
+          nickname: this.nickname,
+          password: this.password,
+          twoFactorCode: this.twoFactorCode
+        });
+        if (response.data.message === 'Two factor code required') {
+          this.$router.push(`/2fa/verify?id=${response.data.id}`);
+          return;
+        }
+        this.sessionStore.signin(this.nickname);
+        this.$cookie.setCookie('jwt', response.data.access_token);
+        this.$router.push('/home');
+      } catch (error) {
+			this.errorMessage = [];
+				this.setErrorMessage(error);
+      }
+    },
+    signin42() {
+      window.location.href = this.auth42;
+    },
+    async signup() {
+			this.errorMessage = [];
+      if (this.password === '') {
+				this.setErrorMessage('Password should not be empty');
+      }
+      if (this.password !== this.passwordVerify) {
+				this.setErrorMessage('Passwords do not match !');
+      }
+      if (!this.isFormValid) {
+			this.setErrorMessage('Invalid character or length in nickname');
+      }
+      try {
+        const response = await axios.post(constants.API_URL + '/auth/signup', {
+          nickname: this.nickname,
+          password: this.password
+        });
+        this.$cookie.setCookie('jwt', response.data.access_token);
+        this.sessionStore.signin(this.nickname);
+        this.$router.push('/home');
+      } catch (error) {
+				this.setErrorMessage(error);
+      }
+		},
+		isLog() {
+			return this.sessionStore.loggedIn;
+    },
+		setErrorMessage(error) {
+			if (typeof error === 'string') {
+				this.errorMessage.push(error);
+				return;
+			};
+			if (typeof error.response.data.message === 'string')
+				this.errorMessage.push(error.response.data.message);
+			else
+				this.errorMessage = error.response.data.message;
+		}
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.card{
+  background: var(--dark-alt);
+}
+.btn{
+    background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
+		width: 180px;
+    bottom: 0;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    border-radius: 5px;
+    display: flex;
+}
+
+</style>

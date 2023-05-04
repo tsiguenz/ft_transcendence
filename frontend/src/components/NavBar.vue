@@ -17,8 +17,8 @@
       </v-form>
       <v-spacer></v-spacer>
       <div v-if="!isLog()" class="button-group">
-					<AppSignin />
-					<AppSignup />
+					<SignCard :toSignin=true />
+					<SignCard  />
       </div>
       <div v-if="isLog()" class="button-group">
         <v-btn class="log" to="/logout">Logout</v-btn>
@@ -30,13 +30,11 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import AppSignin from './AppSignin.vue';
-import AppSignup from './AppSignup.vue';
+import SignCard from './SignCard.vue';
 
 export default {
 	components: {
-		AppSignin,
-		AppSignup
+		SignCard
 	},
   data() {
     return {
