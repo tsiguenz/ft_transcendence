@@ -1,6 +1,7 @@
-import { IsNotEmpty, ValidateIf, IsString } from 'class-validator';
+import { IsNotEmpty, ValidateIf, IsString, Matches } from 'class-validator';
 
 export class AuthDto {
+  @Matches(/^[a-zA-Z0-9-]{1,8}/, { message: 'Invalid nickname' })
   @IsString()
   @IsNotEmpty()
   nickname: string;
@@ -9,8 +10,7 @@ export class AuthDto {
   @IsNotEmpty()
   password: string;
 
-  // TODO: cast to integer, class-validator doesn't support this yet :(
-  @ValidateIf((o) => o === '')
+  @ValidateIf((o) => o.twoFactorCode === '')
   @IsString()
   twoFactorCode: string;
 }

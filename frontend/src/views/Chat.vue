@@ -61,7 +61,6 @@ export default {
       this.chatStore.activeChatroom = this.chatStore.defaultChatroom.id;
       this.chatStore.removeRoom(id);
     },
-   
   }
 };
 </script>

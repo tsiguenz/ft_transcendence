@@ -45,7 +45,7 @@ export class ChatroomController {
     @Req() req: Request
   ) {
     return await this.chatroomService.create(
-      Number.parseInt(req.user['id']),
+      req.user['id'],
       createChatroomDto
     );
   }
@@ -77,27 +77,27 @@ export class ChatroomController {
   @ApiBearerAuth()
   @ApiParam({
     name: 'id',
-    type: Number,
+    type: String,
     required: true,
     description: 'Chatroom id'
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.chatroomService.findOne(+id);
+    return this.chatroomService.findOne(id);
   }
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'id',
-    type: Number,
+    type: String,
     required: true,
     description: 'Chatroom id'
   })
   @Get(':id/users')
   async findChatroomUsers(@Req() req: Request, @Param('id') id: string) {
     const currentUserId = req.user['id'];
-    const users = await this.chatroomService.findChatroomUsers(+id);
+    const users = await this.chatroomService.findChatroomUsers(id);
     if (!users.find(u => u.id == currentUserId)) {
       throw new ForbiddenException('Unauthorized to list users');
     }
@@ -113,7 +113,7 @@ export class ChatroomController {
   @ApiBearerAuth()
   @ApiParam({
     name: 'id',
-    type: Number,
+    type: String,
     required: true,
     description: 'Chatroom id'
   })
@@ -122,27 +122,27 @@ export class ChatroomController {
     @Param('id') id: string,
     @Body() updateChatroomDto: UpdateChatroomDto
   ) {
-    return this.chatroomService.update(+id, updateChatroomDto);
+    return this.chatroomService.update(id, updateChatroomDto);
   }
 
   // @UseGuards(JwtGuard)
   // @ApiBearerAuth()
   // @ApiParam({
   //   name: 'id',
-  //   type: Number,
+  //   type: String,
   //   required: true,
   //   description: 'Chatroom id'
   // })
   // @Delete(':id')
   // remove(@Param('id') id: string) {
-  //   return this.chatroomService.remove(+id);
+  //   return this.chatroomService.remove(id);
   // }
 
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'id',
-    type: Number,
+    type: String,
     required: true,
     description: 'Chatroom id'
   })
@@ -152,6 +152,6 @@ export class ChatroomController {
     @Param('id') id: string,
     @Body('password') password: string
   ) {
-    return await this.chatroomService.join(req.user['id'], +id, password);
+    return await this.chatroomService.join(req.user['id'], id, password);
   }
 }

@@ -1,10 +1,11 @@
 import SocketioService from './socketio.service';
 import * as events from '@/socketioEvents';
 import { useChatStore } from '@/store/chat';
+import { CHAT_SOCKET_URL } from '@/constants';
 
 class ChatService {
   constructor(
-    private socketService: SocketioService = new SocketioService(),
+    private socketService: SocketioService = new SocketioService(CHAT_SOCKET_URL),
     private chatStore: useChatStore = useChatStore()
   ) {}
 

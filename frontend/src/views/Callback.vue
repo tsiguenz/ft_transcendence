@@ -5,6 +5,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -16,7 +17,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   mounted() {
     this.signin42();
@@ -37,12 +39,13 @@ export default {
           authorization: this.authorizationCode
         });
         if (response.data.message === 'Two factor code required') {
-          // TODO: change id to something more secure
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
+        const jwt = response.data.access_token;
+        this.$cookie.setCookie('jwt', jwt);
         this.sessionStore.signin(response.data.nickname);
-        this.$cookie.setCookie('jwt', response.data.access_token);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({ icon: 'error', text: formatError(error.response.data.message) });

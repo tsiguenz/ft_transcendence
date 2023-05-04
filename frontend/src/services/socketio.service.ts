@@ -1,17 +1,25 @@
 import { io, Socket } from 'socket.io-client';
-import { CHAT_SOCKET_URL } from '../constants';
-import type { ServerToClientEvents, ClientToServerEvents } from '@/types/Socket';
+import type {
+  ServerToClientEvents,
+  ClientToServerEvents
+} from '@/types/Socket';
 
 class SocketioService {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  constructor() {}
+  constructor(url: string) {
+    this.url = url;
+    this.socket = null;
+  }
 
   setupSocketConnection(jwt: string) {
-    this.socket = io(CHAT_SOCKET_URL, { auth: { token: jwt } } );
+    this.socket = io(this.url, { auth: { token: jwt } });
   }
 
   disconnect() {
-    if (this.socket) { this.socket.disconnect(); }
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
   }
 
   send(event: string, message: string) {

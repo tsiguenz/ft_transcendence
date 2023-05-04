@@ -13,7 +13,7 @@ export class ChatroomService {
   private static DEFAULT_CHATROOM = 'general';
 
   constructor(private prisma: PrismaService) {}
-  async create(userId: number, dto: CreateChatroomDto) {
+  async create(userId: string, dto: CreateChatroomDto) {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
 
@@ -52,22 +52,22 @@ export class ChatroomService {
     return await this.prisma.chatRoom.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.prisma.chatRoom.findUnique({
       where: { id },
       include: { users: true }
     });
   }
 
-  update(id: number, updateChatroomDto: UpdateChatroomDto) {
+  update(id: string, updateChatroomDto: UpdateChatroomDto) {
     return `This action updates a #${id} chatroom`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} chatroom`;
   }
 
-  async findChatroomUsers(chatroomId: number) {
+  async findChatroomUsers(chatroomId: string) {
     return await this.prisma.user.findMany({
       where: {
         chatrooms: {
@@ -94,8 +94,8 @@ export class ChatroomService {
   }
 
   async join(
-    userId: number,
-    chatroomId: number,
+    userId: string,
+    chatroomId: string,
     password: string
   ): Promise<ChatRoomUser> {
     const chatroom = await this.findOne(chatroomId);
@@ -120,7 +120,7 @@ export class ChatroomService {
     return await this.addUserToChatroom(userId, chatroomId);
   }
 
-  async leave(userId: number, chatroomId: number) {
+  async leave(userId: string, chatroomId: string) {
     const chatroom = await this.findOne(chatroomId);
 
     if (!chatroom) {
@@ -163,7 +163,7 @@ export class ChatroomService {
     return defaultChatroom;
   }
 
-  async findJoinableChatroomsForUser(userId: number) {
+  async findJoinableChatroomsForUser(userId: string) {
     return await this.prisma.chatRoom.findMany({
       where: {
         OR: [
@@ -196,7 +196,7 @@ export class ChatroomService {
     });
   }
 
-  async findChatroomsForUser(userId: number) {
+  async findChatroomsForUser(userId: string) {
     return await this.prisma.chatRoom.findMany({
       where: {
         OR: [
@@ -220,13 +220,13 @@ export class ChatroomService {
     });
   }
 
-  async isUserInChatroom(userId: number, chatroomId: number) {
+  async isUserInChatroom(userId: string, chatroomId: string) {
     return !!(await this.findUserInChatroom(userId, chatroomId));
   }
 
   async findUserInChatroom(
-    userId: number,
-    chatroomId: number
+    userId: string,
+    chatroomId: string
   ): Promise<ChatRoomUser> {
     return await this.prisma.chatRoomUser.findFirst({
       where: {
@@ -237,8 +237,8 @@ export class ChatroomService {
   }
 
   private async addUserToChatroom(
-    userId: number,
-    chatroomId: number,
+    userId: string,
+    chatroomId: string,
     role: Role = Role.USER
   ): Promise<ChatRoomUser> {
     return await this.prisma.chatRoomUser.create({
@@ -252,8 +252,8 @@ export class ChatroomService {
 
 
   private async removeUserFromChatroom(
-    userId: number,
-    chatroomId: number
+    userId: string,
+    chatroomId: string
   ) {
     return await this.prisma.chatRoomUser.deleteMany({
       where: {

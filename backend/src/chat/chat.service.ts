@@ -9,7 +9,7 @@ export class ChatService {
 		private chatroom: ChatroomService
 	) {}
 
-	async getMessages(chatroomId: number, newerThan: Date = new Date(null)) {
+	async getMessages(chatroomId: string, newerThan: Date = new Date(null)) {
 		return await this.prisma.message.findMany({
 			where: {
 				chatRoom: {
@@ -23,7 +23,7 @@ export class ChatService {
 		});
 	}
 
-	async saveMessage(userId: number, chatRoomId: number, message: string) {
+	async saveMessage(userId: string, chatRoomId: string, message: string) {
 		const user = await this.prisma.user.findUnique({ where: { id: userId } });
 		const chatroomUser = await this.chatroom.findUserInChatroom(userId, chatRoomId);
 		const chatroom = await this.chatroom.findOne(chatRoomId);

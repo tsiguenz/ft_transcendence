@@ -11,6 +11,7 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { VueCookieNext } from 'vue-cookie-next';
 import axios from 'axios';
+import '../assets/style.scss';
 
 const app = createApp(App);
 const pinia = createPinia();

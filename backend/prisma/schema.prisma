@@ -15,11 +15,11 @@ enum GameType {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
+  id              String       @id @default(uuid())
   fortyTwoId      Int?         @unique
   nickname        String       @unique
   ladderPoints    Int          @default(0)
-  avatar          Bytes?
+  avatarPath      String       @default("/default.jpeg")
   twoFactorEnable Boolean      @default(false)
   twoFactorSecret String?
   hash            String?
@@ -27,6 +27,7 @@ model User {
   gamesLoose      Game[]       @relation("looser")
   messages        Message[]    @relation("author")
   chatrooms       ChatRoomUser[]
+  friends         Friend[]     @relation("user")
   createdAt       DateTime     @default(now())
   TwoFactorId     TwoFactorId?
 
@@ -34,19 +35,19 @@ model User {
 }
 
 model TwoFactorId {
-  uuid      String   @id @default(uuid())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id   String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("two_factor_ids")
 }
 
 model Game {
-  id                   Int      @id @default(autoincrement())
+  id                   String   @id @default(uuid())
   type                 GameType
-  winnerId             Int
+  winnerId             String
   winner               User     @relation("winner", fields: [winnerId], references: [id])
-  looserId             Int
+  looserId             String
   looser               User     @relation("looser", fields: [looserId], references: [id])
   previousWinnerRating Int
   previousLooserRating Int
@@ -59,11 +60,11 @@ model Game {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   content   String
-  authorId  Int
+  authorId  String
   author    User     @relation("author", fields: [authorId], references: [id], onDelete: Cascade)
-  chatRoomId Int
+  chatRoomId String
   chatRoom  ChatRoom @relation("chatRoom", fields: [chatRoomId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
@@ -72,18 +73,18 @@ model Message {
 
 model ChatRoomUser {
   user        User      @relation(fields: [userId], references: [id])
-  userId      Int
+  userId      String
   chatRoom    ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  chatRoomId  Int
+  chatRoomId  String
   role        Role      @default(USER)
 
   createdAt DateTime    @default(now())
-  @@id([userId, chatRoomId])
+  @@id([userId, chatRoomId], name: "chatrooms_users_pkey")
   @@map("chatrooms_users")
 }
 
 model ChatRoom {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(uuid())
   name      String      @db.VarChar(255) @unique
   slug      String      @db.VarChar(255) @unique
   messages  Message[]   @relation("chatRoom")
@@ -93,6 +94,15 @@ model ChatRoom {
   createdAt DateTime    @default(now())
 
   @@map("chatrooms")
+}
+
+model Friend {
+  userId          String
+  user            User  @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+  friendId        String
+
+  @@id([userId, friendId], name: "friend_pkey")
+  @@map("friends")
 }
 
 enum Role {
@@ -106,3 +116,4 @@ enum RoomType {
   PROTECTED
   PUBLIC
 }
+

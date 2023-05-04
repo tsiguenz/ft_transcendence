@@ -34,8 +34,9 @@ export class ChatGateway
   @SubscribeMessage(events.MESSAGE_TO_SERVER)
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: number; message: string }
+    @MessageBody() payload: { chatroomId: string, message: string }
   ) {
+      this.logger.log("RECEIVED MESSAGE: " + payload.message)
     try {
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
@@ -61,7 +62,7 @@ export class ChatGateway
   @SubscribeMessage(events.JOIN_ROOM)
   async handleJoin(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: number }
+    @MessageBody() payload: { chatroomId: string }
   ) {
     // TODO: refactor these checks
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
@@ -83,7 +84,7 @@ export class ChatGateway
   @SubscribeMessage(events.LEAVE_ROOM)
   async handleLeave(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: number }
+    @MessageBody() payload: { chatroomId: string }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
@@ -102,7 +103,7 @@ export class ChatGateway
   @SubscribeMessage(events.GET_CONNECTED_USERS)
   async getConnectedUsers(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: number }
+    @MessageBody() payload: { chatroomId: string }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
     if (
@@ -120,7 +121,7 @@ export class ChatGateway
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: number; newerThan: Date }
+    @MessageBody() payload: { chatroomId: string, newerThan: Date }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
@@ -172,20 +173,23 @@ export class ChatGateway
         }
         this.logger.log(`AUTHENTICATION ERROR [${message}]`);
         client.disconnect();
+      this.logger.log("CLIENT DISCONNECTED")
         return;
       }
     } else {
       client.disconnect();
+      this.logger.log("CLIENT DISCONNECTED")
       return;
     }
 
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
+      this.logger.log("CLIENT DISCONNECTED")
       client.disconnect();
     }
   }
 
-  // async joinChatroom(client: Socket, chatroomId: number) {
+  // async joinChatroom(client: Socket, chatroomId: string) {
 
   // }
 }

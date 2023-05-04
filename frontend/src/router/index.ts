@@ -35,6 +35,11 @@ const router = createRouter({
       component: () => import('../views/Leaderboard.vue')
     },
     {
+      path: '/friends',
+      name: 'Friends',
+      component: () => import('../views/Friends.vue')
+    },
+    {
       path: '/profile',
       name: 'Profile',
       component: () => import('../views/Profile.vue')
@@ -62,6 +67,7 @@ router.beforeEach(async (to) => {
     router.push('/home');
     return;
   }
+
   const UNAUTHENTICATED_ROUTES = [
     '/signin',
     '/signup',
@@ -74,6 +80,17 @@ router.beforeEach(async (to) => {
     !UNAUTHENTICATED_ROUTES.includes(to.path)
   ) {
     router.push('/signin');
+    return;
+  }
+
+  const UNAUTHENTICATED_ROUTES_WITHOUT_HOME = UNAUTHENTICATED_ROUTES.filter(
+    (route) => route != '/home'
+  );
+  if (
+    VueCookieNext.isCookieAvailable('jwt') &&
+    UNAUTHENTICATED_ROUTES_WITHOUT_HOME.includes(to.path)
+  ) {
+    router.push('/home');
     return;
   }
 });

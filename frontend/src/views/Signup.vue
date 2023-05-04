@@ -42,6 +42,7 @@ import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -61,7 +62,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signup() {
@@ -85,9 +87,10 @@ export default {
           password: this.password
         });
         const jwt = response.data.access_token;
-        
+                
         this.$cookie.setCookie('jwt', jwt);
         this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, this.nickname);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({
@@ -100,23 +103,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>

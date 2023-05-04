@@ -34,6 +34,7 @@ import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -46,12 +47,13 @@ export default {
       auth42: `https://api.intra.42.fr/oauth/authorize?client_id=${
         import.meta.env.VITE_APP42_ID
       }&redirect_uri=${
-        constants.FRONT_URL
-      }/42/callback&response_type=code&scope=public`
+        import.meta.env.VITE_CALLBACK_URL
+      }&response_type=code&scope=public`
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signin() {
@@ -66,9 +68,10 @@ export default {
           return;
         }
         const jwt = response.data.access_token;
-
+        
         this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, this.nickname);
         this.$cookie.setCookie('jwt', jwt);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         // TODO: Handle error with a snackbar
