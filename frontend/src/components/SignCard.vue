@@ -8,7 +8,8 @@
 					<v-card class="card" height="100%" width="400px">
 						<v-card-title>
 							<div class="d-flex justify-space-between">
-								Sign In
+								<div v-if="toSignin">Sign In</div>
+								<div v-else>Sign up</div>
 								<v-btn class="card" @click="dialog = false"><v-icon icon="mdi-close"></v-icon></v-btn>
 							</div>
 						</v-card-title>
@@ -139,7 +140,6 @@ export default {
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-			this.errorMessage = [];
 				this.setErrorMessage(error);
       }
     },
@@ -147,16 +147,18 @@ export default {
       window.location.href = this.auth42;
     },
     async signup() {
-			this.errorMessage = [];
-      if (this.password === '') {
-				this.setErrorMessage('Password should not be empty');
-      }
-      if (this.password !== this.passwordVerify) {
-				this.setErrorMessage('Passwords do not match !');
-      }
-      if (!this.isFormValid) {
-			this.setErrorMessage('Invalid character or length in nickname');
-      }
+			if (this.password === '') {
+			  this.setErrorMessage('Password should not be empty');
+				return;
+			}
+			if (this.password !== this.passwordVerify) {
+			  this.setErrorMessage('Passwords do not match !');
+				return;
+			}
+			if (!this.isFormValid) {
+				this.setErrorMessage('Invalid character or length in nickname');
+				return;
+			}
       try {
         const response = await axios.post(constants.API_URL + '/auth/signup', {
           nickname: this.nickname,
@@ -173,11 +175,10 @@ export default {
 			return this.sessionStore.loggedIn;
     },
 		setErrorMessage(error) {
-			if (typeof error === 'string') {
+			this.errorMessage = [];
+			if (typeof error === 'string')
 				this.errorMessage.push(error);
-				return;
-			};
-			if (typeof error.response.data.message === 'string')
+			else if (typeof error.response.data.message === 'string')
 				this.errorMessage.push(error.response.data.message);
 			else
 				this.errorMessage = error.response.data.message;
