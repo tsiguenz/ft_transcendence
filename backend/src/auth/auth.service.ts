@@ -18,7 +18,6 @@ export class AuthService {
     private twoFa: TwoFaService
   ) {}
 
-  // TODO: sanitize input
   async signup(dto: AuthDto) {
     let user = await this.prisma.user.findUnique({
       where: {
@@ -36,7 +35,6 @@ export class AuthService {
     return this.createJwt(user.id);
   }
 
-  // TODO: sanitize input
   async signin(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
       where: {

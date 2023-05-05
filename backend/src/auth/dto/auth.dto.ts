@@ -1,7 +1,7 @@
 import { IsNotEmpty, ValidateIf, IsString, Matches } from 'class-validator';
 
 export class AuthDto {
-  @Matches(/^[a-zA-Z0-9-]{1,8}/, { message: 'Invalid nickname' })
+  @Matches(/^[a-zA-Z\d]+$/, { message: 'Nickname must be alphanumeric' })
   @IsString()
   @IsNotEmpty()
   nickname: string;
