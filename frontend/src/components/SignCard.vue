@@ -24,8 +24,6 @@
 									v-model="nickname"
 									class="mb-5"
 									label="Nickname"
-									variant="outlined"
-									autocomplete="username"
 									required
 									@keydown.enter.prevent="signin"
 								></v-text-field>
@@ -33,8 +31,6 @@
 									v-model="password"
 									label="Password"
 									type="password"
-									variant="outlined"
-									autocomplete="current-password"
 									required
 									@keydown.enter.prevent="signin"
 								></v-text-field>
@@ -44,8 +40,6 @@
 							    v-model="nickname"
 							    class="mb-5"
 							    label="Nickname"
-							    variant="outlined"
-							    autocomplete="username"
 							    required
 							    :rules="[rules.nicknameCharacters]"
 							    @keydown.enter.prevent="signup"
@@ -55,8 +49,6 @@
 							    class="mb-5"
 							    label="Password"
 							    type="password"
-							    variant="outlined"
-							    autocomplete="new-password"
 							    required
 							    @keydown.enter.prevent="signup"
 							  ></v-text-field>
@@ -65,20 +57,20 @@
 							    class="mb-5"
 							    label="Verify password"
 							    type="password"
-							    variant="outlined"
-							    autocomplete="new-password"
 							    required
 							    :rules="[rules.passwordCheck]"
 							    @keydown.enter.prevent="signup"
 							  ></v-text-field>
 							</v-form>
 						</v-card-text>
-						<v-card-actions v-if="toSignin">
-							<v-btn class="btn" @click="signin">Sign In</v-btn>
-							<v-spacer />
-							<v-btn class="btn" @click="signin42">Sign in with 42</v-btn>
+						<v-card-actions v-if="toSignin" class="justify-center">
+							<v-btn class="btn mb-5 pa-5" @click="signin">Sign In</v-btn>
 						</v-card-actions>
-						<v-card-actions v-else>
+						<v-divider></v-divider>
+						<v-card-actions v-if="toSignin" class="justify-center">
+							<v-btn class="btn ma-5 pa-5" @click="signin42">Sign in with 42</v-btn>
+						</v-card-actions>
+						<v-card-actions class="justify-center" v-else>
 						  <v-btn class="btn" :disabled="!isFormValid" @click="signup">Sign Up</v-btn>
 						</v-card-actions>
 					</v-card>
@@ -126,6 +118,7 @@ export default {
   },
   methods: {
     async signin() {
+			this.errorMessage = [];
       try {
         const response = await axios.post(constants.API_URL + '/auth/signin', {
           nickname: this.nickname,
@@ -134,31 +127,32 @@ export default {
         });
         if (response.data.message === 'Two factor code required') {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
+					this.dialog = false;
           return;
         }
         this.sessionStore.signin(this.nickname);
         this.$cookie.setCookie('jwt', response.data.access_token);
         this.$router.push('/home');
       } catch (error) {
-				this.setErrorMessage(error);
+				this.setErrorMessage(error.response.data.message);
       }
     },
     signin42() {
       window.location.href = this.auth42;
     },
     async signup() {
+			this.errorMessage = [];
 			if (this.password === '') {
 			  this.setErrorMessage('Password should not be empty');
-				return;
 			}
 			if (this.password !== this.passwordVerify) {
 			  this.setErrorMessage('Passwords do not match !');
-				return;
 			}
 			if (!this.isFormValid) {
 				this.setErrorMessage('Invalid character or length in nickname');
-				return;
 			}
+			if (this.errorMessage.length > 0)
+				return;
       try {
         const response = await axios.post(constants.API_URL + '/auth/signup', {
           nickname: this.nickname,
@@ -168,20 +162,17 @@ export default {
         this.sessionStore.signin(this.nickname);
         this.$router.push('/home');
       } catch (error) {
-				this.setErrorMessage(error);
+				this.setErrorMessage(error.response.data.message);
       }
 		},
 		isLog() {
 			return this.sessionStore.loggedIn;
     },
 		setErrorMessage(error) {
-			this.errorMessage = [];
 			if (typeof error === 'string')
 				this.errorMessage.push(error);
-			else if (typeof error.response.data.message === 'string')
-				this.errorMessage.push(error.response.data.message);
 			else
-				this.errorMessage = error.response.data.message;
+				this.errorMessage = error;
 		}
   }
 };
@@ -189,11 +180,12 @@ export default {
 
 <style lang="scss" scoped>
 .card{
-  background: var(--dark-alt);
+  background: var(--dark-purple);
+  border-radius: 30px;
 }
 .btn{
     background-image: linear-gradient(to right, var(--light) 0%, var(--dark-purple) 51%, var(--light) 100%);
-		width: 180px;
+		width: 250px;
     bottom: 0;
     text-align: center;
     text-transform: uppercase;
