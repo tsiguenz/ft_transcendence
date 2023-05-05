@@ -44,8 +44,11 @@ export default {
           this.$router.push('/signin');
           return;
         }
-        this.sessionStore.signin(response.data.nickname);
-        this.$cookie.setCookie('jwt', response.data.access_token);
+        const data = response.data;
+        this.sessionStore.signin(data.nickname);
+        this.$cookie.setCookie('jwt', data.access_token);
+        this.$cookie.setCookie('refresh_token', data.refresh_token);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({

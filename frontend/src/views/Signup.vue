@@ -96,7 +96,6 @@ export default {
           icon: 'error',
           text: formatError(error.response.data.message)
         });
-        // TODO: Handle error with a snackbar
       }
     }
   }

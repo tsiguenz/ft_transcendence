@@ -38,12 +38,14 @@ export class TwoFaController {
     const res = await this.twoFaService.verifyTwoFaRoute(id, Number(code));
     await this.twoFaService.deleteTwoFaId(id);
     if (!res || !res.ret) {
+      console.log('res: ', res);
       return { message: 'Invalid two factor code' };
     }
-    const jwt = await this.authService.createTokens(res.userId);
+    const tokens = await this.authService.createAndUpdateTokens(res.userId);
     return {
       nickname: res.nickname,
-      access_token: jwt.access_token
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token
     };
   }
 }

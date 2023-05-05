@@ -24,7 +24,6 @@ export default {
     this.signin42();
   },
   methods: {
-    // TODO: code duplication from Signin.vue
     async signin42() {
       if (!this.authorizationCode) {
         swal({

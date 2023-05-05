@@ -8,7 +8,6 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { TwoFaService } from '../2fa/2fa.service';
-import { UsersService } from '../users/users.service';
 import * as axios from 'axios';
 
 @Injectable()
@@ -16,11 +15,9 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private twoFa: TwoFaService,
-    private usersService: UsersService
+    private twoFa: TwoFaService
   ) {}
 
-  // TODO: sanitize input
   async signup(dto: AuthDto) {
     let user = await this.prisma.user.findUnique({
       where: {
@@ -35,12 +32,9 @@ export class AuthService {
         hash: hash
       }
     });
-    const tokens = await this.createTokens(user.id);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
+    return await this.createAndUpdateTokens(user.id);
   }
 
-  // TODO: sanitize input
   async signin(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -58,9 +52,7 @@ export class AuthService {
         message: 'Two factor code required',
         id: await this.twoFa.generateTwoFaId(user.id)
       };
-    const tokens = await this.createTokens(user.id);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
+    return await this.createAndUpdateTokens(user.id);
   }
 
   async logout(userId: string) {
@@ -100,7 +92,12 @@ export class AuthService {
     return tokens;
   }
 
-  // TODO: what to do if user is already connected ? (update refresh token ?)
+  async createAndUpdateTokens(userId: string) {
+    const tokens = await this.createTokens(userId);
+    await this.updateRefreshToken(userId, tokens.refresh_token);
+    return tokens;
+  }
+
   async updateRefreshToken(userId: string, refreshToken: string) {
     const hash = refreshToken ? await argon.hash(refreshToken) : null;
     await this.prisma.user.update({
@@ -173,12 +170,11 @@ export class AuthService {
         message: 'Two factor code required',
         id: await this.twoFa.generateTwoFaId(user.id)
       };
-    const jwt = await this.createTokens(user.id);
-    await this.updateRefreshToken(user.id, jwt.refresh_token);
+    const tokens = await this.createAndUpdateTokens(user.id);
     return {
       nickname: user.nickname,
-      access_token: jwt.access_token,
-      refresh_token: jwt.refresh_token
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token
     };
   }
 }

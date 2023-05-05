@@ -73,7 +73,6 @@ export default {
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
-        // TODO: Handle error with a snackbar
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
