@@ -11,43 +11,37 @@ import { UnauthorizedException } from '@nestjs/common';
 export class UsersService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
   async getUser(nickname: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          nickname: nickname
-        },
-        select: {
-          id: true,
-          nickname: true,
-          ladderPoints: true,
-          avatarPath: true,
-          createdAt: true
-        }
-      });
-      return user;
-    } catch (e) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        nickname: nickname
+      },
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true,
+        createdAt: true
+      }
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   async getUserById(userId: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId
-        },
-        select: {
-          id: true,
-          nickname: true,
-          ladderPoints: true,
-          avatarPath: true,
-          createdAt: true
-        }
-      });
-      return user;
-    } catch (e) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true,
+        createdAt: true
+      }
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   async getAllUsers() {
@@ -86,7 +80,6 @@ export class UsersService {
   ) {
     const user = await this.getUser(userNickname);
     const friend = await this.getUser(friendNickname);
-    if (!user || !friend) throw new NotFoundException('User not found');
     if (userNickname === friendNickname || userId !== user.id) {
       throw new UnauthorizedException(
         'You are not authorized to add this friend'
@@ -120,7 +113,6 @@ export class UsersService {
   ) {
     const user = await this.getUser(userNickname);
     const friend = await this.getUser(friendNickname);
-    if (!user || !friend) throw new NotFoundException('User not found');
     if (userNickname === friendNickname || userId !== user.id) {
       throw new UnauthorizedException(
         'You are not authorized to delete this friend'
@@ -143,7 +135,6 @@ export class UsersService {
 
   async getFriends(userNickname: string, userId: string) {
     const user = await this.getUser(userNickname);
-    if (!user) throw new NotFoundException('User not found');
     if (userId !== user.id) {
       throw new ForbiddenException(
         'You are not authorized to get this user friends'
