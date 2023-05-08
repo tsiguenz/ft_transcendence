@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
-import { JwtGuard } from '../auth/guard';
+import { AccessTokenGuard } from '../auth/guard';
 import { Request } from 'express';
 import { EditProfileDto } from './dto';
 import { extname } from 'path';
@@ -23,14 +23,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get()
   getProfile(@Req() req: Request) {
     return this.profileService.getProfile(req.user['id']);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
@@ -50,7 +50,7 @@ export class ProfileController {
     return this.profileService.editProfile(dto, req.user['id']);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({

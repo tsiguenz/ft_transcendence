@@ -2,7 +2,7 @@ import { Controller, Get, Post, UseGuards, Req, Body } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { TwoFaService } from './2fa.service';
 import { Request } from 'express';
-import { JwtGuard } from '../auth/guard';
+import { AccessTokenGuard } from '../auth/guard';
 import { AuthService } from '../auth/auth.service';
 
 @ApiTags('2fa')
@@ -12,7 +12,7 @@ export class TwoFaController {
     private readonly twoFaService: TwoFaService,
     private readonly authService: AuthService
   ) {}
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get('generate-qrcode')
   async generateQrCode(@Req() req: Request) {
@@ -38,12 +38,14 @@ export class TwoFaController {
     const res = await this.twoFaService.verifyTwoFaRoute(id, Number(code));
     await this.twoFaService.deleteTwoFaId(id);
     if (!res || !res.ret) {
+      console.log('res: ', res);
       return { message: 'Invalid two factor code' };
     }
-    const jwt = await this.authService.createJwt(res.userId);
+    const tokens = await this.authService.createAndUpdateTokens(res.userId);
     return {
       nickname: res.nickname,
-      access_token: jwt.access_token
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token
     };
   }
 }

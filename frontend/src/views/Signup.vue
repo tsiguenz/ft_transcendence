@@ -85,8 +85,9 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-        const jwt = response.data.access_token;
-        this.$cookie.setCookie('jwt', jwt);
+        const tokens = response.data;
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.sessionStore.signin(this.nickname);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
@@ -95,7 +96,6 @@ export default {
           icon: 'error',
           text: formatError(error.response.data.message)
         });
-        // TODO: Handle error with a snackbar
       }
     }
   }
