@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { VueCookieNext } from 'vue-cookie-next';
+import { useSessionStore } from '@/store/session';
+import * as constants from '@/constants';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -63,32 +64,23 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  const sessionStore = useSessionStore();
   if (to.path == '/') {
     router.push('/home');
     return;
   }
-
-  const UNAUTHENTICATED_ROUTES = [
-    '/signin',
-    '/signup',
-    '/home',
-    '/42/callback',
-    '/2fa/verify'
-  ];
+  // redirect to signin if not logged in and try to access authenticated routes
   if (
-    !VueCookieNext.isCookieAvailable('jwt') &&
-    !UNAUTHENTICATED_ROUTES.includes(to.path)
+    !sessionStore.loggedIn &&
+    !constants.UNAUTHENTICATED_ROUTES.includes(to.path)
   ) {
     router.push('/signin');
     return;
   }
-
-  const UNAUTHENTICATED_ROUTES_WITHOUT_HOME = UNAUTHENTICATED_ROUTES.filter(
-    (route) => route != '/home'
-  );
+  // redirect to home if logged in and try to access unauthenticated routes
   if (
-    VueCookieNext.isCookieAvailable('jwt') &&
-    UNAUTHENTICATED_ROUTES_WITHOUT_HOME.includes(to.path)
+    sessionStore.loggedIn &&
+    constants.UNAUTHENTICATED_ROUTES_WITHOUT_HOME.includes(to.path)
   ) {
     router.push('/home');
     return;
