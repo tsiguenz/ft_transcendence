@@ -1,9 +1,18 @@
-import { IsNotEmpty, ValidateIf, IsString, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  ValidateIf,
+  IsString,
+  Matches,
+  MaxLength
+} from 'class-validator';
 
 export class AuthDto {
-  @Matches(/^[a-zA-Z\d]+$/, { message: 'Nickname must be alphanumeric' })
+  // don't use @IsNotEmpty because @Matches catch empty string
+  @Matches(/^[a-zA-Z\d]+$/, {
+    message: 'nickname must be alphanumeric and not empty'
+  })
+  @MaxLength(8, { message: 'nickname must be shorter than 8 characters' })
   @IsString()
-  @IsNotEmpty()
   nickname: string;
 
   @IsString()
