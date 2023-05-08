@@ -21,6 +21,8 @@ export default {
     logout() {
       if (this.$cookie.isCookieAvailable('jwt'))
         this.$cookie.removeCookie('jwt');
+      if (this.$cookie.isCookieAvailable('refresh_token'))
+        this.$cookie.removeCookie('refresh_token');
       this.$root.unsubscribeAndDisconnectStatusSocket();
       this.sessionStore.logout();
       this.connectedUsersStore.reset();

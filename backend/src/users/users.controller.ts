@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtGuard } from '../auth/guard';
+import { AccessTokenGuard } from '../auth/guard';
 import { Request } from 'express';
 
 @ApiTags('users')
@@ -17,7 +17,7 @@ import { Request } from 'express';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
@@ -30,14 +30,14 @@ export class UsersController {
     return this.usersService.getUser(nickname);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
@@ -50,7 +50,7 @@ export class UsersController {
     return this.usersService.deleteUser(nickname, req.user['nickname']);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'friendNickname',
@@ -77,7 +77,7 @@ export class UsersController {
     );
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
@@ -92,7 +92,7 @@ export class UsersController {
     );
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
   getFriends(@Param('nickname') nickname: string, @Req() req: Request) {

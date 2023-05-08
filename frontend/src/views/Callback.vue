@@ -24,7 +24,6 @@ export default {
     this.signin42();
   },
   methods: {
-    // TODO: code duplication from Signin.vue
     async signin42() {
       if (!this.authorizationCode) {
         swal({
@@ -42,8 +41,9 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
-        const jwt = response.data.access_token;
-        this.$cookie.setCookie('jwt', jwt);
+        const tokens = response.data;
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.sessionStore.signin(response.data.nickname);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
