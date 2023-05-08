@@ -17,8 +17,8 @@
       </v-form>
       <v-spacer></v-spacer>
       <div v-if="!isLog()" class="button-group">
-				<SignCard :toSignin=true />
-				<SignCard />
+        <SignCard :toSignin="true" />
+        <SignCard />
       </div>
       <div v-if="isLog()" class="button-group">
         <v-btn class="log" to="/logout">Logout</v-btn>
@@ -33,9 +33,9 @@ import { useSessionStore } from '@/store/session';
 import SignCard from './SignCard.vue';
 
 export default {
-	components: {
-		SignCard
-	},
+  components: {
+    SignCard
+  },
   data() {
     return {
       is_expanded: false
