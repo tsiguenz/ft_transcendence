@@ -97,6 +97,7 @@ import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import formatError from '@/utils/lib';
+import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
   props: {
@@ -166,7 +167,7 @@ export default {
           password: this.password
         });
         const tokens = response.data;
-        this.sessionStore.signin(this.nickname);
+        this.sessionStore.signin(VueJwtDecode.decode(tokens.access_token).sub, this.nickname);
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
