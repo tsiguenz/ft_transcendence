@@ -32,6 +32,7 @@ import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useChatStore } from '@/store/chat';
+import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
@@ -45,7 +46,7 @@ export default {
     'join'
   ],
   computed: {
-    ...mapStores(useChatStore),
+    ...mapStores(useChatStore, useSessionStore),
     chatrooms() {
       return this.chatStore.chatrooms;
     }
@@ -70,7 +71,7 @@ export default {
     },
     async getChatrooms() {
       try {
-        const response = await axios.get(constants.API_URL + '/chatrooms/mine');
+        const response = await axios.get(constants.API_URL + '/users/' + this.sessionStore.nickname + '/chatrooms');
         return response.data;
       } catch (error) {
         swal({

@@ -61,13 +61,6 @@ export class ChatroomController {
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
-  @Get('mine')
-  async findChatroomsForUser(@Req() req: Request) {
-    return await this.chatroomService.findChatroomsForUser(req.user['id']);
-  }
-
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
   @Get('joinable')
   async findJoinableChatroomsForUser(@Req() req: Request) {
     return await this.chatroomService.findJoinableChatroomsForUser(
