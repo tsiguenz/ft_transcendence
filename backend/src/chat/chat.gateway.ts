@@ -70,8 +70,7 @@ export class ChatGateway
       return;
     }
 
-    const isUserInChatroom = await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id);
-    if (!isUserInChatroom) { return ; }
+    if (!(await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id))) { return ; }
 
     try {
       client.join(chatroom.slug);
@@ -128,8 +127,7 @@ export class ChatGateway
       return;
     }
 
-    const isUserInChatroom = await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id);
-    if (!isUserInChatroom) { return ; }
+    if (!(await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id))) { return ; }
     const messages = await this.chat.getMessages(
       chatroom.id,
       payload.newerThan
@@ -160,21 +158,21 @@ export class ChatGateway
   // We should decouple  Prisma and the ChatGetway
   async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
-    if (client.handshake.auth && client.handshake.auth.token) {
-      try {
-        client['decoded'] = await this.auth.verifyJwt(
-          client.handshake.auth.token
-        );
-      } catch (error) {
-        let message = 'Unexpected error';
-        if (error instanceof Error) {
-          message = error.message;
-        }
-        this.logger.log(`AUTHENTICATION ERROR [${message}]`);
-        client.disconnect();
-        return;
+    if (!(client.handshake.auth && client.handshake.auth.token)) {
+      client.disconnect();
+      return;
+    }
+
+    try {
+      client['decoded'] = await this.auth.verifyJwt(
+        client.handshake.auth.token
+      );
+    } catch (error) {
+      let message = 'Unexpected error';
+      if (error instanceof Error) {
+        message = error.message;
       }
-    } else {
+      this.logger.log(`AUTHENTICATION ERROR [${message}]`);
       client.disconnect();
       return;
     }

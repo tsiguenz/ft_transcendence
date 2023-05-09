@@ -44,6 +44,7 @@ export default {
 	    return this.sessionStore.userId;
 	  },
 	  currentUserIsAdmin() {
+      // Should be implemented with rooms administration later on
 	  	return true;
 	  }
 	},
@@ -95,7 +96,6 @@ export default {
       ) {
         return new Date(null);
       }
-      console.log(this.messages.at(-1).sentAt);
       return new Date(this.messages.at(-1).sentAt);
     }
 	},

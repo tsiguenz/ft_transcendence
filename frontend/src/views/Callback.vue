@@ -8,6 +8,7 @@ import { useSessionStore } from '@/store/session';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
+import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
   data() {
@@ -44,7 +45,7 @@ export default {
         }
         const jwt = response.data.access_token;
         this.$cookie.setCookie('jwt', jwt);
-        this.sessionStore.signin(response.data.nickname);
+        this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, response.data.nickname);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {

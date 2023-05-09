@@ -52,7 +52,7 @@ export default {
   },
   mounted() {
     if (this.chatStore.chatrooms.length > 0) { return ; }
-    this.loadChatrooms().then((chatrooms) => {
+    this.loadChatrooms().then((_chatrooms) => {
       this.chatStore.switchToDefaultChatroom();
     });
   },

@@ -17,10 +17,6 @@ export class ChatroomService {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
 
-    if (dto.type === RoomType.PROTECTED && !dto.password) {
-      throw new ForbiddenException('Password is required for protected rooms');
-    }
-
     if (dto.type === RoomType.PROTECTED && dto.password) {
       hash = await argon.hash(dto.password);
     }
@@ -146,21 +142,6 @@ export class ChatroomService {
       return false;
     }
     return await argon.verify(chatroom.hash, password);
-  }
-
-  async findOrCreateDefaultChatroom() {
-    let defaultChatroom = await this.prisma.chatRoom.findUnique({
-      where: { name: ChatroomService.DEFAULT_CHATROOM }
-    });
-    if (!defaultChatroom) {
-      defaultChatroom = await this.prisma.chatRoom.create({
-        data: {
-          name: ChatroomService.DEFAULT_CHATROOM,
-          slug: `chatroom_${ChatroomService.DEFAULT_CHATROOM}`
-        }
-      });
-    }
-    return defaultChatroom;
   }
 
   async findJoinableChatroomsForUser(userId: string) {
