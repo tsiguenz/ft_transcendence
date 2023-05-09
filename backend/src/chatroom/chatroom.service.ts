@@ -94,11 +94,7 @@ export class ChatroomService {
     chatroomId: string,
     password: string
   ): Promise<ChatRoomUser> {
-    const chatroom = await this.findOne(chatroomId);
-
-    if (!chatroom) {
-      throw new NotFoundException('Chatroom not found');
-    }
+    const chatroom = await this.findOneException(chatroomId);
 
     if (chatroom.type === RoomType.PRIVATE) {
       throw new ForbiddenException('Could not join private room');
@@ -117,11 +113,7 @@ export class ChatroomService {
   }
 
   async leave(userId: string, chatroomId: string) {
-    const chatroom = await this.findOne(chatroomId);
-
-    if (!chatroom) {
-      throw new NotFoundException('Chatroom not found');
-    }
+    const chatroom = await this.findOneException(chatroomId);
 
     const chatroomUser = await this.findUserInChatroom(userId, chatroomId);
     if (!chatroomUser) {
@@ -221,7 +213,6 @@ export class ChatroomService {
     });
   }
 
-
   private async removeUserFromChatroom(
     userId: string,
     chatroomId: string
@@ -232,5 +223,15 @@ export class ChatroomService {
         userId: userId
       }
     });
+  }
+
+  private async findOneException(chatroomId: string) {
+    const chatroom = await this.findOne(chatroomId);
+
+    if (!chatroom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+
+    return chatroom;
   }
 }
