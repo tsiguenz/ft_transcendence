@@ -15,12 +15,15 @@ export class StatusService {
   }
 
   async removeUser(socket: Socket, connectedUsers: string[]) {
-    const userId = await this.getUserIdFromSocket(socket);
+    // use decode instead of verify because verify
+    // return undefined if the token is expired
+    // and we are sure the token was valid when the user connected
+    const payload = await this.jwt.decode(socket.handshake.auth.token);
+    if (!payload) return undefined;
+    const userId = payload.sub;
     if (!userId) return undefined;
     const index = connectedUsers.indexOf(userId);
-    if (index > -1) {
-      connectedUsers.splice(index, 1);
-    }
+    if (index > -1) connectedUsers.splice(index, 1);
     return userId;
   }
 
@@ -34,7 +37,7 @@ export class StatusService {
   async getUserIdFromJwt(token: string) {
     const payload = await this.jwt
       .verifyAsync(token, {
-        secret: process.env.JWT_SECRET
+        secret: process.env.JWT_ACCESS_SECRET
       })
       .catch(() => {
         return undefined;
