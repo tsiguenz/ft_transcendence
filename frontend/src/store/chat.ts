@@ -27,8 +27,8 @@ export const useChatStore = defineStore('chat', {
 
   },
   actions: {
-    addRoom(...room) {
-      this.chatrooms.push(...room);
+    addRoom(...rooms) {
+      this.chatrooms.push(...rooms);
     },
     removeRoom(roomId) {
       this.chatrooms = this.chatrooms.filter((room) => (room.id !== roomId));

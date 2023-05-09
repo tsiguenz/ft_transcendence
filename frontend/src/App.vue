@@ -10,12 +10,12 @@
 
 <script>
 import AppHeader from './components/AppHeader.vue';
+import Navbar from './components/NavBar.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
 import { STATUS_SOCKET_URL } from './constants';
-import Navbar from './components/NavBar.vue';
 
 export default {
   components: {
@@ -38,24 +38,15 @@ export default {
     ...mapStores(useSessionStore)
   },
   created() {
-    if (!this.sessionStore.isLoggedIn) {
-      this.connectedUsersStore.reset();
-    }
-    this.connectStatusSocket();
+    if (this.sessionStore.loggedIn) this.connectStatusSocket();
   },
   mounted() {
-    this.subscribeStatusSocket();
+    if (this.sessionStore.loggedIn) this.subscribeStatusSocket();
   },
   beforeUnmount() {
     this.disconnectStatusSocket();
   },
   methods: {
-    hideHeader() {
-      return (
-        this.$route.path === '/42/callback' ||
-        this.$route.path === '/2fa/verify'
-      );
-    },
     connectStatusSocket() {
       this.socketioStatus.setupSocketConnection(this.$cookie.getCookie('jwt'));
     },

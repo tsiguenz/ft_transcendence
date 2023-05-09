@@ -62,7 +62,6 @@ export default {
         });
         this.users = response.data;
       } catch (error) {
-        // TODO: Handle error
         swall({
           title: 'Error',
           text: formatError(error.response.data.message),

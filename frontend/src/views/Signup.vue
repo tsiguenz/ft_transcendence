@@ -86,10 +86,10 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-        const jwt = response.data.access_token;
-                
-        this.$cookie.setCookie('jwt', jwt);
-        this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, this.nickname);
+        const tokens = response.data;
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
+        this.sessionStore.signin(VueJwtDecode.decode(tokens.access_token).sub, this.nickname);
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
@@ -97,7 +97,6 @@ export default {
           icon: 'error',
           text: formatError(error.response.data.message)
         });
-        // TODO: Handle error with a snackbar
       }
     }
   }

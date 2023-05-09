@@ -8,6 +8,8 @@ COPY docker/frontend_startup.sh /
 
 RUN chmod +x /frontend_startup.sh
 
+RUN apk add curl
+
 ENTRYPOINT ["/frontend_startup.sh"]
 
 CMD npm run serve

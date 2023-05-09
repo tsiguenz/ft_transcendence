@@ -30,6 +30,7 @@ model User {
   friends         Friend[]     @relation("user")
   createdAt       DateTime     @default(now())
   TwoFactorId     TwoFactorId?
+  refreshToken    String?
 
   @@map("users")
 }
