@@ -98,24 +98,6 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.GET_CONNECTED_USERS)
-  async getConnectedUsers(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: string }
-  ) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId);
-    if (
-      !chatroom ||
-      !chatroom.users.find((user) => user.userId === client['decoded'].sub)
-    ) {
-      throw new WsException('Forbidden');
-    }
-    // const rooms = this.server.sockets.adapter.sids;
-    // console.log(rooms);
-
-    client.emit('');
-  }
-
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
@@ -172,7 +154,6 @@ export class ChatGateway
       if (error instanceof Error) {
         message = error.message;
       }
-      this.logger.log(`AUTHENTICATION ERROR [${message}]`);
       client.disconnect();
       return;
     }
@@ -182,8 +163,4 @@ export class ChatGateway
       client.disconnect();
     }
   }
-
-  // async joinChatroom(client: Socket, chatroomId: string) {
-
-  // }
 }

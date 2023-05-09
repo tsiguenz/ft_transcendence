@@ -25,11 +25,6 @@ class ChatService {
     this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
   }
 
-  subscribeToUsers(connectCb: Function, disconnectCb: Function) {
-    this.socketService.subscribe(events.USER_CONNECT, connectCb);
-    this.socketService.subscribe(events.USER_DISCONNECT, disconnectCb);
-  }
-
   joinRoom(chatroomId: number) {
     this.socketService.send(events.JOIN_ROOM, { chatroomId: chatroomId });
   }
@@ -42,12 +37,6 @@ class ChatService {
     this.socketService.send(events.GET_MESSAGES, {
       chatroomId: chatroomId,
       newerThan: newerThan
-    });
-  }
-
-  getOnlineUsers(chatroomId: number) {
-    this.socketService.send(events.GET_CONNECTED_USERS, {
-      chatroomId: chatroomId
     });
   }
 

@@ -1,7 +1,6 @@
 <template>
 	<v-dialog
 	  v-model="dialog"
-	  persistent
 	  width="1024"
 	>
 	  <template v-slot:activator="{ props }">
@@ -26,7 +25,7 @@
 	          <v-col cols="12" >
 	            <v-select
 	              v-model="newChatroomObject.type"
-	              :items="['PUBLIC', 'PROTECTED', 'PRIVATE']"
+	              :items="roomTypes"
 	              label="Room type*"
 	              required
 	            ></v-select>
@@ -79,6 +78,7 @@ export default {
     return {
       newChatroomObject: { name: '', type: 'PUBLIC', password: null },
       dialog: false,
+      roomTypes: ['PUBLIC', 'PROTECTED', 'PRIVATE'],
     }
   },
   methods: {

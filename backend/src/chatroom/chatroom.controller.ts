@@ -35,7 +35,9 @@ export class ChatroomController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'Chatroom name' }
+        name: { type: 'string', description: 'Chatroom name' },
+        type: { type: 'string', description: 'Chatroom type (PRIVATE, PROTECTED. PUBLIC)' },
+        password: { type: 'string', description: 'Chatroom password (optionnal)' },
       }
     }
   })
@@ -145,6 +147,12 @@ export class ChatroomController {
     type: String,
     required: true,
     description: 'Chatroom id'
+  })
+  @ApiParam({
+    name: 'password',
+    type: String,
+    required: false,
+    description: 'Chatroom password'
   })
   @Post(':id/join')
   async joinRoom(

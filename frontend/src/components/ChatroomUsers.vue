@@ -33,6 +33,7 @@ import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 
 export default {
   props: ['id'],
@@ -47,7 +48,7 @@ export default {
     }
   },
   computed: {
-    ...mapStores(useSessionStore, useChatStore),
+    ...mapStores(useSessionStore, useChatStore, useConnectedUsersStore),
     currentUserId() {
       return this.sessionStore.userId;
     },
@@ -97,8 +98,8 @@ export default {
     isCurrentUser(userId) {
       return this.currentUserId === userId;
     },
-    isOnline(userId) {
-      return this.chatStore.isUserOnline(userId, this.id);
+    isOnline(id) {
+      return this.connectedUsersStore.isConnected(id);
     }
   },
 }
