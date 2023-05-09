@@ -31,7 +31,7 @@ export default {
           icon: 'error',
           text: 'You need to be connected to 42 to access this page'
         });
-        this.$router.push('/signin');
+        this.$router.push('/home');
         return;
       }
       try {
@@ -50,7 +50,7 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         swal({ icon: 'error', text: formatError(error.response.data.message) });
-        this.$router.push('/signin');
+        this.$router.push('/home');
       }
     }
   }
