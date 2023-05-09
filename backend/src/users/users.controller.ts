@@ -4,13 +4,26 @@ import {
   Param,
   UseGuards,
   Delete,
-  Req,
-  Post
+  Post,
+  Put,
+  Body,
+  UploadedFile,
+  UseInterceptors
 } from '@nestjs/common';
-import { ApiParam, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiParam,
+  ApiTags,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AccessTokenGuard } from '../auth/guard';
-import { Request } from 'express';
+import { User } from '../decorator/user.decorator';
+import { EditProfileDto } from './dto/profile-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @ApiTags('users')
 @Controller('api/users')
@@ -46,8 +59,9 @@ export class UsersController {
     description: 'Nickname of the user you are deleting'
   })
   @Delete(':nickname')
-  deleteUser(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.deleteUser(nickname, req.user['nickname']);
+  deleteUser(@Param('nickname') nickname: string, @User() user: object) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.deleteUser(user);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -68,34 +82,101 @@ export class UsersController {
   addFriend(
     @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
-    @Req() req: Request
+    @User() user: object
   ) {
-    return this.usersService.addFriend(
-      nickname,
-      friendNickname,
-      req.user['id']
-    );
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.addFriend(user, friendNickname);
   }
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
-    @Param('nickname') userNickname: string,
+    @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
-    @Req() req: Request
+    @User() user: object
   ) {
-    return this.usersService.deleteFriend(
-      userNickname,
-      friendNickname,
-      req.user['id']
-    );
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.deleteFriend(user, friendNickname);
   }
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
-  getFriends(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.getFriends(nickname, req.user['id']);
+  getFriends(@Param('nickname') nickname: string, @User() user: object) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.getFriends(user['id']);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/profile')
+  getProfile(@Param('nickname') nickname: string, @User() user: object) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return user;
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        nickname: { type: 'string', description: 'The new unique nickname' },
+        twoFactorEnable: {
+          type: 'boolean',
+          description: 'Enable or disable two factor authentication'
+        }
+      }
+    }
+  })
+  @Put(':nickname/profile')
+  editProfile(
+    @Param('nickname') nickname: string,
+    @Body() dto: EditProfileDto,
+    @User() user: object
+  ) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.editProfile(user['id'], dto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'The avatar file'
+        }
+      }
+    }
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './public/avatars',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `/${randomName}${extname(file.originalname)}`);
+        }
+      })
+    })
+  )
+  @Post(':nickname/avatar')
+  async uploadAvatar(
+    @Param('nickname') nickname: string,
+    @User() user: object,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return this.usersService.uploadAvatar(user['id'], file);
   }
 }

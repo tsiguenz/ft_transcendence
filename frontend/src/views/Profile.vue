@@ -82,11 +82,14 @@ export default {
     async getProfile() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + '/profile', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
+          {
+            headers: {
+              Authorization: 'Bearer ' + jwt
+            }
           }
-        });
+        );
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
@@ -103,7 +106,7 @@ export default {
       try {
         const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.put(
-          constants.API_URL + '/profile',
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
           {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable,
@@ -209,12 +212,16 @@ export default {
     async uploadAvatar(jwt) {
       const formData = new FormData();
       formData.append('file', this.newAvatar);
-      await axios.post(constants.API_URL + '/profile/avatar', formData, {
-        headers: {
-          Authorization: 'Bearer ' + jwt,
-          'Content-Type': 'multipart/form-data'
+      await axios.post(
+        constants.API_URL + `/users/${this.sessionStore.nickname}/avatar`,
+        formData,
+        {
+          headers: {
+            Authorization: 'Bearer ' + jwt,
+            'Content-Type': 'multipart/form-data'
+          }
         }
-      });
+      );
     }
   }
 };
