@@ -1,4 +1,5 @@
 <template>
+	<ProfilePrintAvatar />
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
@@ -52,8 +53,12 @@ import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
+  components: {
+    ProfilePrintAvatar
+  },
   data() {
     return {
       user: {},

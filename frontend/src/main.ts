@@ -60,7 +60,7 @@ axios.interceptors.response.use(
     const isRefreshUrl =
       error.config.url === constants.API_URL + '/auth/refresh';
     if (!isUnauthorized || isRefreshUrl)
-      return Promise.reject(error.response.data);
+      return Promise.reject(error);
     const jwt = VueCookieNext.getCookie('jwt');
     const expirationTimestamp = VueJwtDecode.decode(jwt).exp;
     const now = Math.floor(Date.now() / 1000);
