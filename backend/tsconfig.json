@@ -18,6 +18,7 @@
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
         "noEmitOnError": true,
-        "strict": true
+        "strict": true,
+        "lib": ["ES2021.String"]
     }
 }

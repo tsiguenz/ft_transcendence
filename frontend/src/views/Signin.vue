@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -66,8 +67,9 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
+
         const tokens = response.data;
-        this.sessionStore.signin(this.nickname);
+        this.sessionStore.signin(VueJwtDecode.decode(tokens.access_token).sub, this.nickname);
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
