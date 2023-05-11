@@ -6,7 +6,7 @@ export const useSessionStore = defineStore('session', {
     return {
       userId: undefined,
       nickname: '',
-      loggedIn: false,
+      loggedIn: false
     };
   },
   actions: {
@@ -19,7 +19,6 @@ export const useSessionStore = defineStore('session', {
       this.userId = undefined;
       this.loggedIn = false;
       this.nickname = '';
-      this.blockedUsers = [];
     },
   }
 });
