@@ -25,7 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ChatroomService } from '../chatroom/chatroom.service';
-import { IsMeGuard } from '../users/guard/isMe.guard';
+import { IsCurrentUserGuard } from '../users/guard/isCurrentUser.guard';
 
 @ApiTags('users')
 @Controller('api/users')
@@ -55,7 +55,7 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
@@ -68,7 +68,7 @@ export class UsersController {
     return this.usersService.deleteUser(user);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'friendNickname',
@@ -91,7 +91,7 @@ export class UsersController {
     return this.usersService.addFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
@@ -102,21 +102,21 @@ export class UsersController {
     return this.usersService.deleteFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
   getFriends(@Param('nickname') nickname: string, @User() user: object) {
     return this.usersService.getFriends(user['id']);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/profile')
   getProfile(@Param('nickname') nickname: string, @User() user: object) {
     return user;
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
@@ -140,7 +140,7 @@ export class UsersController {
     return this.usersService.editProfile(user['id'], dto);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -178,7 +178,7 @@ export class UsersController {
     return this.usersService.uploadAvatar(user['id'], file);
   }
 
-  @UseGuards(AccessTokenGuard, IsMeGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/chatrooms')
   async findChatroomsForUser(
