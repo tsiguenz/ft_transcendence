@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
   ForbiddenException
@@ -17,11 +16,11 @@ import {
   ApiBody,
   ApiParam
 } from '@nestjs/swagger';
-
 import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
+import { User } from '../decorator/user.decorator';
 
 @Controller('api/chatrooms')
 @ApiTags('chatrooms')
@@ -36,20 +35,23 @@ export class ChatroomController {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Chatroom name' },
-        type: { type: 'string', description: 'Chatroom type (PRIVATE, PROTECTED. PUBLIC)' },
-        password: { type: 'string', description: 'Chatroom password (optionnal)' },
+        type: {
+          type: 'string',
+          description: 'Chatroom type (PRIVATE, PROTECTED. PUBLIC)'
+        },
+        password: {
+          type: 'string',
+          description: 'Chatroom password (optionnal)'
+        }
       }
     }
   })
   @Post()
   async create(
     @Body() createChatroomDto: CreateChatroomDto,
-    @Req() req: Request
+    @User() user: object
   ) {
-    return await this.chatroomService.create(
-      req.user['id'],
-      createChatroomDto
-    );
+    return await this.chatroomService.create(user['id'], createChatroomDto);
   }
 
   // @UseGuards(AccessTokenGuard)
@@ -62,10 +64,8 @@ export class ChatroomController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get('joinable')
-  async findJoinableChatroomsForUser(@Req() req: Request) {
-    return await this.chatroomService.findJoinableChatroomsForUser(
-      req.user['id']
-    );
+  async findJoinableChatroomsForUser(@User() user: object) {
+    return await this.chatroomService.findJoinableChatroomsForUser(user['id']);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -90,10 +90,10 @@ export class ChatroomController {
     description: 'Chatroom id'
   })
   @Get(':id/users')
-  async findChatroomUsers(@Req() req: Request, @Param('id') id: string) {
-    const currentUserId = req.user['id'];
+  async findChatroomUsers(@User() user: object, @Param('id') id: string) {
+    const currentUserId = user['id'];
     const users = await this.chatroomService.findChatroomUsers(id);
-    if (!users.find(u => u.id == currentUserId)) {
+    if (!users.find((u) => u.id == currentUserId)) {
       throw new ForbiddenException('Unauthorized to list users');
     }
     const formattedUsers = users.map((user) => ({
@@ -149,10 +149,10 @@ export class ChatroomController {
   })
   @Post(':id/join')
   async joinRoom(
-    @Req() req: Request,
+    @User() user: object,
     @Param('id') id: string,
     @Body('password') password: string
   ) {
-    return await this.chatroomService.join(req.user['id'], id, password);
+    return await this.chatroomService.join(user['id'], id, password);
   }
 }
