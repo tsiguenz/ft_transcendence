@@ -58,9 +58,4 @@ export class StatusService {
       }
     });
   }
-
-  async setLastConnectionAndDisconnect(socket: Socket) {
-    await this.setLastConnection(socket);
-    socket.disconnect();
-  }
 }
