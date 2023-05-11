@@ -17,9 +17,15 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     const user = await this.prisma.user.findUnique({
       where: {
         id: payload.sub
+      },
+      select: {
+        id: true,
+        nickname: true,
+        avatarPath: true,
+        twoFactorEnable: true,
+        createdAt: true
       }
     });
-    if (user) delete user.hash;
     return user;
   }
 }

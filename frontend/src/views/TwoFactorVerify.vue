@@ -19,6 +19,7 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
+import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
   data() {
@@ -45,7 +46,10 @@ export default {
           return;
         }
         const data = response.data;
-        this.sessionStore.signin(data.nickname);
+        this.sessionStore.signin(
+          VueJwtDecode.decode(data.access_token).sub,
+          response.data.nickname
+        );
         this.$cookie.setCookie('jwt', data.access_token);
         this.$cookie.setCookie('refresh_token', data.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();

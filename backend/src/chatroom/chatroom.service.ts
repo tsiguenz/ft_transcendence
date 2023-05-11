@@ -213,10 +213,7 @@ export class ChatroomService {
     });
   }
 
-  private async removeUserFromChatroom(
-    userId: string,
-    chatroomId: string
-  ) {
+  private async removeUserFromChatroom(userId: string, chatroomId: string) {
     return await this.prisma.chatRoomUser.deleteMany({
       where: {
         chatRoomId: chatroomId,
