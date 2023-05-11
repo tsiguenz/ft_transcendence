@@ -1,7 +1,10 @@
 <template>
-	<v-container flex>
+	<v-container flex class="font">
 		<v-row justify="center">
-			<img :src="avatarPath" alt="avatar" class="rounded-pill" width="100" height="100" />
+			<h1>{{ user.ladderPoints }}</h1>
+		</v-row>
+		<v-row justify="center">
+			<h3>Ladder Points</h3>
 		</v-row>
 	</v-container>
 </template>
@@ -13,24 +16,27 @@ import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
   data() {
     return {
-      avatarPath: ''
-		};
-	},
+      user: {},
+			achievements: [],
+			test: []
+    };
+  },
   computed: {
     ...mapStores(useSessionStore)
   },
   async mounted() {
-    await this.getAvatar();
+    await this.getProfile();
   },
   methods: {
-    async getAvatar() {
+    async getProfile() {
       try {
         const response = await axios.get(constants.API_URL + '/profile');
-        this.avatarPath = constants.AVATARS_URL + response.data.avatarPath;
+        this.user = response.data;
       } catch (error) {
         swal({
           icon: 'error',
@@ -42,3 +48,9 @@ export default {
 	}
 };
 </script>
+
+<style>
+.font{
+	font-family: 'Poppins', serif;
+}
+</style>

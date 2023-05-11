@@ -1,5 +1,7 @@
 <template>
 	<ProfilePrintAvatar />
+	<ProfileLadderPoints />
+	<ProfileAchievements />
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
@@ -54,10 +56,14 @@ import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
+import ProfileLadderPoints from '../components/ProfileLadderPoints.vue';
+import ProfileAchievements from '../components/ProfileAchievements.vue';
 
 export default {
   components: {
-    ProfilePrintAvatar
+    ProfilePrintAvatar,
+		ProfileLadderPoints,
+		ProfileAchievements
   },
   data() {
     return {
