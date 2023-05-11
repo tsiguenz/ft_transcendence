@@ -6,7 +6,8 @@ import {
   Delete,
   Req,
   Post,
-  ForbiddenException
+  ForbiddenException,
+  NotFoundException
 } from '@nestjs/common';
 import { ApiParam, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -108,5 +109,36 @@ export class UsersController {
     const user = await this.usersService.getUser(nickname);
     if (user.id !== req.user['id']) { throw new ForbiddenException('Unauthorized to list chatrooms for user'); }
     return await this.chatroomService.findChatroomsForUser(req.user['id']);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post(':nickname/block')
+  async blockUser(@Param('nickname') nickname: string, @Req() req: Request) {
+    const user = await this.usersService.getUser(nickname);
+    if (!user) throw new NotFoundException('User not found');
+    if (user.id === req.user['id']) { throw new ForbiddenException('You cannot block yourself'); }
+
+    return this.usersService.blockUser(req.user['id'], user.id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post(':nickname/unblock')
+  async unblockUser(@Param('nickname') nickname: string, @Req() req: Request) {
+    const user = await this.usersService.getUser(nickname);
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.usersService.unblockUser(req.user['id'], user.id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/blocked')
+  async getBlockedUsers(@Param('nickname') nickname: string, @Req() req: Request) {
+    const user = await this.usersService.getUser(nickname);
+    if (user.id !== req.user['id']) { throw new ForbiddenException('Unauthorized to list blocked users'); }
+
+    return this.usersService.getBlockedUsers(req.user['id']);
   }
 }

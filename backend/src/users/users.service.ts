@@ -173,4 +173,61 @@ export class UsersService {
     });
     return friends;
   }
+
+  async blockUser(blockerId: string, blockedId: string) {
+    const alreadyBlocked = await this.prisma.blockedUser.findUnique({
+      where: {
+        blocked_users_pkey: {
+          userId: blockerId,
+          blockedId: blockedId
+        }
+      }
+    });
+    if (alreadyBlocked) throw new ForbiddenException('User already blocked');
+    return await this.prisma.blockedUser.create({
+      data: {
+         userId: blockerId,
+         blockedId: blockedId
+      },
+      select: {
+        blockedId: true,
+      }
+    });
+  }
+
+  async unblockUser(blockerId: string, blockedId: string) {
+    const alreadyBlocked = await this.prisma.blockedUser.findUnique({
+      where: {
+        blocked_users_pkey: {
+          userId: blockerId,
+          blockedId: blockedId
+        }
+      }
+    });
+    if (!alreadyBlocked) throw new ForbiddenException('User is not blocked');
+    return await this.prisma.blockedUser.delete({
+      where: {
+        blocked_users_pkey: {
+          userId: blockerId,
+          blockedId: blockedId
+        }
+      },
+      select: {
+        blockedId: true,
+      }
+    });
+  }
+
+  async getBlockedUsers(userId: string) {
+    const blockedUsers =  await this.prisma.blockedUser.findMany({
+      where: {
+        userId: userId
+      },
+      select: {
+        blockedId: true,
+      }
+    });
+
+    return blockedUsers.map(x => x.blockedId);
+  }
 }
