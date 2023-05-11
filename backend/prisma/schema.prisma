@@ -29,6 +29,7 @@ model User {
   chatrooms       ChatRoomUser[]
   friends         Friend[]     @relation("user")
   createdAt       DateTime     @default(now())
+  lastConnection  DateTime     @default(now())
   TwoFactorId     TwoFactorId?
   refreshToken    String?
 
