@@ -39,6 +39,7 @@ export class StatusGateway {
       this.connectedUsers
     );
     if (!userId) client.disconnect();
+    await this.statusService.setLastConnection(client);
     this.logger.log(`Client disconnected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
   }
