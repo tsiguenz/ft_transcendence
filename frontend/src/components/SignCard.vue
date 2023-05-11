@@ -79,7 +79,7 @@
                 >Sign in with 42</v-btn
               >
             </v-card-actions>
-            <v-card-actions class="justify-center" v-else>
+            <v-card-actions v-else class="justify-center">
               <v-btn class="btn" :disabled="!isFormValid" @click="signup"
                 >Sign Up</v-btn
               >
@@ -96,7 +96,7 @@ import axios from 'axios';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import formatError from '@/utils/lib';
+import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
   props: {
@@ -142,7 +142,10 @@ export default {
           return;
         }
         const tokens = response.data;
-        this.sessionStore.signin(this.nickname);
+        this.sessionStore.signin(
+          VueJwtDecode.decode(tokens.access_token).sub,
+          this.nickname
+        );
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
@@ -166,7 +169,10 @@ export default {
           password: this.password
         });
         const tokens = response.data;
-        this.sessionStore.signin(this.nickname);
+        this.sessionStore.signin(
+          VueJwtDecode.decode(tokens.access_token).sub,
+          this.nickname
+        );
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();

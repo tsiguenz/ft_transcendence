@@ -89,7 +89,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.message),
+          text: formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -112,7 +112,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.message),
+          text: formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -135,7 +135,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.message),
+          text: formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });

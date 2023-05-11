@@ -24,11 +24,15 @@ import { EditProfileDto } from './dto/profile-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { ChatroomService } from '../chatroom/chatroom.service';
 
 @ApiTags('users')
 @Controller('api/users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private readonly chatroomService: ChatroomService
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -178,5 +182,16 @@ export class UsersController {
   ) {
     this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.uploadAvatar(user['id'], file);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/chatrooms')
+  async findChatroomsForUser(
+    @Param('nickname') nickname: string,
+    @User() user: object
+  ) {
+    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
+    return await this.chatroomService.findChatroomsForUser(user['id']);
   }
 }

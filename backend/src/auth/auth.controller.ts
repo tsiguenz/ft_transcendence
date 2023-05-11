@@ -4,14 +4,13 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Req,
   UseGuards
 } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { AccessTokenGuard, RefreshTokenGuard } from '../auth/guard';
-import { Request } from 'express';
+import { User } from '../decorator/user.decorator';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -62,8 +61,8 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Post('logout')
-  logout(@Req() req: Request) {
-    return this.authService.logout(req.user['id']);
+  logout(@User() user: object) {
+    return this.authService.logout(user['id']);
   }
 
   @ApiConsumes('application/x-www-form-urlencoded')
@@ -87,9 +86,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth()
   @Post('refresh')
-  refreshTokens(@Req() req: Request) {
-    const userId = req.user['id'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  refreshTokens(@User() user: object) {
+    return this.authService.refreshTokens(user['id'], user['refreshToken']);
   }
 }

@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
+import { ChatroomModule } from './chatroom/chatroom.module';
 import { StatusModule } from './status/status.module';
 import { TwoFaService } from './2fa/2fa.service';
 import { TwoFaModule } from './2fa/2fa.module';
@@ -15,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 @Module({
   imports: [
     AuthModule,
+    ChatroomModule,
     UsersModule,
     PrismaModule,
     UsersModule,

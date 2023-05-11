@@ -13,6 +13,9 @@ export const useConnectedUsersStore = defineStore('connectedUsers', {
     },
     reset() {
       this.connectedUsers = [];
+    },
+    isConnected(id: string) {
+      return this.connectedUsers.includes(id);
     }
   }
 });
