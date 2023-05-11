@@ -20,14 +20,6 @@ export class UsersService {
     private twoFa: TwoFaService
   ) {}
 
-  checkIfUserIsMe(nickname1: string, nickname2: string) {
-    if (nickname1 !== nickname2) {
-      throw new UnauthorizedException(
-        'You are not authorized to perform this action'
-      );
-    }
-  }
-
   async getUser(nickname: string) {
     const user = await this.prisma.user.findUnique({
       where: {

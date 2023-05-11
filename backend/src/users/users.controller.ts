@@ -25,6 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ChatroomService } from '../chatroom/chatroom.service';
+import { IsMeGuard } from '../users/guard/isMe.guard';
 
 @ApiTags('users')
 @Controller('api/users')
@@ -54,7 +55,7 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
@@ -64,11 +65,10 @@ export class UsersController {
   })
   @Delete(':nickname')
   deleteUser(@Param('nickname') nickname: string, @User() user: object) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.deleteUser(user);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'friendNickname',
@@ -88,11 +88,10 @@ export class UsersController {
     @Param('friendNickname') friendNickname: string,
     @User() user: object
   ) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.addFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
@@ -100,27 +99,24 @@ export class UsersController {
     @Param('friendNickname') friendNickname: string,
     @User() user: object
   ) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.deleteFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
   getFriends(@Param('nickname') nickname: string, @User() user: object) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.getFriends(user['id']);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @Get(':nickname/profile')
   getProfile(@Param('nickname') nickname: string, @User() user: object) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return user;
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @ApiConsumes('application/x-www-form-urlencoded')
   @ApiBody({
@@ -141,11 +137,10 @@ export class UsersController {
     @Body() dto: EditProfileDto,
     @User() user: object
   ) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.editProfile(user['id'], dto);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -180,18 +175,16 @@ export class UsersController {
     @User() user: object,
     @UploadedFile() file: Express.Multer.File
   ) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return this.usersService.uploadAvatar(user['id'], file);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsMeGuard)
   @ApiBearerAuth()
   @Get(':nickname/chatrooms')
   async findChatroomsForUser(
     @Param('nickname') nickname: string,
     @User() user: object
   ) {
-    this.usersService.checkIfUserIsMe(nickname, user['nickname']);
     return await this.chatroomService.findChatroomsForUser(user['id']);
   }
 }
