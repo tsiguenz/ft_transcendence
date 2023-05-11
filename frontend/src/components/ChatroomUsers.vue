@@ -31,6 +31,7 @@ import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 import ChatService from '../services/chat.service';
+import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
@@ -104,8 +105,7 @@ export default {
     },
     async blockUser(username) {
      try {
-        const response = await axios.post(constants.API_URL + '/users/' + username + '/block', {});
-        this.chatStore.addBlockedUser(response.data.blockedId);
+        BlockUserService.blockUser(username);
       } catch (error) {
         swal({
           icon: 'error',
@@ -115,8 +115,7 @@ export default {
     },
     async unblockUser(username) {
      try {
-        const response = await axios.post(constants.API_URL + '/users/' + username + '/unblock', {});
-        this.chatStore.removeBlockedUser(response.data.blockedId);
+        BlockUserService.unblockUser(username);
       } catch (error) {
         swal({
           icon: 'error',
@@ -125,7 +124,7 @@ export default {
       }
     },
     isUserBlocked(userId) {
-      return this.chatStore.isUserBlocked(userId);
+      return BlockUserService.isUserBlocked(userId);
     }
   },
 }
