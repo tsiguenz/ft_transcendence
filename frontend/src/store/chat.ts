@@ -8,6 +8,7 @@ export const useChatStore = defineStore('chat', {
       users: {},
       chatrooms: [],
       activeChatroom: undefined,
+      blockedUsers: [],
     };
   },
   getters: {
@@ -20,11 +21,20 @@ export const useChatStore = defineStore('chat', {
 
     activeRoomMessages() {
       if (this.messages.hasOwnProperty(this.activeChatroom)) {
-        return this.messages[this.activeChatroom];
+        return this.filteredMessages[this.activeChatroom];
       }
       return [];
     },
 
+    filteredMessages() {
+      let filteredMessages = {}
+
+      for (var chatroomId in this.messages) {
+        filteredMessages[chatroomId] = this.messages[chatroomId].filter(x => !this.isUserBlocked(x.authorId));
+      }
+
+      return filteredMessages;
+    }
   },
   actions: {
     addRoom(...rooms) {
@@ -75,6 +85,18 @@ export const useChatStore = defineStore('chat', {
       } else {
         this.activeChatroom = undefined;
       }
+    },
+
+    addBlockedUser(...users) {
+      this.blockedUsers.push(...users);
+    },
+
+    removeBlockedUser(toRemove: string) {
+      this.blockedUsers = this.blockedUsers.filter((user) => (user !== toRemove));
+    },
+
+    isUserBlocked(userId) {
+      return this.blockedUsers.includes(userId);
     }
   }
 });

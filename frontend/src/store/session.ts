@@ -7,7 +7,6 @@ export const useSessionStore = defineStore('session', {
       userId: undefined,
       nickname: '',
       loggedIn: false,
-      blockedUsers: []
     };
   },
   actions: {
@@ -22,14 +21,5 @@ export const useSessionStore = defineStore('session', {
       this.nickname = '';
       this.blockedUsers = [];
     },
-    addBlockedUser(...users) {
-      this.blockedUsers.push(...users);
-    },
-    removeBlockedUser(toRemove: string) {
-      this.blockedUsers = this.blockedUsers.filter((user) => (user !== toRemove));
-    },
-    isUserBlocked(userId) {
-      return this.blockedUsers.includes(userId);
-    }
   }
 });

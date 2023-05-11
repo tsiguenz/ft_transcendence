@@ -105,7 +105,7 @@ export default {
     async blockUser(username) {
      try {
         const response = await axios.post(constants.API_URL + '/users/' + username + '/block', {});
-        this.sessionStore.addBlockedUser(response.data.blockedId);
+        this.chatStore.addBlockedUser(response.data.blockedId);
       } catch (error) {
         swal({
           icon: 'error',
@@ -116,7 +116,7 @@ export default {
     async unblockUser(username) {
      try {
         const response = await axios.post(constants.API_URL + '/users/' + username + '/unblock', {});
-        this.sessionStore.removeBlockedUser(response.data.blockedId);
+        this.chatStore.removeBlockedUser(response.data.blockedId);
       } catch (error) {
         swal({
           icon: 'error',
@@ -125,7 +125,7 @@ export default {
       }
     },
     isUserBlocked(userId) {
-      return this.sessionStore.isUserBlocked(userId);
+      return this.chatStore.isUserBlocked(userId);
     }
   },
 }
