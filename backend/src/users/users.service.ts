@@ -282,6 +282,6 @@ export class UsersService {
       }
     });
 
-    return blockedUsers.map(x => x.blockedId);
+    return { blockedUsers: blockedUsers.map(x => x.blockedId) };
   }
 }
