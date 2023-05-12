@@ -29,9 +29,10 @@ model User {
   chatrooms       ChatRoomUser[]
   friends         Friend[]       @relation("user")
   blockedUsers    BlockedUser[]  @relation("user")
-  createdAt       DateTime       @default(now())
   TwoFactorId     TwoFactorId?
   refreshToken    String?
+  lastConnection  DateTime       @default(now())
+  createdAt       DateTime       @default(now())
 
   @@map("users")
 }
