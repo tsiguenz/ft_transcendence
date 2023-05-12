@@ -4,22 +4,21 @@
   <v-table density="compact">
     <thead>
       <tr>
-        <th class="text-left">Id</th>
-        <th class="text-left">Nickname</th>
-        <th class="text-left">Ladder points</th>
-        <th class="text-left">Status</th>
+        <!-- <th class="cust-th">Id</th> -->
+        <th class="cust-th">Nickname</th>
+        <th class="cust-th">Ladder points</th>
+        <th class="cust-th">Status</th>
+        <th class="cust-th"></th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <td>{{ user.id }}</td>
-        <td>{{ user.nickname }}</td>
+      <tr v-for="user in sortedUsers" :key="user.id">
+        <!-- <td>{{ user.id }}</td> -->
+        <td class="cust-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)"></ProfileClick><p>{{ user.nickname }}</p></td>
         <td>{{ user.ladderPoints }}</td>
         <td>{{ userStatus(user) }}</td>
         <td>
-          <v-btn size="small" @click="addFriend(user.nickname)"
-            >Add friend</v-btn
-          >
+          <IsFriend :friendname="user.nickname"></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -27,18 +26,35 @@
 </template>
 
 <script>
+import ProfileClick from '../components/ProfileClick.vue';
+import IsFriend from '../components/IsFriend.vue';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
+  components: {
+    ProfileClick,
+    IsFriend
+  },
   inject: ['connectedUsersStore', 'sessionStore'],
   data() {
     return {
       users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
+  },
+  computed: {
+    sortedUsers() {
+      return [...this.users].sort((a, b) =>
+        a.ladderPoints === b.ladderPoints
+          ? a.nickname.localeCompare(b.nickname)
+          : a.ladderPoints > b.ladderPoints
+          ? -1
+          : 1
+      );
+    },
   },
   watch: {
     connectedUsersStore: {
@@ -98,6 +114,41 @@ export default {
         ? 'Connected'
         : 'Disconnected';
     }
-  }
+  },
 };
 </script>
+
+
+<style lang="scss" scoped>
+
+.v-table{
+  background: var(--medium-purple);
+  width: 95%;
+  margin-right: auto;
+  margin-left: auto;
+  border-style: solid;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--light-purple);
+  border-color: var(--light-purple);
+}
+
+.cust-th{
+  color: #ffff !important;
+  text-transform: uppercase;
+}
+
+.cust-td{
+  display: flex !important;
+  padding: 1rem;
+
+  p{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10px;
+  }
+}
+
+
+
+
+</style>
