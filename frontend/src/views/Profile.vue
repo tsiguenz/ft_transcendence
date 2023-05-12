@@ -1,8 +1,28 @@
 <template>
-  <ProfilePrintAvatar />
-  <ProfileLadderPoints />
+	<v-container flex>
+		<v-row>
+			<v-col cols="3">
+				<v-sheet class="sheet pa-3">
+  <div class="py-5"><ProfileLadderPoints /></div>
   <ProfileAchievements />
+				</v-sheet>
+			</v-col>
+			<v-col cols="6">
+				<v-sheet color="transparent">
+  <ProfilePrintAvatar />
+				<v-row class="justify-center">
+	<h4 class="font ma-3">{{ newNickname }}</h4>
+					</v-row>
   <ProfileHistoryGames />
+				</v-sheet>
+			</v-col>
+			<v-col cols="3">
+				<v-sheet>
+				</v-sheet>
+			</v-col>
+		</v-row>
+	</v-container>
+  <ProfileLadderPoints />
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
@@ -223,3 +243,14 @@ export default {
   }
 };
 </script>
+
+<style>
+.font {
+  font-family: 'Poppins', serif;
+}
+.sheet{
+  background: var(--dark-purple);
+  border-radius: 30px;
+	border: 3px solid var(--light);
+}
+</style>

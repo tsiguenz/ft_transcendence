@@ -4,12 +4,12 @@
     <div v-for="(title, description) in achievements.titles">
       <v-divider />
       <ul>
-        <h4>{{ title }}</h4>
+        <h4 class="mt-5">{{ title }}</h4>
       </ul>
       <ul>
-        {{
+        <p class="mb-5">{{
           achievements.descriptions[description]
-        }}
+        }}</p>
       </ul>
     </div>
   </div>
@@ -42,7 +42,7 @@ export default {
   methods: {
     async getProfile() {
       try {
-        const response = await axios.get(constants.API_URL + '/profile');
+        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
         this.user = response.data;
       } catch (error) {
         swal({

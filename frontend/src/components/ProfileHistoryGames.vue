@@ -45,7 +45,7 @@ export default {
   methods: {
     async getProfile() {
       try {
-        const response = await axios.get(constants.API_URL + '/profile');
+        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
         this.user = response.data;
       } catch (error) {
         swal({

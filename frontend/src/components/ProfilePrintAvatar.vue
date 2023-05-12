@@ -35,7 +35,7 @@ export default {
   methods: {
     async getAvatar() {
       try {
-        const response = await axios.get(constants.API_URL + '/profile');
+        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
         this.avatarPath = constants.AVATARS_URL + response.data.avatarPath;
       } catch (error) {
         swal({

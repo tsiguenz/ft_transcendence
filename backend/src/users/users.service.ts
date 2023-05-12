@@ -30,7 +30,8 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true
+        createdAt: true,
+				lastConnection: true
       }
     });
     return user;
@@ -46,7 +47,8 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true
+        createdAt: true,
+				lastConnection: true
       }
     });
     return user;
@@ -59,11 +61,30 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true
+        createdAt: true,
+				lastConnection: true
       }
     });
     return users;
   }
+
+	async getProfile(userId: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: userId
+			},
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true,
+        createdAt: true,
+				lastConnection: true,
+				twoFactorEnable: true
+    	}
+		});
+		return user;
+	}
 
   async deleteUser(user: object) {
     this.deleteAvatar(user['avatarPath']);

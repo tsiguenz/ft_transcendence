@@ -16,14 +16,12 @@ import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
   data() {
     return {
       user: {},
-      achievements: [],
-      test: []
+      achievements: []
     };
   },
   computed: {
@@ -35,7 +33,7 @@ export default {
   methods: {
     async getProfile() {
       try {
-        const response = await axios.get(constants.API_URL + '/profile');
+        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
         this.user = response.data;
       } catch (error) {
         swal({
