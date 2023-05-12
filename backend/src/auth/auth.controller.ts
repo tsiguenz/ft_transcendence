@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { AccessTokenGuard, RefreshTokenGuard } from '../auth/guard';
 import { User } from '../decorator/user.decorator';
+import { Signin42Dto } from './dto/signin42.dto';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -70,17 +71,26 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        code: {
+        authorization: {
           type: 'string',
           description:
             'Authorization code returned by the 42 API after the user has logged in'
+        },
+        access_token42: {
+          type: 'string',
+          description:
+            'Access token returned by the 42 API after the user has logged in'
+        },
+        nickname: {
+          type: 'string',
+          description: 'Nickname of the user'
         }
       }
     }
   })
   @Post('42')
-  async signin42(@Body('authorization') authorizationCode: string) {
-    return await this.authService.signin42(authorizationCode);
+  async signin42(@Body() dto: Signin42Dto) {
+    return await this.authService.signin42(dto);
   }
 
   @UseGuards(RefreshTokenGuard)

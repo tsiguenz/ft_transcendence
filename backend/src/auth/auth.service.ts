@@ -9,6 +9,7 @@ import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { TwoFaService } from '../2fa/2fa.service';
 import * as axios from 'axios';
+import { Signin42Dto } from './dto/signin42.dto';
 
 @Injectable()
 export class AuthService {
@@ -145,19 +146,25 @@ export class AuthService {
     return response.data.access_token;
   }
 
-  async signin42(authorizationCode: string) {
-    const accessToken42 = await this.get42Token(authorizationCode);
-    const user42 = await this.getFortyTwoProfile(accessToken42);
+  async signin42(dto: Signin42Dto) {
+    if (!dto.access_token42)
+      dto.access_token42 = await this.get42Token(dto.authorization);
+    const user42 = await this.getFortyTwoProfile(dto.access_token42);
     let user = await this.prisma.user.findUnique({
       where: {
         fortyTwoId: user42.id
       }
     });
     if (!user) {
+      if (!dto.nickname)
+        return {
+          message: 'Nickname required',
+          access_token42: dto.access_token42
+        };
       user = await this.prisma.user
         .create({
           data: {
-            nickname: `42user-${user42.login}`,
+            nickname: dto.nickname,
             fortyTwoId: user42.id
           }
         })
