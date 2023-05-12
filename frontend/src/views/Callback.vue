@@ -16,7 +16,7 @@ export default {
       authorizationCode: this.$route.query.code,
       twoFactorCode: ''
     };
-  },
+		},
   computed: {
     ...mapStores(useSessionStore),
     ...mapStores(useConnectedUsersStore)
@@ -46,7 +46,7 @@ export default {
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
         this.sessionStore.signin(
-          VueJwtDecode.decode(jwt).sub,
+          VueJwtDecode.decode(tokens.access_token).sub,
           response.data.nickname
         );
         this.$root.connectAndSubscribeStatusSocket();

@@ -4,20 +4,38 @@ import {
   Param,
   UseGuards,
   Delete,
-  Req,
   Post,
-  ForbiddenException
+  ForbiddenException,
+  NotFoundException,
+  Put,
+  Body,
+  UploadedFile,
+  UseInterceptors
 } from '@nestjs/common';
-import { ApiParam, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiParam,
+  ApiTags,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AccessTokenGuard } from '../auth/guard';
-import { Request } from 'express';
+import { User } from '../decorator/user.decorator';
+import { EditProfileDto } from './dto/profile-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { ChatroomService } from '../chatroom/chatroom.service';
+import { IsCurrentUserGuard } from '../users/guard/isCurrentUser.guard';
 
 @ApiTags('users')
 @Controller('api/users')
 export class UsersController {
-  constructor(private usersService: UsersService, private readonly chatroomService: ChatroomService) {}
+  constructor(
+    private usersService: UsersService,
+    private readonly chatroomService: ChatroomService
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -39,7 +57,7 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'nickname',
@@ -48,11 +66,11 @@ export class UsersController {
     description: 'Nickname of the user you are deleting'
   })
   @Delete(':nickname')
-  deleteUser(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.deleteUser(nickname, req.user['nickname']);
+  deleteUser(@Param('nickname') nickname: string, @User() user: object) {
+    return this.usersService.deleteUser(user);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiParam({
     name: 'friendNickname',
@@ -70,43 +88,138 @@ export class UsersController {
   addFriend(
     @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
-    @Req() req: Request
+    @User() user: object
   ) {
-    return this.usersService.addFriend(
-      nickname,
-      friendNickname,
-      req.user['id']
-    );
+    return this.usersService.addFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
-    @Param('nickname') userNickname: string,
+    @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
-    @Req() req: Request
+    @User() user: object
   ) {
-    return this.usersService.deleteFriend(
-      userNickname,
-      friendNickname,
-      req.user['id']
-    );
+    return this.usersService.deleteFriend(user, friendNickname);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
-  getFriends(@Param('nickname') nickname: string, @Req() req: Request) {
-    return this.usersService.getFriends(nickname, req.user['id']);
+  getFriends(@Param('nickname') nickname: string, @User() user: object) {
+    return this.usersService.getFriends(user['id']);
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/profile')
+  getProfile(@Param('nickname') nickname: string, @User() user: object) {
+    return user;
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        nickname: { type: 'string', description: 'The new unique nickname' },
+        twoFactorEnable: {
+          type: 'boolean',
+          description: 'Enable or disable two factor authentication'
+        }
+      }
+    }
+  })
+  @Put(':nickname/profile')
+  editProfile(
+    @Param('nickname') nickname: string,
+    @Body() dto: EditProfileDto,
+    @User() user: object
+  ) {
+    return this.usersService.editProfile(user['id'], dto);
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'The avatar file'
+        }
+      }
+    }
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './public/avatars',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `/${randomName}${extname(file.originalname)}`);
+        }
+      })
+    })
+  )
+  @Post(':nickname/avatar')
+  async uploadAvatar(
+    @Param('nickname') nickname: string,
+    @User() user: object,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.usersService.uploadAvatar(user['id'], file);
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/chatrooms')
+  async findChatroomsForUser(
+    @Param('nickname') nickname: string,
+    @User() user: object
+  ) {
+    return await this.chatroomService.findChatroomsForUser(user['id']);
   }
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
-  @Get(':nickname/chatrooms')
-  async findChatroomsForUser(@Param('nickname') nickname: string, @Req() req: Request) {
-    const user = await this.usersService.getUser(nickname);
-    if (user.id !== req.user['id']) { throw new ForbiddenException('Unauthorized to list chatrooms for user'); }
-    return await this.chatroomService.findChatroomsForUser(req.user['id']);
+  @Post(':nickname/block')
+  async blockUser(@Param('nickname') nickname: string, @User() user: object) {
+    const toBlock = await this.usersService.getUser(nickname);
+    if (!toBlock) throw new NotFoundException('User not found');
+    if (toBlock.id === user['id']) {
+      throw new ForbiddenException('You cannot block yourself');
+    }
+
+    return this.usersService.blockUser(user['id'], toBlock.id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post(':nickname/unblock')
+  async unblockUser(@Param('nickname') nickname: string, @User() user: object) {
+    const toUnblock = await this.usersService.getUser(nickname);
+    if (!toUnblock) throw new NotFoundException('User not found');
+
+    return this.usersService.unblockUser(user['id'], toUnblock.id);
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/blocked')
+  async getBlockedUsers(
+    @Param('nickname') nickname: string,
+    @User() user: object
+  ) {
+    return this.usersService.getBlockedUsers(user['id']);
   }
 }

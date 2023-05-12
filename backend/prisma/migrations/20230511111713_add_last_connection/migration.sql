@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "lastConnection" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

@@ -18,7 +18,13 @@
         <v-btn v-if="currentUserIsAdmin" block>Make admin</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
-        <v-btn block>Block</v-btn>
+        <v-btn
+          v-if="!isUserBlocked(user.id)"
+          @click="blockUser(user.nickname)"
+          block
+          >Block</v-btn
+        >
+        <v-btn v-else @click="unblockUser(user.nickname)" block>Unblock</v-btn>
       </v-row>
     </v-list-group>
   </v-list>
@@ -30,6 +36,7 @@ import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 import ChatService from '../services/chat.service';
+import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
@@ -104,6 +111,29 @@ export default {
     },
     isOnline(id) {
       return this.connectedUsersStore.isConnected(id);
+    },
+    async blockUser(username) {
+      try {
+        BlockUserService.blockUser(username);
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
+    async unblockUser(username) {
+      try {
+        BlockUserService.unblockUser(username);
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
+    isUserBlocked(userId) {
+      return BlockUserService.isUserBlocked(userId);
     }
   }
 };
@@ -117,5 +147,9 @@ export default {
 
 .online {
   color: lightgreen;
+}
+
+.blocked {
+  text-decoration: line-through;
 }
 </style>

@@ -23,6 +23,7 @@
 import axios from 'axios';
 import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
+import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
@@ -40,6 +41,9 @@ export default {
     return {
       // currentChatroomId: 0,
     };
+  },
+  created() {
+    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
