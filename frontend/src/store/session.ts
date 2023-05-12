@@ -19,6 +19,6 @@ export const useSessionStore = defineStore('session', {
       this.userId = undefined;
       this.loggedIn = false;
       this.nickname = '';
-    },
+    }
   }
 });

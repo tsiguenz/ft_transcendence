@@ -8,13 +8,13 @@ export const useChatStore = defineStore('chat', {
       users: {},
       chatrooms: [],
       activeChatroom: undefined,
-      blockedUsers: [],
+      blockedUsers: []
     };
   },
   getters: {
     currentChatroom(): any {
       if (this.activeChatroom === undefined) {
-        return ;
+        return;
       }
       return this.chatrooms.find((room) => room.id === this.activeChatroom);
     },
@@ -27,10 +27,12 @@ export const useChatStore = defineStore('chat', {
     },
 
     filteredMessages() {
-      let filteredMessages = {}
+      let filteredMessages = {};
 
       for (var chatroomId in this.messages) {
-        filteredMessages[chatroomId] = this.messages[chatroomId].filter(x => !this.isUserBlocked(x.authorId));
+        filteredMessages[chatroomId] = this.messages[chatroomId].filter(
+          (x) => !this.isUserBlocked(x.authorId)
+        );
       }
 
       return filteredMessages;
@@ -41,7 +43,7 @@ export const useChatStore = defineStore('chat', {
       this.chatrooms.push(...rooms);
     },
     removeRoom(roomId) {
-      this.chatrooms = this.chatrooms.filter((room) => (room.id !== roomId));
+      this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
     },
     // joinChatroom(chatroomId: number) {},
@@ -92,7 +94,7 @@ export const useChatStore = defineStore('chat', {
     },
 
     removeBlockedUser(toRemove: string) {
-      this.blockedUsers = this.blockedUsers.filter((user) => (user !== toRemove));
+      this.blockedUsers = this.blockedUsers.filter((user) => user !== toRemove);
     },
 
     isUserBlocked(userId) {

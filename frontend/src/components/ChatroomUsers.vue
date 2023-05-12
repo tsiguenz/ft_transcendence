@@ -2,15 +2,15 @@
   <v-list>
     <v-btn block>Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
-    <v-list-group
-      v-for="user in users"
-      :key="user.id"
-    >
+    <v-list-group v-for="user in users" :key="user.id">
       <template v-slot:activator="{ props }">
         <v-list-item
           v-bind="props"
           :prepend-icon="userRoleIcon[user.role]"
-          :class="{ 'blue-border': isCurrentUser(user.id), 'online': isOnline(user.id) }"
+          :class="{
+            'blue-border': isCurrentUser(user.id),
+            online: isOnline(user.id)
+          }"
           :title="user.nickname"
         ></v-list-item>
       </template>
@@ -18,7 +18,12 @@
         <v-btn v-if="currentUserIsAdmin" block>Make admin</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
-        <v-btn v-if="!isUserBlocked(user.id)" @click="blockUser(user.nickname)" block>Block</v-btn>
+        <v-btn
+          v-if="!isUserBlocked(user.id)"
+          @click="blockUser(user.nickname)"
+          block
+          >Block</v-btn
+        >
         <v-btn v-else @click="unblockUser(user.nickname)" block>Unblock</v-btn>
       </v-row>
     </v-list-group>
@@ -43,11 +48,11 @@ export default {
     return {
       users: [],
       userRoleIcon: {
-        'OWNER': 'mdi-crown-circle',
-        'ADMIN': 'mdi-alpha-a-circle',
-        'USER': 'mdi-account-circle'
-      } 
-    }
+        OWNER: 'mdi-crown-circle',
+        ADMIN: 'mdi-alpha-a-circle',
+        USER: 'mdi-account-circle'
+      }
+    };
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore, useConnectedUsersStore),
@@ -55,7 +60,9 @@ export default {
       return this.sessionStore.userId;
     },
     currentUserIsAdmin() {
-      const currentUser = this.users.find((user) => user.id == this.currentUserId);
+      const currentUser = this.users.find(
+        (user) => user.id == this.currentUserId
+      );
 
       return currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
     }
@@ -70,7 +77,7 @@ export default {
         this.getChatroomUsers(this.id).then((users) => {
           this.users = users;
         });
-      },
+      }
     }
   },
   mounted() {
@@ -88,7 +95,9 @@ export default {
   methods: {
     async getChatroomUsers(chatroomId) {
       try {
-        const response = await axios.get(constants.API_URL + '/chatrooms/' + chatroomId + '/users');
+        const response = await axios.get(
+          constants.API_URL + '/chatrooms/' + chatroomId + '/users'
+        );
         return response.data;
       } catch (error) {
         swal({
@@ -104,7 +113,7 @@ export default {
       return this.connectedUsersStore.isConnected(id);
     },
     async blockUser(username) {
-     try {
+      try {
         BlockUserService.blockUser(username);
       } catch (error) {
         swal({
@@ -114,7 +123,7 @@ export default {
       }
     },
     async unblockUser(username) {
-     try {
+      try {
         BlockUserService.unblockUser(username);
       } catch (error) {
         swal({
@@ -126,21 +135,21 @@ export default {
     isUserBlocked(userId) {
       return BlockUserService.isUserBlocked(userId);
     }
-  },
-}
+  }
+};
 </script>
 
 <style scoped>
-  .blue-border {
-    border-color: blue;
-    border-width: 5px;
-  }
+.blue-border {
+  border-color: blue;
+  border-width: 5px;
+}
 
-  .online {
-    color: lightgreen;
-  }
+.online {
+  color: lightgreen;
+}
 
-  .blocked {
-    text-decoration: line-through;
-  }
+.blocked {
+  text-decoration: line-through;
+}
 </style>
