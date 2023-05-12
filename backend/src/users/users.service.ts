@@ -147,7 +147,7 @@ export class UsersService {
     });
     return friends;
   }
-  
+
   async editProfile(userId: string, dto: EditProfileDto) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -240,11 +240,11 @@ export class UsersService {
     if (alreadyBlocked) throw new ForbiddenException('User already blocked');
     return await this.prisma.blockedUser.create({
       data: {
-         userId: blockerId,
-         blockedId: blockedId
+        userId: blockerId,
+        blockedId: blockedId
       },
       select: {
-        blockedId: true,
+        blockedId: true
       }
     });
   }
@@ -267,21 +267,21 @@ export class UsersService {
         }
       },
       select: {
-        blockedId: true,
+        blockedId: true
       }
     });
   }
 
   async getBlockedUsers(userId: string) {
-    const blockedUsers =  await this.prisma.blockedUser.findMany({
+    const blockedUsers = await this.prisma.blockedUser.findMany({
       where: {
         userId: userId
       },
       select: {
-        blockedId: true,
+        blockedId: true
       }
     });
 
-    return { blockedUsers: blockedUsers.map(x => x.blockedId) };
+    return { blockedUsers: blockedUsers.map((x) => x.blockedId) };
   }
 }
