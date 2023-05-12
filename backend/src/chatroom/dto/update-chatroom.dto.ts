@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateChatroomDto } from './create-chatroom.dto';
+import {
+  IsNotEmpty,
+  IsString,
+  IsIn,
+  IsOptional,
+  ValidateIf
+} from 'class-validator';
 
-export class UpdateChatroomDto extends PartialType(CreateChatroomDto) {}
+export class UpdateChatroomDto {
+  @IsString()
+  password: string;
+}

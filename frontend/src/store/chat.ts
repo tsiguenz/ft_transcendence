@@ -5,7 +5,7 @@ export const useChatStore = defineStore('chat', {
   state() {
     return {
       messages: {},
-      users: {},
+      users: [],
       chatrooms: [],
       activeChatroom: undefined,
       blockedUsers: []
@@ -22,6 +22,13 @@ export const useChatStore = defineStore('chat', {
     activeRoomMessages() {
       if (this.messages.hasOwnProperty(this.activeChatroom)) {
         return this.filteredMessages[this.activeChatroom];
+      }
+      return [];
+    },
+
+    activeRoomUsers() {
+      if (this.users.hasOwnProperty(this.activeChatroom)) {
+        return this.users[this.activeChatroom];
       }
       return [];
     },
@@ -45,7 +52,7 @@ export const useChatStore = defineStore('chat', {
     removeRoom(roomId) {
       this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
-    },
+    }, 
     // joinChatroom(chatroomId: number) {},
     storeMessage(message) {
       const chatroomId: number = message.chatroomId;
@@ -56,13 +63,11 @@ export const useChatStore = defineStore('chat', {
       this.messages[chatroomId].push(message);
     },
 
-    storeUser(payload) {
-      const chatroomId: number = payload.chatroomId;
-
+    storeUser(chatroomId, users) {
       if (!this.users.hasOwnProperty(chatroomId)) {
         this.users[chatroomId] = [];
       }
-      this.users[chatroomId].push(payload);
+      this.users[chatroomId].push(...users);
     },
 
     removeUser(payload) {

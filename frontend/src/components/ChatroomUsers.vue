@@ -46,7 +46,6 @@ export default {
   props: ['id'],
   data() {
     return {
-      users: [],
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -56,11 +55,14 @@ export default {
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore, useConnectedUsersStore),
+    users() {
+      return this.chatStore.users;
+    },
     currentUserId() {
       return this.sessionStore.userId;
     },
     currentUserIsAdmin() {
-      const currentUser = this.users.find(
+      const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
 
@@ -71,11 +73,11 @@ export default {
     id: {
       handler() {
         if (!this.id) {
-          this.users = [];
+          this.chatStore.users = [];
           return;
         }
         this.getChatroomUsers(this.id).then((users) => {
-          this.users = users;
+          this.chatStore.users = users;
         });
       }
     }

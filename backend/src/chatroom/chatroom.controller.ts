@@ -113,10 +113,14 @@ export class ChatroomController {
     description: 'Chatroom id'
   })
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
-    @Body() updateChatroomDto: UpdateChatroomDto
+    @Body() updateChatroomDto: UpdateChatroomDto,
+    @User() user: object
   ) {
+    if (!(await this.chatroomService.isUserChatroomOwner(user['id'], id))) {
+      throw new ForbiddenException('Unauthorized to edit room');
+    }
     return this.chatroomService.update(id, updateChatroomDto);
   }
 

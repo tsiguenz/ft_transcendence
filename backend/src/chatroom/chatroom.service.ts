@@ -55,8 +55,20 @@ export class ChatroomService {
     });
   }
 
-  update(id: string, updateChatroomDto: UpdateChatroomDto) {
-    return `This action updates a #${id} chatroom`;
+  async update(id: string, updateChatroomDto: UpdateChatroomDto) {
+    let roomType = RoomType.PROTECTED;
+
+    if (updateChatroomDto.password === '') {
+      roomType = RoomType.PUBLIC
+    }
+
+    return await this.prisma.chatRoom.update({
+      where: { id: id },
+      data: {
+        password: updateChatroomDto.password,
+        type: roomType
+      }
+    });
   }
 
   remove(id: string) {
@@ -185,6 +197,15 @@ export class ChatroomService {
 
   async isUserInChatroom(userId: string, chatroomId: string) {
     return !!(await this.findUserInChatroom(userId, chatroomId));
+  }
+
+  async isUserChatroomOwner(userId: string, chatroomId: string) {
+    const user = await this.findUserInChatroom(userId, chatroomId);
+
+    if (!user || user.role !== Role.OWNER) {
+      return false;
+    }
+    return true;
   }
 
   async findUserInChatroom(
