@@ -15,23 +15,24 @@ enum GameType {
 }
 
 model User {
-  id              String       @id @default(uuid())
-  fortyTwoId      Int?         @unique
-  nickname        String       @unique
-  ladderPoints    Int          @default(0)
-  avatarPath      String       @default("/default.jpeg")
-  twoFactorEnable Boolean      @default(false)
+  id              String         @id @default(uuid())
+  fortyTwoId      Int?           @unique
+  nickname        String         @unique
+  ladderPoints    Int            @default(0)
+  avatarPath      String         @default("/default.jpeg")
+  twoFactorEnable Boolean        @default(false)
   twoFactorSecret String?
   hash            String?
-  gamesWin        Game[]       @relation("winner")
-  gamesLoose      Game[]       @relation("looser")
-  messages        Message[]    @relation("author")
+  gamesWin        Game[]         @relation("winner")
+  gamesLoose      Game[]         @relation("looser")
+  messages        Message[]      @relation("author")
   chatrooms       ChatRoomUser[]
-  friends         Friend[]     @relation("user")
-  createdAt       DateTime     @default(now())
-  lastConnection  DateTime     @default(now())
+  friends         Friend[]       @relation("user")
+  blockedUsers    BlockedUser[]  @relation("user")
   TwoFactorId     TwoFactorId?
   refreshToken    String?
+  lastConnection  DateTime       @default(now())
+  createdAt       DateTime       @default(now())
 
   @@map("users")
 }
@@ -105,6 +106,15 @@ model Friend {
 
   @@id([userId, friendId], name: "friend_pkey")
   @@map("friends")
+}
+
+model BlockedUser {
+  userId          String
+  user            User @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+  blockedId       String
+
+  @@id([userId, blockedId], name: "blocked_users_pkey")
+  @@map("blocked_users")
 }
 
 enum Role {

@@ -2,10 +2,7 @@
   <v-container fluid>
     <v-row justify="space-between" align="start">
       <v-col cols="3">
-        <Chatrooms
-          :id="currentChatroomId"
-          @join="joinChatroom"
-        />
+        <Chatrooms :id="currentChatroomId" @join="joinChatroom" />
       </v-col>
       <v-col cols="6">
         <Chat
@@ -26,6 +23,7 @@
 import axios from 'axios';
 import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
+import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
@@ -44,6 +42,9 @@ export default {
       // currentChatroomId: 0,
     };
   },
+  created() {
+    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
+  },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
     messages() {
@@ -60,7 +61,7 @@ export default {
     leaveRoom(id) {
       this.chatStore.removeRoom(id);
       this.chatStore.switchToDefaultChatroom();
-    },
+    }
   }
 };
 </script>

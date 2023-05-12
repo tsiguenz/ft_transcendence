@@ -5,6 +5,8 @@ import {
   UseGuards,
   Delete,
   Post,
+  ForbiddenException,
+  NotFoundException,
   Put,
   Body,
   UploadedFile,
@@ -186,5 +188,38 @@ export class UsersController {
     @User() user: object
   ) {
     return await this.chatroomService.findChatroomsForUser(user['id']);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post(':nickname/block')
+  async blockUser(@Param('nickname') nickname: string, @User() user: object) {
+    const toBlock = await this.usersService.getUser(nickname);
+    if (!toBlock) throw new NotFoundException('User not found');
+    if (toBlock.id === user['id']) {
+      throw new ForbiddenException('You cannot block yourself');
+    }
+
+    return this.usersService.blockUser(user['id'], toBlock.id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post(':nickname/unblock')
+  async unblockUser(@Param('nickname') nickname: string, @User() user: object) {
+    const toUnblock = await this.usersService.getUser(nickname);
+    if (!toUnblock) throw new NotFoundException('User not found');
+
+    return this.usersService.unblockUser(user['id'], toUnblock.id);
+  }
+
+  @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
+  @ApiBearerAuth()
+  @Get(':nickname/blocked')
+  async getBlockedUsers(
+    @Param('nickname') nickname: string,
+    @User() user: object
+  ) {
+    return this.usersService.getBlockedUsers(user['id']);
   }
 }
