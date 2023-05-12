@@ -2,10 +2,7 @@
   <v-container fluid>
     <v-row justify="space-between" align="start">
       <v-col cols="3">
-        <Chatrooms
-          :id="currentChatroomId"
-          @join="joinChatroom"
-        />
+        <Chatrooms :id="currentChatroomId" @join="joinChatroom" />
       </v-col>
       <v-col cols="6">
         <Chat
@@ -60,7 +57,7 @@ export default {
     leaveRoom(id) {
       this.chatStore.removeRoom(id);
       this.chatStore.switchToDefaultChatroom();
-    },
+    }
   }
 };
 </script>

@@ -1,12 +1,12 @@
 <template>
-	<v-container flex class="font">
-		<v-row justify="center">
-			<h1>{{ user.ladderPoints }}</h1>
-		</v-row>
-		<v-row justify="center">
-			<h3>Ladder Points</h3>
-		</v-row>
-	</v-container>
+  <v-container flex class="font">
+    <v-row justify="center">
+      <h1>{{ user.ladderPoints }}</h1>
+    </v-row>
+    <v-row justify="center">
+      <h3>Ladder Points</h3>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -22,8 +22,8 @@ export default {
   data() {
     return {
       user: {},
-			achievements: [],
-			test: []
+      achievements: [],
+      test: []
     };
   },
   computed: {
@@ -45,12 +45,12 @@ export default {
         this.$router.push('/logout');
       }
     }
-	}
+  }
 };
 </script>
 
 <style>
-.font{
-	font-family: 'Poppins', serif;
+.font {
+  font-family: 'Poppins', serif;
 }
 </style>

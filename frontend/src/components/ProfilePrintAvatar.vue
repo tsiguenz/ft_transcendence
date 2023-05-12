@@ -1,9 +1,15 @@
 <template>
-	<v-container flex>
-		<v-row justify="center">
-			<img :src="avatarPath" alt="avatar" class="rounded-pill" width="100" height="100" />
-		</v-row>
-	</v-container>
+  <v-container flex>
+    <v-row justify="center">
+      <img
+        :src="avatarPath"
+        alt="avatar"
+        class="rounded-pill"
+        width="100"
+        height="100"
+      />
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -18,8 +24,8 @@ export default {
   data() {
     return {
       avatarPath: ''
-		};
-	},
+    };
+  },
   computed: {
     ...mapStores(useSessionStore)
   },
@@ -39,6 +45,6 @@ export default {
         this.$router.push('/logout');
       }
     }
-	}
+  }
 };
 </script>

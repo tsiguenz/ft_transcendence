@@ -45,7 +45,10 @@ export default {
         const tokens = response.data;
         this.$cookie.setCookie('jwt', tokens.access_token);
         this.$cookie.setCookie('refresh_token', tokens.refresh_token);
-        this.sessionStore.signin(VueJwtDecode.decode(jwt).sub, response.data.nickname);
+        this.sessionStore.signin(
+          VueJwtDecode.decode(jwt).sub,
+          response.data.nickname
+        );
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {

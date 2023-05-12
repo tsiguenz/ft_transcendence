@@ -1,7 +1,8 @@
 <template>
-	<ProfilePrintAvatar />
-	<ProfileLadderPoints />
-	<ProfileAchievements />
+  <ProfilePrintAvatar />
+  <ProfileLadderPoints />
+  <ProfileAchievements />
+  <ProfileHistoryGames />
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
@@ -58,12 +59,14 @@ import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 import ProfileLadderPoints from '../components/ProfileLadderPoints.vue';
 import ProfileAchievements from '../components/ProfileAchievements.vue';
+import ProfileHistoryGames from '../components/ProfileHistoryGames.vue';
 
 export default {
   components: {
     ProfilePrintAvatar,
-		ProfileLadderPoints,
-		ProfileAchievements
+    ProfileLadderPoints,
+    ProfileAchievements,
+    ProfileHistoryGames
   },
   data() {
     return {
@@ -108,14 +111,11 @@ export default {
     async editProfile() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.put(
-          constants.API_URL + '/profile',
-          {
-            nickname: this.newNickname,
-            twoFactorEnable: this.newTwoFactorEnable,
-            twoFactorCode: this.twoFactorCode
-          }
-        );
+        const response = await axios.put(constants.API_URL + '/profile', {
+          nickname: this.newNickname,
+          twoFactorEnable: this.newTwoFactorEnable,
+          twoFactorCode: this.twoFactorCode
+        });
         this.sessionStore.nickname = this.newNickname;
         if (this.newAvatar) await this.uploadAvatar(jwt);
         swal({
@@ -147,7 +147,8 @@ export default {
     async generate2faQrcode() {
       try {
         const response = await axios.get(
-          constants.API_URL + '/2fa/generate-qrcode');
+          constants.API_URL + '/2fa/generate-qrcode'
+        );
         this.qrcode = response.data.qrcode;
       } catch (error) {
         swal({

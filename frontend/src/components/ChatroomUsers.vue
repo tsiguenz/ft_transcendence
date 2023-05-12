@@ -2,15 +2,15 @@
   <v-list>
     <v-btn block>Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
-    <v-list-group
-      v-for="user in users"
-      :key="user.id"
-    >
+    <v-list-group v-for="user in users" :key="user.id">
       <template v-slot:activator="{ props }">
         <v-list-item
           v-bind="props"
           :prepend-icon="userRoleIcon[user.role]"
-          :class="{ 'blue-border': isCurrentUser(user.id), 'online': isOnline(user.id) }"
+          :class="{
+            'blue-border': isCurrentUser(user.id),
+            online: isOnline(user.id)
+          }"
           :title="user.nickname"
         ></v-list-item>
       </template>
@@ -41,11 +41,11 @@ export default {
     return {
       users: [],
       userRoleIcon: {
-        'OWNER': 'mdi-crown-circle',
-        'ADMIN': 'mdi-alpha-a-circle',
-        'USER': 'mdi-account-circle'
-      } 
-    }
+        OWNER: 'mdi-crown-circle',
+        ADMIN: 'mdi-alpha-a-circle',
+        USER: 'mdi-account-circle'
+      }
+    };
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore, useConnectedUsersStore),
@@ -53,7 +53,9 @@ export default {
       return this.sessionStore.userId;
     },
     currentUserIsAdmin() {
-      const currentUser = this.users.find((user) => user.id == this.currentUserId);
+      const currentUser = this.users.find(
+        (user) => user.id == this.currentUserId
+      );
 
       return currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
     }
@@ -68,7 +70,7 @@ export default {
         this.getChatroomUsers(this.id).then((users) => {
           this.users = users;
         });
-      },
+      }
     }
   },
   mounted() {
@@ -86,7 +88,9 @@ export default {
   methods: {
     async getChatroomUsers(chatroomId) {
       try {
-        const response = await axios.get(constants.API_URL + '/chatrooms/' + chatroomId + '/users');
+        const response = await axios.get(
+          constants.API_URL + '/chatrooms/' + chatroomId + '/users'
+        );
         return response.data;
       } catch (error) {
         swal({
@@ -101,17 +105,17 @@ export default {
     isOnline(id) {
       return this.connectedUsersStore.isConnected(id);
     }
-  },
-}
+  }
+};
 </script>
 
 <style scoped>
-  .blue-border {
-    border-color: blue;
-    border-width: 5px;
-  }
+.blue-border {
+  border-color: blue;
+  border-width: 5px;
+}
 
-  .online {
-    color: lightgreen;
-  }
+.online {
+  color: lightgreen;
+}
 </style>

@@ -7,13 +7,13 @@ export const useChatStore = defineStore('chat', {
       messages: {},
       users: {},
       chatrooms: [],
-      activeChatroom: undefined,
+      activeChatroom: undefined
     };
   },
   getters: {
     currentChatroom(): any {
       if (this.activeChatroom === undefined) {
-        return ;
+        return;
       }
       return this.chatrooms.find((room) => room.id === this.activeChatroom);
     },
@@ -23,15 +23,14 @@ export const useChatStore = defineStore('chat', {
         return this.messages[this.activeChatroom];
       }
       return [];
-    },
-
+    }
   },
   actions: {
     addRoom(...rooms) {
       this.chatrooms.push(...rooms);
     },
     removeRoom(roomId) {
-      this.chatrooms = this.chatrooms.filter((room) => (room.id !== roomId));
+      this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
     },
     // joinChatroom(chatroomId: number) {},
