@@ -32,13 +32,17 @@ function create_env_file() {
   touch ${ENV_FILE}
 }
 
+function set_env_var() {
+  echo "\"$1=$2\"" >> ${ENV_FILE}
+}
+
 function set_hostname() {
   local HOST_IP_VAR="HOST_IP"
   echo_colored "${CYAN}" "Setting ${HOST_IP_VAR}..."
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo "${HOST_IP_VAR}=$(hostname -I | awk '{print $1}')" >> ${ENV_FILE}
+    set_env_var "${HOST_IP_VAR}" "$(hostname -I | awk '{print $1}')"
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "${HOST_IP_VAR}=$(ipconfig getifaddr en0)" >> ${ENV_FILE}
+    set_env_var "${HOST_IP_VAR}" "$(ipconfig getifaddr en0)"
   else
     echo_colored "${CYAN}" "Unsupported OS, please set HOST_IP manually"
     ask_to_set_env_var "${HOST_IP_VAR}"
@@ -48,13 +52,13 @@ function set_hostname() {
 function ask_to_set_env_var() {
   echo_colored "${CYAN}" "Enter value for $1:"
   read -r VALUE
-  echo "$1=$VALUE" >> ${ENV_FILE}
+  set_env_var "$1" "$VALUE"
 }
 
 function generate_random_env_var() {
   echo_colored "${CYAN}" "Generating random value for $1..."
   VALUE=$(openssl rand -base64 32)
-  echo "$1=$VALUE" >> ${ENV_FILE}
+  set_env_var "$1" "$VALUE"
 }
 
 create_env_file
