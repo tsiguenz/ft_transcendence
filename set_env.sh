@@ -5,8 +5,29 @@ set -eu
 
 LIGHT_RED='\033[1;31m'
 CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+LIGHT_GREEN='\033[1;32m'
 DEFAULT='\033[0m'
+
 ENV_FILE=.env
+
+function print_pong_ascii_art() {
+  echo_colored "${LIGHT_GREEN}" "\nYou are ready to play pong like a pro!\n"
+  echo_colored "${LIGHT_GREEN}" "          O ."
+  echo_colored "${LIGHT_GREEN}" "        _/|\_-O"
+  echo_colored "${LIGHT_GREEN}" "       ___|_______"
+  echo_colored "${LIGHT_GREEN}" "      /     |     \\ "
+  echo_colored "${LIGHT_GREEN}" "     /      |      \\ "
+  echo_colored "${LIGHT_GREEN}" "    #################"
+  echo_colored "${LIGHT_GREEN}" "   /   _ ( )|        \\ "
+  echo_colored "${LIGHT_GREEN}" "  /   ( ) | |         \\ "
+  echo_colored "${LIGHT_GREEN}" " /  \  |_/  |          \\ "
+  echo_colored "${LIGHT_GREEN}" "/____\/|____|___________\\ "
+  echo_colored "${LIGHT_GREEN}" "   |   |             |"
+  echo_colored "${LIGHT_GREEN}" "   |  / \            |"
+  echo_colored "${LIGHT_GREEN}" "   | /   \           |"
+  echo_colored "${LIGHT_GREEN}" "   _/    /_"
+}
 
 function echo_colored() {
   echo "${1}${2}${DEFAULT}"
@@ -98,3 +119,4 @@ generate_random_env_var "POSTGRES_PASSWORD"
 generate_random_env_var "DB_PASSWORD"
 generate_random_env_var "JWT_ACCESS_SECRET"
 generate_random_env_var "JWT_REFRESH_SECRET"
+print_pong_ascii_art
