@@ -22,10 +22,10 @@ function create_env_file() {
     echo_colored "${CYAN}" "File ${ENV_FILE} exists, do you want to overwrite it? (y/n)"
     read -r OVERWRITE
     if [ "$OVERWRITE" = "y" ]; then
-      echo_colored "${CYAN}" "Overwriting ${ENV_FILE}..."
+      echo_colored "${CYAN}" "Overwriting ${ENV_FILE}...\n"
       rm -f ${ENV_FILE}
     else
-      echo_colored "${CYAN}" "Not overwriting ${ENV_FILE}..."
+      echo_colored "${CYAN}" "Not overwriting ${ENV_FILE}"
       exit 0
     fi
   fi
@@ -33,7 +33,7 @@ function create_env_file() {
 }
 
 function set_env_var() {
-  echo "\"$1=$2\"" >> ${ENV_FILE}
+  echo "$1=\"$2\"" >> ${ENV_FILE}
 }
 
 function set_hostname() {
@@ -61,17 +61,40 @@ function generate_random_env_var() {
   set_env_var "$1" "$VALUE"
 }
 
+function set_app42_env_vars() {
+  local APP_KEYS_DIR=~/.42keys
+  local APP_UID_FILE_NAME=transcendence_uid.txt
+  local APP_SECRET_FILE_NAME=transcendence_secret.txt
+  if [ ! -f ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} ] || [ ! -f ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} ]; then
+    echo_colored "${CYAN}" "Directory ~/.42keys does not exist. Creating it..."
+    mkdir -p ${APP_KEYS_DIR}
+    touch ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
+    touch ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
+    echo_colored "${CYAN}" "Please enter your App42 credentials:"
+    echo_colored "${CYAN}" "App42 UID:"
+    read -r APP42_ID
+    echo "$APP42_ID" > ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
+    echo_colored "${CYAN}" "App42 SECRET:"
+    read -r APP42_KEY
+    echo "$APP42_KEY" > ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
+  fi
+  echo_colored "${CYAN}" "Setting App42 environment variables from ~/.keys42..."
+  local APP_ID=$(cat ${APP_KEYS_DIR}/$APP_UID_FILE_NAME)
+  local APP_KEY=$(cat ${APP_KEYS_DIR}/$APP_SECRET_FILE_NAME)
+  set_env_var "APP42_ID" "${APP_ID}"
+  set_env_var "APP42_KEY" "${APP_KEY}"
+}
+
 create_env_file
 set_hostname
 ask_to_set_env_var "POSTGRES_USER"
-generate_random_env_var "POSTGRES_PASSWORD"
 ask_to_set_env_var "POSTGRES_DB"
 ask_to_set_env_var "DB_NAME"
 ask_to_set_env_var "DB_USER"
-generate_random_env_var "DB_PASSWORD"
 ask_to_set_env_var "TEST_DB_NAME"
+ask_to_set_env_var "APP_NAME"
+set_app42_env_vars
+generate_random_env_var "POSTGRES_PASSWORD"
+generate_random_env_var "DB_PASSWORD"
 generate_random_env_var "JWT_ACCESS_SECRET"
 generate_random_env_var "JWT_REFRESH_SECRET"
-ask_to_set_env_var "APP42_ID"
-ask_to_set_env_var "APP42_KEY"
-ask_to_set_env_var "APP_NAME"
