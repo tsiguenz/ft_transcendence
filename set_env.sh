@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# exit on error and unset variables
 set -eu
 
 LIGHT_RED='\033[1;31m'
@@ -26,14 +25,13 @@ function print_pong_ascii_art() {
   echo_colored "${LIGHT_GREEN}" "   |   |             |"
   echo_colored "${LIGHT_GREEN}" "   |  / \            |"
   echo_colored "${LIGHT_GREEN}" "   | /   \           |"
-  echo_colored "${LIGHT_GREEN}" "   _/    /_"
+  echo_colored "${LIGHT_GREEN}" "   _/    /_\n"
 }
 
 function echo_colored() {
   echo "${1}${2}${DEFAULT}"
 }
 
-# catch SIGINT and exit with error
 trap "{ echo_colored '${LIGHT_RED}' 'Terminated by SIGINT'; exit 1; }" SIGINT
 
 function create_env_file() {
@@ -78,7 +76,9 @@ function ask_to_set_env_var() {
 
 function generate_random_env_var() {
   echo_colored "${CYAN}" "Generating random value for $1..."
-  VALUE=$(openssl rand -base64 32)
+  local VALUE=$(openssl rand -base64 32)
+  # delete all slashes and backslashes to avoid escaping issues
+  VALUE=$(echo "$VALUE" | tr -d '\\/')
   set_env_var "$1" "$VALUE"
 }
 
@@ -106,17 +106,21 @@ function set_app42_env_vars() {
   set_env_var "APP42_KEY" "${APP_KEY}"
 }
 
-create_env_file
-set_hostname
-ask_to_set_env_var "POSTGRES_USER"
-ask_to_set_env_var "POSTGRES_DB"
-ask_to_set_env_var "DB_NAME"
-ask_to_set_env_var "DB_USER"
-ask_to_set_env_var "TEST_DB_NAME"
-ask_to_set_env_var "APP_NAME"
-set_app42_env_vars
-generate_random_env_var "POSTGRES_PASSWORD"
-generate_random_env_var "DB_PASSWORD"
-generate_random_env_var "JWT_ACCESS_SECRET"
-generate_random_env_var "JWT_REFRESH_SECRET"
-print_pong_ascii_art
+function set_env() {
+  create_env_file
+  set_hostname
+  ask_to_set_env_var "POSTGRES_USER"
+  ask_to_set_env_var "POSTGRES_DB"
+  ask_to_set_env_var "DB_NAME"
+  ask_to_set_env_var "DB_USER"
+  ask_to_set_env_var "TEST_DB_NAME"
+  ask_to_set_env_var "APP_NAME"
+  set_app42_env_vars
+  generate_random_env_var "POSTGRES_PASSWORD"
+  generate_random_env_var "DB_PASSWORD"
+  generate_random_env_var "JWT_ACCESS_SECRET"
+  generate_random_env_var "JWT_REFRESH_SECRET"
+  print_pong_ascii_art
+}
+
+set_env
