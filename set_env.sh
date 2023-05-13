@@ -32,8 +32,6 @@ function echo_colored() {
   echo "${1}${2}${DEFAULT}"
 }
 
-trap "{ echo_colored '${LIGHT_RED}' 'Terminated by SIGINT'; exit 1; }" SIGINT
-
 function create_env_file() {
   if [ ! -f .env ]; then
     echo_colored "${CYAN}" "File ${ENV_FILE} does not exist. Creating it..."
@@ -51,10 +49,6 @@ function create_env_file() {
   touch ${ENV_FILE}
 }
 
-function set_env_var() {
-  echo "$1=\"$2\"" >> ${ENV_FILE}
-}
-
 function set_hostname() {
   local HOST_IP_VAR="HOST_IP"
   echo_colored "${CYAN}" "Setting ${HOST_IP_VAR}..."
@@ -66,6 +60,10 @@ function set_hostname() {
     echo_colored "${CYAN}" "Unsupported OS, please set HOST_IP manually"
     ask_to_set_env_var "${HOST_IP_VAR}"
   fi
+}
+
+function set_env_var() {
+  echo "$1=\"$2\"" >> ${ENV_FILE}
 }
 
 function ask_to_set_env_var() {
@@ -87,28 +85,36 @@ function set_app42_env_vars() {
   local APP_UID_FILE_NAME=transcendence_uid.txt
   local APP_SECRET_FILE_NAME=transcendence_secret.txt
   if [ ! -f ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} ] || [ ! -f ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} ]; then
-    echo_colored "${CYAN}" "Directory ~/.42keys does not exist. Creating it..."
-    mkdir -p ${APP_KEYS_DIR}
-    touch ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
-    touch ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
-    echo_colored "${CYAN}" "Please enter your App42 credentials:"
-    echo_colored "${CYAN}" "App42 UID:"
-    read -r APP42_ID
-    echo "$APP42_ID" > ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
-    echo_colored "${CYAN}" "App42 SECRET:"
-    read -r APP42_KEY
-    echo "$APP42_KEY" > ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
+    echo_colored "${CYAN}" "File ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} or ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} does not exist."
+    echo_colored "${CYAN}" "Do you want to create them? (y/n)"
+    read -r SET_APP42_CREDS
+    if [ "${SET_APP42_CREDS}" = "y" ]; then
+      mkdir -p ${APP_KEYS_DIR}
+      echo_colored "${CYAN}" "Please enter your App42 credentials:"
+      echo_colored "${CYAN}" "App42 UID:"
+      read -r APP42_ID
+      echo "$APP42_ID" > ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
+      echo_colored "${CYAN}" "App42 SECRET:"
+      read -r APP42_KEY
+      echo "$APP42_KEY" > ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
+      set_env_var "APP42_ID" "${APP42_ID}"
+      set_env_var "APP42_KEY" "${APP42_KEY}"
+    else
+      echo_colored "${CYAN}" "Not creating directory ~/.42keys"
+      ask_to_set_env_var "APP42_ID"
+      ask_to_set_env_var "APP42_KEY"
+    fi
+  else
+    echo_colored "${CYAN}" "Setting App42 environment variables from ~/.keys42..."
+    local APP_ID=$(cat ${APP_KEYS_DIR}/$APP_UID_FILE_NAME)
+    local APP_KEY=$(cat ${APP_KEYS_DIR}/$APP_SECRET_FILE_NAME)
+    set_env_var "APP42_ID" "${APP_ID}"
+    set_env_var "APP42_KEY" "${APP_KEY}"
   fi
-  echo_colored "${CYAN}" "Setting App42 environment variables from ~/.keys42..."
-  local APP_ID=$(cat ${APP_KEYS_DIR}/$APP_UID_FILE_NAME)
-  local APP_KEY=$(cat ${APP_KEYS_DIR}/$APP_SECRET_FILE_NAME)
-  set_env_var "APP42_ID" "${APP_ID}"
-  set_env_var "APP42_KEY" "${APP_KEY}"
 }
 
 function set_env() {
   create_env_file
-  set_hostname
   ask_to_set_env_var "POSTGRES_USER"
   ask_to_set_env_var "POSTGRES_DB"
   ask_to_set_env_var "DB_NAME"
@@ -120,7 +126,9 @@ function set_env() {
   generate_random_env_var "DB_PASSWORD"
   generate_random_env_var "JWT_ACCESS_SECRET"
   generate_random_env_var "JWT_REFRESH_SECRET"
+  set_hostname
   print_pong_ascii_art
 }
 
 set_env
+exit 0
