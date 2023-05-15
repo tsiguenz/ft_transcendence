@@ -1,4 +1,17 @@
-<template></template>
+<template>
+  <v-form v-if="printForm">
+    <v-text-field
+      v-model="nickname"
+      class="mb-5"
+      label="Nickname"
+      variant="outlined"
+      autocomplete="username"
+      required
+      @keydown.enter.prevent="signin42"
+    ></v-text-field>
+    <v-btn @click="signin42">Create account</v-btn>
+  </v-form>
+</template>
 
 <script>
 import axios from 'axios';
@@ -14,7 +27,10 @@ export default {
   data() {
     return {
       authorizationCode: this.$route.query.code,
-      twoFactorCode: ''
+      twoFactorCode: '',
+      printForm: false,
+      nickname: '',
+      accessToken42: ''
     };
 		},
   computed: {
@@ -34,12 +50,23 @@ export default {
         this.$router.push('/home');
         return;
       }
+      if (this.nickname === '' && this.printForm === true) {
+        swal({ icon: 'error', text: 'Nickname is required' });
+        return;
+      }
       try {
         const response = await axios.post(constants.API_URL + '/auth/42', {
-          authorization: this.authorizationCode
+          authorization: this.authorizationCode,
+          nickname: this.nickname,
+          access_token42: this.accessToken42
         });
         if (response.data.message === 'Two factor code required') {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
+          return;
+        }
+        if (response.data.message == 'Nickname required') {
+          this.printForm = true;
+          this.accessToken42 = response.data.access_token42;
           return;
         }
         const tokens = response.data;
@@ -53,7 +80,6 @@ export default {
         this.$router.push('/home');
       } catch (error) {
         swal({ icon: 'error', text: formatError(error.response.data.message) });
-        this.$router.push('/home');
       }
     }
   }

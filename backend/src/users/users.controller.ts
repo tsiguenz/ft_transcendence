@@ -66,7 +66,7 @@ export class UsersController {
     description: 'Nickname of the user you are deleting'
   })
   @Delete(':nickname')
-  deleteUser(@Param('nickname') nickname: string, @User() user: object) {
+  deleteUser(@User() user: object) {
     return this.usersService.deleteUser(user);
   }
 
@@ -86,7 +86,6 @@ export class UsersController {
   })
   @Post(':nickname/friends/:friendNickname')
   addFriend(
-    @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
     @User() user: object
   ) {
@@ -97,7 +96,6 @@ export class UsersController {
   @ApiBearerAuth()
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
-    @Param('nickname') nickname: string,
     @Param('friendNickname') friendNickname: string,
     @User() user: object
   ) {
@@ -107,15 +105,15 @@ export class UsersController {
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/friends')
-  getFriends(@Param('nickname') nickname: string, @User() user: object) {
+  getFriends(@User() user: object) {
     return this.usersService.getFriends(user['id']);
   }
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/profile')
-  getProfile(@Param('nickname') nickname: string, @User() user: object) {
-    return this.usersService.getProfile(user['id']);
+  getProfile(@User() user: object) {
+    return user;
   }
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
@@ -134,11 +132,7 @@ export class UsersController {
     }
   })
   @Put(':nickname/profile')
-  editProfile(
-    @Param('nickname') nickname: string,
-    @Body() dto: EditProfileDto,
-    @User() user: object
-  ) {
+  editProfile(@Body() dto: EditProfileDto, @User() user: object) {
     return this.usersService.editProfile(user['id'], dto);
   }
 
@@ -173,7 +167,6 @@ export class UsersController {
   )
   @Post(':nickname/avatar')
   async uploadAvatar(
-    @Param('nickname') nickname: string,
     @User() user: object,
     @UploadedFile() file: Express.Multer.File
   ) {
@@ -183,10 +176,7 @@ export class UsersController {
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @Get(':nickname/chatrooms')
-  async findChatroomsForUser(
-    @Param('nickname') nickname: string,
-    @User() user: object
-  ) {
+  async findChatroomsForUser(@User() user: object) {
     return await this.chatroomService.findChatroomsForUser(user['id']);
   }
 
