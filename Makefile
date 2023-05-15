@@ -1,7 +1,9 @@
 all:
+	./check_env_file.sh
 	-docker compose up --build
 
 detach:
+	./check_env_file.sh
 	-docker compose up -d --build
 
 stop:
