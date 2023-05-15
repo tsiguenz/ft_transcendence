@@ -1,6 +1,6 @@
 <template>
 	<v-container flex>
-		<v-row>
+		<v-row align="center">
 			<v-col cols="3">
 				<v-sheet class="sheet pa-3">
   <div class="py-5"><ProfileLadderPoints /></div>
@@ -17,7 +17,14 @@
 				</v-sheet>
 			</v-col>
 			<v-col cols="3">
-				<v-sheet>
+				<v-sheet class="sheet pa-3">
+				<v-row class="justify-center mt-5"><h4 class="font">{{ user.lastConnection }}</h4></v-row>
+				<v-row class="justify-center mb-5"><p>Last connection</p></v-row>
+				<v-row class="justify-center"><h2 class="font">12</h2></v-row>
+				<v-row class="justify-center mb-5"><p class="font">Game won</p></v-row>
+				<v-row class="justify-center"><h2 class="font">23</h2></v-row>
+				<v-row class="justify-center mb-5"><p class="font">Game played</p></v-row>
+				
 				</v-sheet>
 			</v-col>
 		</v-row>
@@ -27,6 +34,8 @@
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>
   <p>Created at: {{ user.createdAt }}</p>
+	<p>Ladder points: {{ user.ladderPoints }}</p>
+	<p>Last connection: {{ user.lastConnection }}</p>
   <img :src="avatarPath" alt="avatar" width="100" height="100" />
   <p>Avatar path: {{ avatarPath }}</p>
   <br />
@@ -98,6 +107,7 @@ export default {
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
+			lastCo: '',
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -122,6 +132,8 @@ export default {
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
         this.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
+				this.lastCo = new Date();
+				console.log(this.user.lastConnection + " TEST " + this.lastCo);
       } catch (error) {
         swal({
           icon: 'error',
