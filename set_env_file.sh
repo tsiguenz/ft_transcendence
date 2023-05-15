@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 set -eu
 
@@ -38,7 +38,7 @@ function create_env_file() {
   else
     echo_colored "${CYAN}" "File ${ENV_FILE} exists, do you want to overwrite it? (y/n)"
     read -r OVERWRITE
-    if [ "$OVERWRITE" = "y" ]; then
+    if [ "${OVERWRITE}" = "y" ]; then
       echo_colored "${CYAN}" "Overwriting ${ENV_FILE}...\n"
       rm -f ${ENV_FILE}
     else
@@ -52,9 +52,9 @@ function create_env_file() {
 function set_hostname() {
   local HOST_IP_VAR="HOST_IP"
   echo_colored "${CYAN}" "Setting ${HOST_IP_VAR}..."
-  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
     set_env_var "${HOST_IP_VAR}" "$(hostname -I | awk '{print $1}')"
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
+  elif [[ "${OSTYPE}" == "darwin"* ]]; then
     set_env_var "${HOST_IP_VAR}" "$(ipconfig getifaddr en0)"
   else
     echo_colored "${CYAN}" "Unsupported OS, please set HOST_IP manually"
@@ -63,53 +63,55 @@ function set_hostname() {
 }
 
 function set_env_var() {
-  echo "$1=\"$2\"" >> ${ENV_FILE}
+  echo "${1}=\"${2}\"" >> ${ENV_FILE}
 }
 
 function ask_to_set_env_var() {
-  echo_colored "${CYAN}" "Enter value for $1:"
+  echo_colored "${CYAN}" "Enter value for ${1}:"
   read -r VALUE
-  set_env_var "$1" "$VALUE"
+  set_env_var "${1}" "${VALUE}"
 }
 
 function generate_random_env_var() {
-  echo_colored "${CYAN}" "Generating random value for $1..."
+  echo_colored "${CYAN}" "Generating random value for ${1}..."
   local VALUE=$(openssl rand -base64 32)
   # delete all slashes and backslashes to avoid escaping issues
-  VALUE=$(echo "$VALUE" | tr -d '\\/')
-  set_env_var "$1" "$VALUE"
+  VALUE=$(echo "${VALUE}" | tr -d '\\/')
+  set_env_var "${1}" "${VALUE}"
 }
 
 function set_app42_env_vars() {
   local APP_KEYS_DIR=~/.42keys
   local APP_UID_FILE_NAME=transcendence_uid.txt
   local APP_SECRET_FILE_NAME=transcendence_secret.txt
-  if [ ! -f ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} ] || [ ! -f ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} ]; then
-    echo_colored "${CYAN}" "File ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} or ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} does not exist."
-    echo_colored "${CYAN}" "Do you want to create them? (y/n)"
-    read -r SET_APP42_CREDS
-    if [ "${SET_APP42_CREDS}" = "y" ]; then
-      mkdir -p ${APP_KEYS_DIR}
-      echo_colored "${CYAN}" "Please enter your App42 credentials:"
-      echo_colored "${CYAN}" "App42 UID:"
-      read -r APP42_ID
-      echo "$APP42_ID" > ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
-      echo_colored "${CYAN}" "App42 SECRET:"
-      read -r APP42_KEY
-      echo "$APP42_KEY" > ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
-      set_env_var "APP42_ID" "${APP42_ID}"
-      set_env_var "APP42_KEY" "${APP42_KEY}"
+  if [ ! -f ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} ] || \
+     [ ! -f ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} ]; then
+      echo_colored "${CYAN}" "File ${APP_KEYS_DIR}/${APP_UID_FILE_NAME} \
+        or ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME} does not exist."
+      echo_colored "${CYAN}" "Do you want to create them? (y/n)"
+      read -r SET_APP42_CREDS
+      if [ "${SET_APP42_CREDS}" = "y" ]; then
+        mkdir -p ${APP_KEYS_DIR}
+        echo_colored "${CYAN}" "Please enter your App42 credentials:"
+        echo_colored "${CYAN}" "App42 UID:"
+        read -r APP42_ID
+        echo "${APP42_ID}" > ${APP_KEYS_DIR}/${APP_UID_FILE_NAME}
+        echo_colored "${CYAN}" "App42 SECRET:"
+        read -r APP42_KEY
+        echo "${APP42_KEY}" > ${APP_KEYS_DIR}/${APP_SECRET_FILE_NAME}
+        set_env_var "APP42_ID" "${APP42_ID}"
+        set_env_var "APP42_KEY" "${APP42_KEY}"
+      else
+        echo_colored "${CYAN}" "Not creating directory ~/.42keys"
+        ask_to_set_env_var "APP42_ID"
+        ask_to_set_env_var "APP42_KEY"
+      fi
     else
-      echo_colored "${CYAN}" "Not creating directory ~/.42keys"
-      ask_to_set_env_var "APP42_ID"
-      ask_to_set_env_var "APP42_KEY"
-    fi
-  else
-    echo_colored "${CYAN}" "Setting App42 environment variables from ~/.keys42..."
-    local APP_ID=$(cat ${APP_KEYS_DIR}/$APP_UID_FILE_NAME)
-    local APP_KEY=$(cat ${APP_KEYS_DIR}/$APP_SECRET_FILE_NAME)
-    set_env_var "APP42_ID" "${APP_ID}"
-    set_env_var "APP42_KEY" "${APP_KEY}"
+      echo_colored "${CYAN}" "Setting App42 environment variables from ~/.keys42..."
+      local APP_ID=$(cat ${APP_KEYS_DIR}/$APP_UID_FILE_NAME)
+      local APP_KEY=$(cat ${APP_KEYS_DIR}/$APP_SECRET_FILE_NAME)
+      set_env_var "APP42_ID" "${APP_ID}"
+      set_env_var "APP42_KEY" "${APP_KEY}"
   fi
 }
 
