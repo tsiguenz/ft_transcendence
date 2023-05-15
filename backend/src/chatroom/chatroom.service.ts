@@ -55,17 +55,19 @@ export class ChatroomService {
     });
   }
 
-  async update(id: string, updateChatroomDto: UpdateChatroomDto) {
-    let roomType = RoomType.PROTECTED;
+  async update(id: string, dto: UpdateChatroomDto) {
+    let roomType: RoomType = RoomType.PUBLIC;
+    let hash = null;
 
-    if (updateChatroomDto.password === '') {
-      roomType = RoomType.PUBLIC
+    if (dto.password !== '') {
+      roomType = RoomType.PROTECTED;
+      hash = await argon.hash(dto.password);
     }
 
     return await this.prisma.chatRoom.update({
       where: { id: id },
       data: {
-        password: updateChatroomDto.password,
+        hash: hash,
         type: roomType
       }
     });
