@@ -10,8 +10,6 @@ import * as argon from 'argon2';
 
 @Injectable()
 export class ChatroomService {
-  private static DEFAULT_CHATROOM = 'general';
-
   constructor(private prisma: PrismaService) {}
   async create(userId: string, dto: CreateChatroomDto) {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
@@ -75,32 +73,6 @@ export class ChatroomService {
 
   remove(id: string) {
     return `This action removes a #${id} chatroom`;
-  }
-
-  async findChatroomUsers(chatroomId: string) {
-    return await this.prisma.user.findMany({
-      where: {
-        chatrooms: {
-          some: {
-            chatRoom: { id: chatroomId }
-          }
-        }
-      },
-      select: {
-        id: true,
-        nickname: true,
-        chatrooms: {
-          select: {
-            role: true,
-            chatRoom: false,
-            userId: false
-          },
-          where: {
-            chatRoomId: chatroomId
-          }
-        }
-      }
-    });
   }
 
   async join(

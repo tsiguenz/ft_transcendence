@@ -11,6 +11,7 @@ import { TwoFaModule } from './2fa/2fa.module';
 import { UsersService } from './users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ChatroomUserModule } from './chatroom_user/chatroom_user.module';
 
 // TODO: remember when we said global is bad? Well, it's bad here too.
 @Module({
@@ -22,12 +23,12 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     UsersModule,
     TwoFaModule,
     StatusModule,
+    ChatroomUserModule,
     ServeStaticModule.forRoot({
       rootPath: '/app/public',
       serveRoot: '/'
     })
   ],
-  controllers: [],
   providers: [ChatGateway, ChatService, TwoFaService, UsersService, JwtService]
 })
 export class AppModule {}

@@ -80,30 +80,7 @@ export class ChatroomController {
   findOne(@Param('id') id: string) {
     return this.chatroomService.findOne(id);
   }
-
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-    description: 'Chatroom id'
-  })
-  @Get(':id/users')
-  async findChatroomUsers(@User() user: object, @Param('id') id: string) {
-    const currentUserId = user['id'];
-    const users = await this.chatroomService.findChatroomUsers(id);
-    if (!users.find((u) => u.id == currentUserId)) {
-      throw new ForbiddenException('Unauthorized to list users');
-    }
-    const formattedUsers = users.map((user) => ({
-      id: user.id,
-      nickname: user.nickname,
-      role: user.chatrooms[0].role
-    }));
-    return formattedUsers;
-  }
-
+  
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiParam({
