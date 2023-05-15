@@ -89,7 +89,7 @@ export class ChatroomUserController {
   @Post(':id/demote')
   async demote(@User() user: object, @Param('chatroomId') chatroomId: string, @Param('id') userId: string) {
     if (!(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) || !(await this.chatroomUserService.isUserAdmin(userId, chatroomId))) {
-      throw new ForbiddenException("Unauthorized to promote user");
+      throw new ForbiddenException("Unauthorized to demote user");
     }
     return await this.chatroomUserService.setUserRole(userId, chatroomId, Role.USER);
   }

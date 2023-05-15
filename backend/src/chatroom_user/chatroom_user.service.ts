@@ -37,6 +37,32 @@ export class ChatroomUserService {
     });
   }
 
+  async findOne(
+    userId: string,
+    chatroomId: string
+  ): Promise<ChatRoomUser> {
+    return await this.prisma.chatRoomUser.findFirst({
+      where: {
+        chatRoomId: chatroomId,
+        userId: userId
+      }
+    });
+  }
+
+  async create(
+    userId: string,
+    chatroomId: string,
+    role: Role = Role.USER
+  ): Promise<ChatRoomUser> {
+    return await this.prisma.chatRoomUser.create({
+      data: {
+        userId: userId,
+        chatRoomId: chatroomId,
+        role: role
+      }
+    });
+  }
+
   async setUserRole(userId: string, chatroomId: string, role: Role) {
     return await this.prisma.chatRoomUser.update({
       where: {
@@ -52,11 +78,11 @@ export class ChatroomUserService {
   }
 
   async isUserInChatroom(userId: string, chatroomId: string) {
-    return !!(await this.findUserInChatroom(userId, chatroomId));
+    return !!(await this.findOne(userId, chatroomId));
   }
 
   async userHasRole(userId: string, chatroomId: string, role: Role) {
-    const user = await this.findUserInChatroom(userId, chatroomId);
+    const user = await this.findOne(userId, chatroomId);
 
     if (!user || user.role !== role) {
       return false;
@@ -72,15 +98,4 @@ export class ChatroomUserService {
     return await this.userHasRole(userId, chatroomId, Role.ADMIN);
   } 
 
-  async findUserInChatroom(
-    userId: string,
-    chatroomId: string
-  ): Promise<ChatRoomUser> {
-    return await this.prisma.chatRoomUser.findFirst({
-      where: {
-        chatRoomId: chatroomId,
-        userId: userId
-      }
-    });
-  }
 }

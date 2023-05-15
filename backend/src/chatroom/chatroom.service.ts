@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+
 import { ChatRoom, ChatRoomUser, Role, RoomType } from '@prisma/client';
 import * as argon from 'argon2';
 
 @Injectable()
 export class ChatroomService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private chatroomUser: ChatroomUserService) {}
   async create(userId: string, dto: CreateChatroomDto) {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
@@ -90,18 +92,18 @@ export class ChatroomService {
       throw new ForbiddenException('Invalid password');
     }
     // Check if user is able to join chatroom
-    const chatroomUser = await this.findUserInChatroom(userId, chatroomId);
+    const chatroomUser = await this.chatroomUser.findOne(userId, chatroomId);
     if (chatroomUser) {
       throw new ForbiddenException('User already in room');
     }
     // Check if user is banned from channel
-    return await this.addUserToChatroom(userId, chatroomId);
+    return await this.chatroomUser.create(userId, chatroomId);
   }
 
   async leave(userId: string, chatroomId: string) {
     const chatroom = await this.findOneException(chatroomId);
 
-    const chatroomUser = await this.findUserInChatroom(userId, chatroomId);
+    const chatroomUser = await this.chatroomUser.findOne(userId, chatroomId);
     if (!chatroomUser) {
       throw new ForbiddenException('User not in room');
     }
@@ -170,28 +172,16 @@ export class ChatroomService {
   }
 
   async isUserInChatroom(userId: string, chatroomId: string) {
-    return !!(await this.findUserInChatroom(userId, chatroomId));
+    return !!(await this.chatroomUser.findOne(userId, chatroomId));
   }
 
   async isUserChatroomOwner(userId: string, chatroomId: string) {
-    const user = await this.findUserInChatroom(userId, chatroomId);
+    const user = await this.chatroomUser.findOne(userId, chatroomId);
 
     if (!user || user.role !== Role.OWNER) {
       return false;
     }
     return true;
-  }
-
-  async findUserInChatroom(
-    userId: string,
-    chatroomId: string
-  ): Promise<ChatRoomUser> {
-    return await this.prisma.chatRoomUser.findFirst({
-      where: {
-        chatRoomId: chatroomId,
-        userId: userId
-      }
-    });
   }
 
   private async addUserToChatroom(
