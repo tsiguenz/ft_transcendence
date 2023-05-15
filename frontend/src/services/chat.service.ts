@@ -5,7 +5,9 @@ import { CHAT_SOCKET_URL } from '@/constants';
 
 class ChatService {
   constructor(
-    private socketService: SocketioService = new SocketioService(CHAT_SOCKET_URL),
+    private socketService: SocketioService = new SocketioService(
+      CHAT_SOCKET_URL
+    ),
     private chatStore: useChatStore = useChatStore()
   ) {}
 

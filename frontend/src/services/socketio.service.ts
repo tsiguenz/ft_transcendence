@@ -28,7 +28,7 @@ class SocketioService {
 
   subscribe(event: string, callback: Function) {
     if (!this.socket) return;
-    this.socket.on(event, message => {
+    this.socket.on(event, (message) => {
       return callback(message);
     });
   }

@@ -34,7 +34,7 @@ export class ChatGateway
   @SubscribeMessage(events.MESSAGE_TO_SERVER)
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: string, message: string }
+    @MessageBody() payload: { chatroomId: string; message: string }
   ) {
     try {
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
@@ -70,7 +70,14 @@ export class ChatGateway
       return;
     }
 
-    if (!(await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id))) { return ; }
+    if (
+      !(await this.chatroom.isUserInChatroom(
+        client['decoded'].sub,
+        chatroom.id
+      ))
+    ) {
+      return;
+    }
 
     try {
       client.join(chatroom.slug);
@@ -101,7 +108,7 @@ export class ChatGateway
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatroomId: string, newerThan: Date }
+    @MessageBody() payload: { chatroomId: string; newerThan: Date }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
@@ -109,7 +116,14 @@ export class ChatGateway
       return;
     }
 
-    if (!(await this.chatroom.isUserInChatroom(client['decoded'].sub, chatroom.id))) { return ; }
+    if (
+      !(await this.chatroom.isUserInChatroom(
+        client['decoded'].sub,
+        chatroom.id
+      ))
+    ) {
+      return;
+    }
     const messages = await this.chat.getMessages(
       chatroom.id,
       payload.newerThan

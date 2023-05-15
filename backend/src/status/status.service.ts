@@ -45,4 +45,23 @@ export class StatusService {
     if (!payload) return undefined;
     return payload.sub;
   }
+
+  async setLastConnection(socket: Socket) {
+    const userId = await this.getUserIdFromSocket(socket);
+    if (!userId) return;
+    await this.prisma.user
+      .update({
+        where: {
+          id: userId
+        },
+        data: {
+          lastConnection: new Date()
+        }
+      })
+      .catch(() => {
+        // occur when the user have a good token but is not in the database
+        // in case of restart the containers but jwt is still valid
+        return socket.disconnect();
+      });
+  }
 }

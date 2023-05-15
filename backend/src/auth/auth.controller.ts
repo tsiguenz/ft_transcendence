@@ -4,14 +4,14 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Req,
   UseGuards
 } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { AccessTokenGuard, RefreshTokenGuard } from '../auth/guard';
-import { Request } from 'express';
+import { User } from '../decorator/user.decorator';
+import { Signin42Dto } from './dto/signin42.dto';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -62,8 +62,8 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Post('logout')
-  logout(@Req() req: Request) {
-    return this.authService.logout(req.user['id']);
+  logout(@User() user: object) {
+    return this.authService.logout(user['id']);
   }
 
   @ApiConsumes('application/x-www-form-urlencoded')
@@ -71,25 +71,32 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        code: {
+        authorization: {
           type: 'string',
           description:
             'Authorization code returned by the 42 API after the user has logged in'
+        },
+        access_token42: {
+          type: 'string',
+          description:
+            'Access token returned by the 42 API after the user has logged in'
+        },
+        nickname: {
+          type: 'string',
+          description: 'Nickname of the user'
         }
       }
     }
   })
   @Post('42')
-  async signin42(@Body('authorization') authorizationCode: string) {
-    return await this.authService.signin42(authorizationCode);
+  async signin42(@Body() dto: Signin42Dto) {
+    return await this.authService.signin42(dto);
   }
 
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth()
   @Post('refresh')
-  refreshTokens(@Req() req: Request) {
-    const userId = req.user['id'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  refreshTokens(@User() user: object) {
+    return this.authService.refreshTokens(user['id'], user['refreshToken']);
   }
 }

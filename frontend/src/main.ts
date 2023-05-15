@@ -3,7 +3,7 @@ import { createVuetify } from 'vuetify';
 import App from './App.vue';
 import router from './router';
 import 'vuetify/dist/vuetify.min.css';
-import '@mdi/font/css/materialdesignicons.css'
+import '@mdi/font/css/materialdesignicons.css';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
@@ -30,7 +30,6 @@ const vuetify = createVuetify({
   }
 });
 
-
 pinia.use(piniaPluginPersistedstate);
 app.use(VueCookieNext);
 VueCookieNext.config({ expire: '7d' });
@@ -39,15 +38,16 @@ app.use(pinia);
 app.use(router);
 app.mount('#app');
 
-axios.interceptors.request.use(config => {
-  const jwt = VueCookieNext.getCookie('jwt');
-  if (jwt) {
-      config.headers.Authorization = `Bearer ${jwt}`
+axios.interceptors.request.use(
+  (config) => {
+    const jwt = VueCookieNext.getCookie('jwt');
+    if (jwt) {
+      config.headers.Authorization = `Bearer ${jwt}`;
     }
-    return config
+    return config;
   },
-  error => {
-    return Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
   }
 );
 
@@ -59,9 +59,9 @@ axios.interceptors.response.use(
     const isUnauthorized = error.response.status === 401;
     const isRefreshUrl =
       error.config.url === constants.API_URL + '/auth/refresh';
-    if (!isUnauthorized || isRefreshUrl)
-      return Promise.reject(error);
+    if (!isUnauthorized || isRefreshUrl) return Promise.reject(error);
     const jwt = VueCookieNext.getCookie('jwt');
+    if (!jwt) return Promise.reject(error);
     const expirationTimestamp = VueJwtDecode.decode(jwt).exp;
     const now = Math.floor(Date.now() / 1000);
     if (now < expirationTimestamp) return Promise.reject(error);

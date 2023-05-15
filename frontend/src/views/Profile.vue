@@ -81,7 +81,9 @@ export default {
   methods: {
     async getProfile() {
       try {
-        const response = await axios.get(constants.API_URL + '/profile');
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`
+        );
         this.user = response.data;
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
@@ -98,7 +100,7 @@ export default {
       try {
         const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.put(
-          constants.API_URL + '/profile',
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
           {
             nickname: this.newNickname,
             twoFactorEnable: this.newTwoFactorEnable,
@@ -136,7 +138,8 @@ export default {
     async generate2faQrcode() {
       try {
         const response = await axios.get(
-          constants.API_URL + '/2fa/generate-qrcode');
+          constants.API_URL + '/2fa/generate-qrcode'
+        );
         this.qrcode = response.data.qrcode;
       } catch (error) {
         swal({
@@ -192,12 +195,16 @@ export default {
     async uploadAvatar(jwt) {
       const formData = new FormData();
       formData.append('file', this.newAvatar);
-      await axios.post(constants.API_URL + '/profile/avatar', formData, {
-        headers: {
-          Authorization: 'Bearer ' + jwt,
-          'Content-Type': 'multipart/form-data'
+      await axios.post(
+        constants.API_URL + `/users/${this.sessionStore.nickname}/avatar`,
+        formData,
+        {
+          headers: {
+            Authorization: 'Bearer ' + jwt,
+            'Content-Type': 'multipart/form-data'
+          }
         }
-      });
+      );
     }
   }
 };
