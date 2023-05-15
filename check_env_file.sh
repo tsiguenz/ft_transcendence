@@ -20,12 +20,12 @@ function check_42_creds() {
 
   local APP42_UID=$(grep APP42_ID ${ENV_FILE} | cut -d '"' -f2)
   local APP42_SECRET=$(grep APP42_KEY ${ENV_FILE} | cut -d '"' -f2)
-  local APP42_REDIRECT_URI=http://localhost:8080/42/callback
+  local APP42_REDIRECT_URI=http://localhost:3000/42/healthcheck
 
   echo_colored ${CYAN} "Getting credentials..."
   echo_colored ${CYAN} "Redirecting to 42's authorization page..."
-  open "${AUTHORIZE_URL}?client_id=${APP42_UID}&redirect_uri=http://localhost:8080/42/callback&response_type=code" > /dev/null 2>&1
-  echo_colored ${CYAN} "Please enter the authorization code:"
+  open "${AUTHORIZE_URL}?client_id=${APP42_UID}&redirect_uri=${APP42_REDIRECT_URI}&response_type=code" > /dev/null 2>&1
+  echo_colored ${CYAN} "Please enter the authorization code: (You can find it in the URL)"
   read AUTHORIZATION_CODE
   echo_colored ${CYAN} "Getting access token..."
   local ACCESS_TOKEN=$(curl -F grant_type=authorization_code \
@@ -33,7 +33,7 @@ function check_42_creds() {
     -F client_secret=${APP42_SECRET} \
     -F code=${AUTHORIZATION_CODE} \
     -F redirect_uri=${APP42_REDIRECT_URI} \
-    -X POST https://api.intra.42.fr/oauth/token \
+    -X POST ${TOKEN_URL} \
     2> /dev/null \
     | cut -d '"' -f4)
   echo_colored ${CYAN} "Testing access token..."
