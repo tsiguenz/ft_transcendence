@@ -10,6 +10,12 @@
 ALTER TABLE "friends" DROP CONSTRAINT "friends_userId_fkey";
 
 -- DropForeignKey
+ALTER TABLE "chatrooms_users" DROP CONSTRAINT "chatrooms_users_userId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "chatrooms_users" DROP CONSTRAINT "chatrooms_users_chatRoomId_fkey";
+
+-- DropForeignKey
 ALTER TABLE "games" DROP CONSTRAINT "games_looserId_fkey";
 
 -- DropForeignKey
@@ -19,7 +25,16 @@ ALTER TABLE "games" DROP CONSTRAINT "games_winnerId_fkey";
 ALTER TABLE "messages" DROP CONSTRAINT "messages_authorId_fkey";
 
 -- DropForeignKey
+ALTER TABLE "messages" DROP CONSTRAINT "messages_chatRoomId_fkey";
+
+-- DropForeignKey
 ALTER TABLE "two_factor_ids" DROP CONSTRAINT "two_factor_ids_userId_fkey";
+
+-- AlterTable
+ALTER TABLE "chatrooms_users" DROP CONSTRAINT "chatrooms_users_pkey",
+ALTER COLUMN "userId" SET DATA TYPE TEXT,
+ALTER COLUMN "chatRoomId" SET DATA TYPE TEXT,
+ADD CONSTRAINT "chatrooms_users_pkey" PRIMARY KEY ("userId", "chatRoomId");
 
 -- AlterTable
 ALTER TABLE "friends" DROP CONSTRAINT "friends_pkey",
@@ -37,7 +52,20 @@ ADD CONSTRAINT "games_pkey" PRIMARY KEY ("id");
 DROP SEQUENCE "games_id_seq";
 
 -- AlterTable
-ALTER TABLE "messages" ALTER COLUMN "authorId" SET DATA TYPE TEXT;
+ALTER TABLE "messages" DROP CONSTRAINT "messages_pkey",
+ALTER COLUMN "id" DROP DEFAULT,
+ALTER COLUMN "id" SET DATA TYPE TEXT,
+ALTER COLUMN "authorId" SET DATA TYPE TEXT,
+ALTER COLUMN "chatRoomId" SET DATA TYPE TEXT,
+ADD CONSTRAINT "messages_pkey" PRIMARY KEY ("id");
+DROP SEQUENCE "messages_id_seq";
+
+-- AlterTable
+ALTER TABLE "chatrooms" DROP CONSTRAINT "chatrooms_pkey",
+ALTER COLUMN "id" DROP DEFAULT,
+ALTER COLUMN "id" SET DATA TYPE TEXT,
+ADD CONSTRAINT "chatrooms_pkey" PRIMARY KEY ("id");
+DROP SEQUENCE "chatrooms_id_seq";
 
 -- AlterTable
 ALTER TABLE "two_factor_ids" ALTER COLUMN "userId" SET DATA TYPE TEXT;
@@ -63,3 +91,9 @@ ALTER TABLE "messages" ADD CONSTRAINT "messages_authorId_fkey" FOREIGN KEY ("aut
 
 -- AddForeignKey
 ALTER TABLE "friends" ADD CONSTRAINT "friends_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chatrooms_users" ADD CONSTRAINT "chatrooms_users_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chatrooms_users" ADD CONSTRAINT "chatrooms_users_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "chatrooms"("id") ON DELETE CASCADE ON UPDATE CASCADE;

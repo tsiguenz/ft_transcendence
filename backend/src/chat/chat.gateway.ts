@@ -4,13 +4,18 @@ import {
   OnGatewayInit,
   WebSocketServer,
   OnGatewayConnection,
-  OnGatewayDisconnect
+  OnGatewayDisconnect,
+  MessageBody,
+  ConnectedSocket,
+  WsException
 } from '@nestjs/websockets';
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { ChatroomService } from '../chatroom/chatroom.service';
 import { UsersService } from '../users/users.service';
+import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
@@ -19,30 +24,119 @@ export class ChatGateway
   constructor(
     private auth: AuthService,
     private chat: ChatService,
-    private users: UsersService
+    private users: UsersService,
+    private chatroom: ChatroomService
   ) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
 
-  @SubscribeMessage('msgToServer')
-  async handleMessage(client: Socket, payload: string) {
+  @SubscribeMessage(events.MESSAGE_TO_SERVER)
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string; message: string }
+  ) {
     try {
-      await this.chat.saveMessage(client['decoded'].sub, payload);
-    } catch (error) {
-      this.logger.warn('HandleMessage error');
-    }
+      const chatroom = await this.chatroom.findOne(payload.chatroomId);
+      const user = await this.users.getUserById(client['decoded'].sub);
 
-    const user = await this.users.getUserById(client['decoded'].sub);
-    client.broadcast.emit('msgToClient', {
-      author: user.nickname,
-      data: payload
-    });
+      const message = await this.chat.saveMessage(
+        client['decoded'].sub,
+        payload.chatroomId,
+        payload.message
+      );
+
+      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
+        authorId: user.id,
+        authorNickname: user.nickname,
+        chatroomId: chatroom.id,
+        sentAt: message.createdAt,
+        data: payload.message
+      });
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
   }
 
-  @SubscribeMessage('testChannel')
-  handleTest(client: Socket, payload: string) {
-    this.server.emit('msgToClient', { author: 'SERVER', data: payload });
+  @SubscribeMessage(events.JOIN_ROOM)
+  async handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string }
+  ) {
+    // TODO: refactor these checks
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (
+      !(await this.chatroom.isUserInChatroom(
+        client['decoded'].sub,
+        chatroom.id
+      ))
+    ) {
+      return;
+    }
+
+    try {
+      client.join(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.LEAVE_ROOM)
+  async handleLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    try {
+      await this.chatroom.leave(client['decoded'].sub, chatroom.id);
+      client.leave(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.GET_MESSAGES)
+  async handleMessageHistory(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string; newerThan: Date }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (
+      !(await this.chatroom.isUserInChatroom(
+        client['decoded'].sub,
+        chatroom.id
+      ))
+    ) {
+      return;
+    }
+    const messages = await this.chat.getMessages(
+      chatroom.id,
+      payload.newerThan
+    );
+    for (const id in messages) {
+      client.emit(events.MESSAGE_TO_CLIENT, {
+        authorId: messages[id].author.id,
+        authorNickname: messages[id].author.nickname,
+        chatroomId: chatroom.id,
+        sentAt: messages[id].createdAt,
+        data: messages[id].content
+      });
+    }
   }
 
   afterInit(server: Server) {
@@ -60,35 +154,27 @@ export class ChatGateway
   // We should decouple  Prisma and the ChatGetway
   async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
-    if (client.handshake.auth && client.handshake.auth.token) {
-      try {
-        client['decoded'] = await this.auth.verifyJwt(
-          client.handshake.auth.token
-        );
-      } catch (error) {
-        let message = 'Unexpected error';
-        if (error instanceof Error) {
-          message = error.message;
-        }
-        this.logger.log(`AUTHENTICATION ERROR [${message}]`);
-        client.disconnect();
-        return;
-      }
-    } else {
+    if (!(client.handshake.auth && client.handshake.auth.token)) {
       client.disconnect();
       return;
     }
+
+    try {
+      client['decoded'] = await this.auth.verifyJwt(
+        client.handshake.auth.token
+      );
+    } catch (error) {
+      let message = 'Unexpected error';
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      client.disconnect();
+      return;
+    }
+
     const user = await this.users.getUserById(client['decoded'].sub);
     if (!user) {
       client.disconnect();
-    } else {
-      const messages = await this.chat.getMessages();
-      for (const id in messages) {
-        client.emit('msgToClient', {
-          author: messages[id].author.nickname,
-          data: messages[id].content
-        });
-      }
     }
   }
 }

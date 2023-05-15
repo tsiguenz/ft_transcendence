@@ -38,9 +38,11 @@
 
 <script>
 import axios from 'axios';
+import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -60,7 +62,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signup() {
@@ -83,15 +86,20 @@ export default {
           nickname: this.nickname,
           password: this.password
         });
-        this.$cookie.setCookie('jwt', response.data.access_token);
-        this.sessionStore.signin(this.nickname);
+        const tokens = response.data;
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
+        this.sessionStore.signin(
+          VueJwtDecode.decode(tokens.access_token).sub,
+          this.nickname
+        );
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
         });
-        // TODO: Handle error with a snackbar
       }
     }
   }

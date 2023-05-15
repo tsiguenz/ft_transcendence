@@ -30,9 +30,11 @@
 
 <script>
 import axios from 'axios';
+import VueJwtDecode from 'vue-jwt-decode';
 import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
@@ -50,7 +52,8 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useConnectedUsersStore)
   },
   methods: {
     async signin() {
@@ -64,11 +67,17 @@ export default {
           this.$router.push(`/2fa/verify?id=${response.data.id}`);
           return;
         }
-        this.sessionStore.signin(this.nickname);
-        this.$cookie.setCookie('jwt', response.data.access_token);
+
+        const tokens = response.data;
+        this.sessionStore.signin(
+          VueJwtDecode.decode(tokens.access_token).sub,
+          this.nickname
+        );
+        this.$cookie.setCookie('jwt', tokens.access_token);
+        this.$cookie.setCookie('refresh_token', tokens.refresh_token);
+        this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
-        // TODO: Handle error with a snackbar
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
@@ -81,23 +90,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.swal-overlay {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.swal-modal {
-  background-color: rgba(0, 0, 0, 1);
-  border: 3px solid white;
-}
-
-.swal-button {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid white;
-}
-
-.swal-text {
-  color: rgba(225, 225, 225, 1);
-}
-</style>
