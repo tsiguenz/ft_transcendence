@@ -18,8 +18,7 @@
 			</v-col>
 			<v-col cols="3">
 				<v-sheet class="sheet pa-3">
-				<v-row class="justify-center mt-5"><h4 class="font">{{ user.lastConnection }}</h4></v-row>
-				<v-row class="justify-center mb-5"><p>Last connection</p></v-row>
+				<p class="ma-5"><ProfileLastConnection /></p>
 				<v-row class="justify-center"><h2 class="font">12</h2></v-row>
 				<v-row class="justify-center mb-5"><p class="font">Game won</p></v-row>
 				<v-row class="justify-center"><h2 class="font">23</h2></v-row>
@@ -89,13 +88,15 @@ import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 import ProfileLadderPoints from '../components/ProfileLadderPoints.vue';
 import ProfileAchievements from '../components/ProfileAchievements.vue';
 import ProfileHistoryGames from '../components/ProfileHistoryGames.vue';
+import ProfileLastConnection from '../components/ProfileLastConnection.vue';
 
 export default {
   components: {
     ProfilePrintAvatar,
     ProfileLadderPoints,
     ProfileAchievements,
-    ProfileHistoryGames
+    ProfileHistoryGames,
+		ProfileLastConnection
   },
   data() {
     return {
@@ -107,7 +108,6 @@ export default {
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
-			lastCo: '',
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -132,8 +132,6 @@ export default {
         this.newNickname = this.user.nickname;
         this.newTwoFactorEnable = this.user.twoFactorEnable;
         this.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
-				this.lastCo = new Date();
-				console.log(this.user.lastConnection + " TEST " + this.lastCo);
       } catch (error) {
         swal({
           icon: 'error',
