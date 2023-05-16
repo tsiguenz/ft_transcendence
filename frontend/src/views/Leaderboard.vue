@@ -1,9 +1,10 @@
 <template>
   <h1>Leaderboard</h1>
   <br />
+  <Ranking :users="getLeaders()"/>
   <v-table density="compact">
     <thead>
-      <tr>
+      <tr class="cust-tr">
         <!-- <th class="cust-th">Id</th> -->
         <th class="cust-th">Nickname</th>
         <th class="cust-th">Ladder points</th>
@@ -12,12 +13,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in sortedUsers" :key="user.id">
+      <tr v-for="user in users" :key="user.id">
         <!-- <td>{{ user.id }}</td> -->
-        <td class="cust-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)"></ProfileClick><p>{{ user.nickname }}</p></td>
-        <td>{{ user.ladderPoints }}</td>
-        <td>{{ userStatus(user) }}</td>
-        <td>
+        <td class="cust-td hgt-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)" :width="40" :height="40"></ProfileClick><p>{{ user.nickname }}</p></td>
+        <td class=" hgt-td">{{ user.ladderPoints }}</td>
+        <td class=" hgt-td">{{ userStatus(user) }}</td>
+        <td class=" hgt-td">
           <IsFriend :friendname="user.nickname"></IsFriend>
         </td>
       </tr>
@@ -28,6 +29,7 @@
 <script>
 import ProfileClick from '../components/ProfileClick.vue';
 import IsFriend from '../components/IsFriend.vue';
+import Ranking from '../components/Ranking.vue';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
@@ -36,7 +38,8 @@ import swall from 'sweetalert';
 export default {
   components: {
     ProfileClick,
-    IsFriend
+    IsFriend,
+    Ranking
   },
   inject: ['connectedUsersStore', 'sessionStore'],
   data() {
@@ -44,17 +47,6 @@ export default {
       users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
-  },
-  computed: {
-    sortedUsers() {
-      return [...this.users].sort((a, b) =>
-        a.ladderPoints === b.ladderPoints
-          ? a.nickname.localeCompare(b.nickname)
-          : a.ladderPoints > b.ladderPoints
-          ? -1
-          : 1
-      );
-    },
   },
   watch: {
     connectedUsersStore: {
@@ -64,10 +56,18 @@ export default {
       deep: true
     }
   },
-  async mounted() {
+  created() {
+    console.log('leaderboard is created')
+    
+  },
+  async abeforeMount() {
+    console.log('leaderboard before mount')
     await this.getUsers();
   },
-  methods: {
+  mounted() {
+    console.log('leaderboard is mouted')
+  },
+  methods: { 
     async getUsers() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
@@ -113,6 +113,10 @@ export default {
       return this.connectedUsers.includes(user.id)
         ? 'Connected'
         : 'Disconnected';
+    },
+    getLeaders() {
+      console.log('in gettop3', this.users);
+      return { first: this.users[0], second: this.users[1], third: this.users[2] };
     }
   },
 };
@@ -137,10 +141,13 @@ export default {
   text-transform: uppercase;
 }
 
+.hgt-td{
+  height: 60px !important;
+}
+
 .cust-td{
   display: flex !important;
   padding: 1rem;
-
   p{
     margin-top: auto;
     margin-bottom: auto;
@@ -148,7 +155,9 @@ export default {
   }
 }
 
-
-
+.cont{
+  margin-top: auto;
+  margin-bottom: auto;
+}
 
 </style>

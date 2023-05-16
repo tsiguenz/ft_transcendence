@@ -60,6 +60,9 @@ export class UsersService {
         ladderPoints: true,
         avatarPath: true,
         createdAt: true
+      },
+      orderBy: {
+        ladderPoints: 'desc'
       }
     });
     return users;
