@@ -30,36 +30,22 @@ export class GameGateway {
   }
 
   @SubscribeMessage('pressPadUp')
-  async handlePressPadUp(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('player') player: string
-  ) {
-    console.log('pressPadUp', player);
-    this.server.emit('movePadUp', player);
+  async handlePressPadUp() {
+    this.server.emit('movePadUp');
   }
 
   @SubscribeMessage('pressPadDown')
-  async handlePressPadDown(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('player') player: string
-  ) {
-    console.log('pressPadDown', player);
-    this.server.emit('movePadDown', player);
+  async handlePressPadDown() {
+    this.server.emit('movePadDown');
   }
 
   @SubscribeMessage('releasePadUp')
-  async handleReleasePadUp(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('player') player: string
-  ) {
-    console.log('releasePadUp', player);
+  async handleReleasePadUp() {
+    this.server.emit('releasePadUp');
   }
 
   @SubscribeMessage('releasePadDown')
-  async handleReleasePadDown(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('player') player: string
-  ) {
-    console.log('releasePadDown', player);
+  async handleReleasePadDown() {
+    this.server.emit('releasePadDown');
   }
 }

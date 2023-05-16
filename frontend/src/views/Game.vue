@@ -32,9 +32,10 @@ export default {
         width: 3,
         height: 30,
         color: 'white',
-        speed: 5,
+        speed: 1,
         dx: 1,
-        dy: 1
+        dy: 1,
+        direction: null
       },
       pad2: {
         x: 0,
@@ -42,9 +43,10 @@ export default {
         width: 3,
         height: 30,
         color: 'white',
-        speed: 5,
+        speed: 1,
         dx: 1,
-        dy: 1
+        dy: 1,
+        direction: null
       },
       score: {
         player1: 0,
@@ -53,46 +55,43 @@ export default {
     };
   },
   created() {
-    console.log('created');
     this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
   },
-  //  computed: {
-  //    padPlayerOne() {}
-  //  },
   mounted() {
-    let padUpIsPressed = false;
-    let padDownIsPressed = false;
     this.init();
-    this.socketioGame.subscribe('movePadUp', (player) => {
-      if (player === 'player1') this.movePad(this.pad1, 'up');
-      else if (player === 'player2') this.movePad(this.pad2, 'up');
+    this.socketioGame.subscribe('movePadUp', () => {
+      this.pad1.direction = 'up';
+      this.pad2.direction = 'up';
     });
-    this.socketioGame.subscribe('movePadDown', (player) => {
-      if (player === 'player1') this.movePad(this.pad1, 'down');
-      else if (player === 'player2') this.movePad(this.pad2, 'down');
+    this.socketioGame.subscribe('movePadDown', () => {
+      this.pad1.direction = 'down';
+      this.pad2.direction = 'down';
+    });
+    this.socketioGame.subscribe('releasePadUp', () => {
+      this.pad1.direction = null;
+      this.pad2.direction = null;
+    });
+    this.socketioGame.subscribe('releasePadDown', () => {
+      this.pad1.direction = null;
+      this.pad2.direction = null;
     });
     document.addEventListener('keydown', (e) => {
-      if (e.keyCode === 38 && !padUpIsPressed) {
-        this.socketioGame.send('pressPadUp', { player: 'player1' });
-        padUpIsPressed = true;
-      } else if (e.keyCode === 40 && !padDownIsPressed) {
-        this.socketioGame.send('pressPadDown', { player: 'player1' });
-        padDownIsPressed = true;
+      if (e.keyCode === 38) {
+        this.socketioGame.send('pressPadUp');
+      } else if (e.keyCode === 40) {
+        this.socketioGame.send('pressPadDown');
       }
     });
     document.addEventListener('keyup', (e) => {
       if (e.keyCode === 38) {
-        this.socketioGame.send('releasePadUp', { player: 'player1' });
-        padUpIsPressed = false;
+        this.socketioGame.send('releasePadUp');
       } else if (e.keyCode === 40) {
-        this.socketioGame.send('releasePadDown', { player: 'player1' });
-        padDownIsPressed = false;
+        this.socketioGame.send('releasePadDown');
       }
     });
     setInterval(this.draw, 10);
   },
   beforeUnmount() {
-    console.log('beforeUnmount');
     this.socketioGame.disconnect();
   },
   methods: {
@@ -125,6 +124,8 @@ export default {
       this.checkBallCollisionWithPad();
       this.checkGoal();
       this.moveBall();
+      this.movePad(this.pad1);
+      this.movePad(this.pad2);
       this.drawBall();
       this.drawPad(this.pad1);
       this.drawPad(this.pad2);
@@ -150,10 +151,11 @@ export default {
       this.ctx.fillStyle = pad.color;
       this.ctx.fill();
     },
-    movePad(pad, direction) {
-      if (direction === 'up') {
+    movePad(pad) {
+      if (pad.direction === null) return;
+      if (pad.direction === 'up') {
         pad.y -= pad.speed;
-      } else if (direction === 'down') {
+      } else if (pad.direction === 'down') {
         pad.y += pad.speed;
       }
     },
