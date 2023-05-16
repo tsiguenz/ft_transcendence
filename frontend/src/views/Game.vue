@@ -6,9 +6,12 @@
 </template>
 
 <script>
+import { GAME_SOCKET_URL } from '../constants';
+import SocketioService from '../services/socketio.service';
 export default {
   data() {
     return {
+      socketioGame: new SocketioService(GAME_SOCKET_URL),
       canvas: null,
       ctx: null,
       maxHeight: null,
@@ -49,21 +52,48 @@ export default {
       }
     };
   },
+  created() {
+    console.log('created');
+    this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
+  },
+  //  computed: {
+  //    padPlayerOne() {}
+  //  },
   mounted() {
+    let padUpIsPressed = false;
+    let padDownIsPressed = false;
     this.init();
-    this.draw();
+    this.socketioGame.subscribe('movePadUp', (player) => {
+      if (player === 'player1') this.movePad(this.pad1, 'up');
+      else if (player === 'player2') this.movePad(this.pad2, 'up');
+    });
+    this.socketioGame.subscribe('movePadDown', (player) => {
+      if (player === 'player1') this.movePad(this.pad1, 'down');
+      else if (player === 'player2') this.movePad(this.pad2, 'down');
+    });
     document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 38 && !padUpIsPressed) {
+        this.socketioGame.send('pressPadUp', { player: 'player1' });
+        padUpIsPressed = true;
+      } else if (e.keyCode === 40 && !padDownIsPressed) {
+        this.socketioGame.send('pressPadDown', { player: 'player1' });
+        padDownIsPressed = true;
+      }
+    });
+    document.addEventListener('keyup', (e) => {
       if (e.keyCode === 38) {
-        this.movePad(this.pad2, 'up');
+        this.socketioGame.send('releasePadUp', { player: 'player1' });
+        padUpIsPressed = false;
       } else if (e.keyCode === 40) {
-        this.movePad(this.pad2, 'down');
-      } else if (e.keyCode === 87) {
-        this.movePad(this.pad1, 'up');
-      } else if (e.keyCode === 83) {
-        this.movePad(this.pad1, 'down');
+        this.socketioGame.send('releasePadDown', { player: 'player1' });
+        padDownIsPressed = false;
       }
     });
     setInterval(this.draw, 10);
+  },
+  beforeUnmount() {
+    console.log('beforeUnmount');
+    this.socketioGame.disconnect();
   },
   methods: {
     init() {
