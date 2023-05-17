@@ -15,8 +15,18 @@
         ></v-list-item>
       </template>
       <v-row v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn v-if="currentUserIsOwner && user.role === 'USER'" @click="promote(user.id)" block>Make admin</v-btn>
-        <v-btn v-if="currentUserIsOwner && user.role === 'ADMIN'" @click="demote(user.id)" block>Revoke admin</v-btn>
+        <v-btn
+          v-if="currentUserIsOwner && user.role === 'USER'"
+          @click="promote(user.id)"
+          block
+          >Make admin</v-btn
+        >
+        <v-btn
+          v-if="currentUserIsOwner && user.role === 'ADMIN'"
+          @click="demote(user.id)"
+          block
+          >Revoke admin</v-btn
+        >
         <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
         <v-btn
@@ -106,9 +116,14 @@ export default {
     async promote(userId) {
       try {
         const response = await axios.post(
-          constants.API_URL + '/chatrooms/' + this.id + '/users/' + userId + '/promote'
+          constants.API_URL +
+            '/chatrooms/' +
+            this.id +
+            '/users/' +
+            userId +
+            '/promote'
         );
-        this.chatStore.setUserRole(userId, this.id, response.data.role)
+        this.chatStore.setUserRole(userId, this.id, response.data.role);
         return response.data;
       } catch (error) {
         swal({
@@ -120,9 +135,14 @@ export default {
     async demote(userId) {
       try {
         const response = await axios.post(
-          constants.API_URL + '/chatrooms/' + this.id + '/users/' + userId + '/demote'
+          constants.API_URL +
+            '/chatrooms/' +
+            this.id +
+            '/users/' +
+            userId +
+            '/demote'
         );
-        this.chatStore.setUserRole(userId, this.id, response.data.role)
+        this.chatStore.setUserRole(userId, this.id, response.data.role);
         return response.data;
       } catch (error) {
         swal({

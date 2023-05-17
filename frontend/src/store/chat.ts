@@ -52,7 +52,7 @@ export const useChatStore = defineStore('chat', {
     removeRoom(roomId) {
       this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
-    }, 
+    },
     // joinChatroom(chatroomId: number) {},
     storeMessage(message) {
       const chatroomId: number = message.chatroomId;
@@ -80,7 +80,7 @@ export const useChatStore = defineStore('chat', {
     // },
 
     setUserRole(userId, chatroomId, role) {
-      const i = this.users.findIndex(e => e.id == userId);
+      const i = this.users.findIndex((e) => e.id == userId);
       this.users[i].role = role;
     },
 

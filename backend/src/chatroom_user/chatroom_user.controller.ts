@@ -65,11 +65,26 @@ export class ChatroomUserController {
     description: 'User id'
   })
   @Post(':id/promote')
-  async promote(@User() user: object, @Param('chatroomId') chatroomId: string, @Param('id') userId: string) {
-    if (!(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) || !(await this.chatroomUserService.userHasRole(userId, chatroomId, Role.USER))) {
-      throw new ForbiddenException("Unauthorized to promote user");
+  async promote(
+    @User() user: object,
+    @Param('chatroomId') chatroomId: string,
+    @Param('id') userId: string
+  ) {
+    if (
+      !(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) ||
+      !(await this.chatroomUserService.userHasRole(
+        userId,
+        chatroomId,
+        Role.USER
+      ))
+    ) {
+      throw new ForbiddenException('Unauthorized to promote user');
     }
-    return await this.chatroomUserService.setUserRole(userId, chatroomId, Role.ADMIN);
+    return await this.chatroomUserService.setUserRole(
+      userId,
+      chatroomId,
+      Role.ADMIN
+    );
   }
 
   @UseGuards(AccessTokenGuard)
@@ -87,11 +102,21 @@ export class ChatroomUserController {
     description: 'User id'
   })
   @Post(':id/demote')
-  async demote(@User() user: object, @Param('chatroomId') chatroomId: string, @Param('id') userId: string) {
-    if (!(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) || !(await this.chatroomUserService.isUserAdmin(userId, chatroomId))) {
-      throw new ForbiddenException("Unauthorized to demote user");
+  async demote(
+    @User() user: object,
+    @Param('chatroomId') chatroomId: string,
+    @Param('id') userId: string
+  ) {
+    if (
+      !(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) ||
+      !(await this.chatroomUserService.isUserAdmin(userId, chatroomId))
+    ) {
+      throw new ForbiddenException('Unauthorized to demote user');
     }
-    return await this.chatroomUserService.setUserRole(userId, chatroomId, Role.USER);
+    return await this.chatroomUserService.setUserRole(
+      userId,
+      chatroomId,
+      Role.USER
+    );
   }
-
 }

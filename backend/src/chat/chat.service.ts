@@ -30,10 +30,7 @@ export class ChatService {
 
   async saveMessage(userId: string, chatRoomId: string, message: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const chatroomUser = await this.chatroomUser.findOne(
-      userId,
-      chatRoomId
-    );
+    const chatroomUser = await this.chatroomUser.findOne(userId, chatRoomId);
     const chatroom = await this.chatroom.findOne(chatRoomId);
     if (!user || !chatroomUser || !chatroom) {
       throw new Error('Cannot save message');

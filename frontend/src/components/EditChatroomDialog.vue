@@ -27,7 +27,7 @@
         <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
           Close
         </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="newChatroom">
+        <v-btn color="blue-darken-1" variant="text" @click="editChatroom">
           Save
         </v-btn>
       </v-card-actions>
@@ -55,11 +55,14 @@ export default {
       this.dialog = false;
       this.newPassword = '';
     },
-    async newChatroom() {
+    async editChatroom() {
       try {
-        const response = await axios.patch(constants.API_URL + '/chatrooms/' + this.id, {
-          password: this.newPassword,
-        });
+        const response = await axios.patch(
+          constants.API_URL + '/chatrooms/' + this.id,
+          {
+            password: this.newPassword
+          }
+        );
         this.closeDialog();
       } catch (error) {
         console.log(error);

@@ -26,7 +26,10 @@ import { User } from '../decorator/user.decorator';
 @Controller('api/chatrooms')
 @ApiTags('chatrooms')
 export class ChatroomController {
-  constructor(private readonly chatroomService: ChatroomService, private readonly chatroomUserService: ChatroomUserService) {}
+  constructor(
+    private readonly chatroomService: ChatroomService,
+    private readonly chatroomUserService: ChatroomUserService
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -81,7 +84,7 @@ export class ChatroomController {
   findOne(@Param('id') id: string) {
     return this.chatroomService.findOne(id);
   }
-  
+
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @ApiParam({

@@ -37,10 +37,7 @@ export class ChatroomUserService {
     });
   }
 
-  async findOne(
-    userId: string,
-    chatroomId: string
-  ): Promise<ChatRoomUser> {
+  async findOne(userId: string, chatroomId: string): Promise<ChatRoomUser> {
     return await this.prisma.chatRoomUser.findFirst({
       where: {
         chatRoomId: chatroomId,
@@ -83,7 +80,7 @@ export class ChatroomUserService {
       data: {
         role: role
       }
-    })
+    });
   }
 
   async isUserInChatroom(userId: string, chatroomId: string) {
@@ -105,6 +102,5 @@ export class ChatroomUserService {
 
   async isUserAdmin(userId: string, chatroomId: string) {
     return await this.userHasRole(userId, chatroomId, Role.ADMIN);
-  } 
-
+  }
 }

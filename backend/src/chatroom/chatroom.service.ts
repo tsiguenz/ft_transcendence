@@ -12,7 +12,10 @@ import * as argon from 'argon2';
 
 @Injectable()
 export class ChatroomService {
-  constructor(private prisma: PrismaService, private chatroomUser: ChatroomUserService) {}
+  constructor(
+    private prisma: PrismaService,
+    private chatroomUser: ChatroomUserService
+  ) {}
   async create(userId: string, dto: CreateChatroomDto) {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
