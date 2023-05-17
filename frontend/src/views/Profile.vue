@@ -18,7 +18,7 @@
 			</v-col>
 			<v-col cols="3">
 				<v-sheet class="sheet pa-3">
-				<p class="ma-5"><ProfileLastConnection /></p>
+				<p class="ma-5"><ProfileLastConnection :lastConnection="user.lastConnection" /></p>
 				<v-row class="justify-center"><h2 class="font">12</h2></v-row>
 				<v-row class="justify-center mb-5"><p class="font">Game won</p></v-row>
 				<v-row class="justify-center"><h2 class="font">23</h2></v-row>
@@ -28,7 +28,6 @@
 			</v-col>
 		</v-row>
 	</v-container>
-  <ProfileLadderPoints />
   <h1>Profile infos</h1>
   <p>Nickname: {{ user.nickname }}</p>
   <p>2fa enable: {{ user.twoFactorEnable }}</p>

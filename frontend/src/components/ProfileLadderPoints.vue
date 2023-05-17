@@ -32,8 +32,12 @@ export default {
   },
   methods: {
     async getProfile() {
+			if(!this.sessionStore.loggedIn)
+				return ;
       try {
-        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`
+        );
         this.user = response.data;
       } catch (error) {
         swal({
