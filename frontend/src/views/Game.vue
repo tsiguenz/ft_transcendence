@@ -1,5 +1,8 @@
 <template>
   <h1>Game</h1>
+  <p>ball: {{ ball }}</p>
+  <p>pad1: {{ pad1 }}</p>
+  <p>pad2: {{ pad2 }}</p>
   <div>
     <canvas id="canvas"></canvas>
   </div>
@@ -14,67 +17,37 @@ export default {
       socketioGame: new SocketioService(GAME_SOCKET_URL),
       canvas: null,
       ctx: null,
-      maxHeight: null,
-      maxWidth: null,
-      ball: {
-        x: 0,
-        y: 0,
-        radius: 4,
-        color: 'white',
-        speed: 1,
-        dx: 1,
-        dy: 1,
-        deviation: 0.5
-      },
-      pad1: {
-        x: 0,
-        y: 0,
-        width: 3,
-        height: 30,
-        color: 'white',
-        speed: 1,
-        dx: 1,
-        dy: 1,
-        direction: null
-      },
-      pad2: {
-        x: 0,
-        y: 0,
-        width: 3,
-        height: 30,
-        color: 'white',
-        speed: 1,
-        dx: 1,
-        dy: 1,
-        direction: null
-      },
-      score: {
-        player1: 0,
-        player2: 0
-      }
+      height: null,
+      width: null,
+      gameDatas: null
     };
   },
   created() {
     this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
+    this.socketioGame.subscribe('initGame', (data) => {
+      console.log('initGame');
+      this.ball = data.ball;
+      this.pad1 = data.pad1;
+      this.pad2 = data.pad2;
+      this.score = data.score;
+      this.map = data.map;
+    });
   },
-  mounted() {
-    this.init();
+  beforeMount() {
     this.socketioGame.subscribe('movePadUp', () => {
-      this.pad1.direction = 'up';
-      this.pad2.direction = 'up';
+      this.pad1.dy = -1;
+      this.pad2.dy = -1;
     });
     this.socketioGame.subscribe('movePadDown', () => {
-      this.pad1.direction = 'down';
-      this.pad2.direction = 'down';
+      this.pad1.dy = 1;
+      this.pad2.dy = 1;
     });
-    this.socketioGame.subscribe('releasePadUp', () => {
-      this.pad1.direction = null;
-      this.pad2.direction = null;
+    this.socketioGame.subscribe('padStop', () => {
+      this.pad1.dy = 0;
+      this.pad2.dy = 0;
     });
-    this.socketioGame.subscribe('releasePadDown', () => {
-      this.pad1.direction = null;
-      this.pad2.direction = null;
-    });
+  },
+  mounted() {
     document.addEventListener('keydown', (e) => {
       if (e.keyCode === 38) {
         this.socketioGame.send('pressPadUp');
@@ -89,23 +62,66 @@ export default {
         this.socketioGame.send('releasePadDown');
       }
     });
-    setInterval(this.draw, 10);
+    this.runGame();
   },
   beforeUnmount() {
     this.socketioGame.disconnect();
   },
   methods: {
+    runGame() {
+      console.log('runGame');
+      this.init();
+      this.sendGameDatas();
+      //setInterval(this.draw, this.gameDatas.map.refreshRate);
+    },
+    sendGameDatas() {
+      console.log(this.gameDatas);
+      this.socketioGame.send('initGame', this.gameDatas);
+    },
     init() {
+      console.log('init');
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
-      this.maxHeight = this.canvas.height;
-      this.maxWidth = this.canvas.width;
-      this.ball.x = this.maxWidth / 2;
-      this.ball.y = this.maxHeight / 2;
-      this.pad1.x = 10;
-      this.pad1.y = this.maxHeight / 2 - this.pad1.height / 2;
-      this.pad2.x = this.maxWidth - 10 - this.pad2.width / 2;
-      this.pad2.y = this.maxHeight / 2 - this.pad2.height / 2;
+      this.height = this.canvas.height;
+      this.width = this.canvas.width;
+      this.gameDatas = {
+        map: {
+          height: this.height,
+          width: this.width,
+          refreshRate: 100
+        },
+        ball: {
+          x: this.width / 2,
+          y: this.height / 2,
+          speed: 1,
+          dx: 1,
+          dy: 1
+        },
+        pad1: {
+          x: 0,
+          y: this.height / 2,
+          length: this.height / 4,
+          speed: 1,
+          dy: 0
+        },
+        pad2: {
+          x: this.width,
+          y: this.height / 2,
+          length: this.height / 4,
+          speed: 1,
+          dy: 0
+        }
+      };
+    },
+    draw() {
+      this.ctx.clearRect(0, 0, this.maxWidth, this.maxHeight);
+      this.writeScoreInCtx();
+      this.createCenterDotLine();
+      this.movePad(this.pad1);
+      this.movePad(this.pad2);
+      this.drawBall();
+      this.drawPad(this.pad1);
+      this.drawPad(this.pad2);
     },
     createCenterDotLine() {
       this.ctx.beginPath();
@@ -114,21 +130,6 @@ export default {
       this.ctx.lineTo(this.maxWidth / 2, this.maxHeight);
       this.ctx.strokeStyle = 'white';
       this.ctx.stroke();
-    },
-    draw() {
-      this.ctx.clearRect(0, 0, this.maxWidth, this.maxHeight);
-      this.writeScoreInCtx();
-      this.createCenterDotLine();
-      this.checkBallCollisionWithBorder();
-      this.checkPadCollisionWithBorder();
-      this.checkBallCollisionWithPad();
-      this.checkGoal();
-      this.moveBall();
-      this.movePad(this.pad1);
-      this.movePad(this.pad2);
-      this.drawBall();
-      this.drawPad(this.pad1);
-      this.drawPad(this.pad2);
     },
     drawBall() {
       this.ctx.beginPath();
@@ -148,93 +149,17 @@ export default {
       this.ctx.beginPath();
       this.ctx.rect(pad.x, pad.y, pad.width, pad.height);
       this.ctx.closePath();
-      this.ctx.fillStyle = pad.color;
+      this.ctx.fillStyle = 'white';
       this.ctx.fill();
-    },
-    movePad(pad) {
-      if (pad.direction === null) return;
-      if (pad.direction === 'up') {
-        pad.y -= pad.speed;
-      } else if (pad.direction === 'down') {
-        pad.y += pad.speed;
-      }
-    },
-    moveBall() {
-      this.ball.x += this.ball.dx * this.ball.speed;
-      this.ball.y += this.ball.dy * this.ball.speed;
-    },
-    checkBallCollisionWithPad() {
-      if (
-        this.ball.x + this.ball.radius >= this.pad2.x &&
-        this.ball.x + this.ball.radius <= this.pad2.x + this.pad2.width &&
-        this.ball.y - this.ball.radius >= this.pad2.y &&
-        this.ball.y + this.ball.radius <= this.pad2.y + this.pad2.height
-      ) {
-        this.ball.dx = -this.ball.dx;
-        this.ball.dy += this.ball.deviation * this.pad2.dy;
-        this.ball.speed += 0.1;
-      }
-      if (
-        this.ball.x - this.ball.radius <= this.pad1.x + this.pad1.width &&
-        this.ball.x - this.ball.radius >= this.pad1.x &&
-        this.ball.y - this.ball.radius >= this.pad1.y &&
-        this.ball.y + this.ball.radius <= this.pad1.y + this.pad1.height
-      ) {
-        this.ball.dx = -this.ball.dx;
-        this.ball.dy += this.ball.deviation * this.pad1.dy;
-        this.ball.speed += 0.1;
-      }
-    },
-    checkBallCollisionWithBorder() {
-      if (
-        this.ball.x + this.ball.radius > this.maxWidth ||
-        this.ball.x - this.ball.radius < 0
-      ) {
-        this.ball.dx = -this.ball.dx;
-      }
-      if (
-        this.ball.y + this.ball.radius > this.maxHeight ||
-        this.ball.y - this.ball.radius < 0
-      ) {
-        this.ball.dy = -this.ball.dy;
-      }
-    },
-    checkPadCollisionWithBorder() {
-      if (this.pad1.y + this.pad1.height >= this.maxHeight) {
-        this.pad1.y = this.maxHeight - this.pad1.height;
-      }
-      if (this.pad1.y < 0) {
-        this.pad1.y = 0;
-      }
-      if (this.pad2.y + this.pad2.height >= this.maxHeight) {
-        this.pad2.y = this.maxHeight - this.pad2.height;
-      }
-      if (this.pad2.y < 0) {
-        this.pad2.y = 0;
-      }
-    },
-    checkGoal() {
-      if (this.ball.x + this.ball.radius > this.pad2.x + 10) {
-        this.resetBall();
-        this.score.player1++;
-      }
-      if (this.ball.x - this.ball.radius < this.pad1.x - 10) {
-        this.resetBall();
-        this.score.player2++;
-      }
-    },
-    resetBall() {
-      this.ball.x = this.maxWidth / 2;
-      this.ball.y = this.maxHeight / 2;
-      this.ball.dx = 1;
-      this.ball.dy = 1;
-      this.ball.speed = 1;
     },
     writeScoreInCtx() {
       this.ctx.font = '20px Arial';
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.score.player1, this.maxWidth / 2 - 25, 20);
       this.ctx.fillText(this.score.player2, this.maxWidth / 2 + 15, 20);
+    },
+    movePad(pad) {
+      pad.y += pad.dy * pad.speed;
     }
   }
 };
