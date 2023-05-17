@@ -14,6 +14,7 @@ import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
+import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { UsersService } from '../users/users.service';
 import * as events from './socketioEvents';
 
@@ -25,7 +26,8 @@ export class ChatGateway
     private auth: AuthService,
     private chat: ChatService,
     private users: UsersService,
-    private chatroom: ChatroomService
+    private chatroom: ChatroomService,
+    private chatroomUser: ChatroomUserService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -71,7 +73,7 @@ export class ChatGateway
     }
 
     if (
-      !(await this.chatroom.isUserInChatroom(
+      !(await this.chatroomUser.isUserInChatroom(
         client['decoded'].sub,
         chatroom.id
       ))
@@ -117,7 +119,7 @@ export class ChatGateway
     }
 
     if (
-      !(await this.chatroom.isUserInChatroom(
+      !(await this.chatroomUser.isUserInChatroom(
         client['decoded'].sub,
         chatroom.id
       ))

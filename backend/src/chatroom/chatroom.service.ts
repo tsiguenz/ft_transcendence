@@ -108,7 +108,7 @@ export class ChatroomService {
       throw new ForbiddenException('User not in room');
     }
 
-    return await this.removeUserFromChatroom(userId, chatroomId);
+    return await this.chatroomUser.remove(userId, chatroomId);
   }
 
   async roomPasswordMatches(
@@ -150,59 +150,6 @@ export class ChatroomService {
         name: true,
         slug: true,
         type: true
-      }
-    });
-  }
-
-  async findChatroomsForUser(userId: string) {
-    return await this.prisma.chatRoom.findMany({
-      where: {
-        users: {
-          some: {
-            user: { id: userId }
-          }
-        }
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true
-      }
-    });
-  }
-
-  async isUserInChatroom(userId: string, chatroomId: string) {
-    return !!(await this.chatroomUser.findOne(userId, chatroomId));
-  }
-
-  async isUserChatroomOwner(userId: string, chatroomId: string) {
-    const user = await this.chatroomUser.findOne(userId, chatroomId);
-
-    if (!user || user.role !== Role.OWNER) {
-      return false;
-    }
-    return true;
-  }
-
-  private async addUserToChatroom(
-    userId: string,
-    chatroomId: string,
-    role: Role = Role.USER
-  ): Promise<ChatRoomUser> {
-    return await this.prisma.chatRoomUser.create({
-      data: {
-        userId: userId,
-        chatRoomId: chatroomId,
-        role: role
-      }
-    });
-  }
-
-  private async removeUserFromChatroom(userId: string, chatroomId: string) {
-    return await this.prisma.chatRoomUser.deleteMany({
-      where: {
-        chatRoomId: chatroomId,
-        userId: userId
       }
     });
   }

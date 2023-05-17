@@ -187,7 +187,7 @@ export class UsersController {
     @Param('nickname') nickname: string,
     @User() user: object
   ) {
-    return await this.chatroomService.findChatroomsForUser(user['id']);
+    return await this.usersService.chatrooms(user['id']);
   }
 
   @UseGuards(AccessTokenGuard)

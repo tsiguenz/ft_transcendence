@@ -19,13 +19,14 @@ import {
 import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
+import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { User } from '../decorator/user.decorator';
 
 @Controller('api/chatrooms')
 @ApiTags('chatrooms')
 export class ChatroomController {
-  constructor(private readonly chatroomService: ChatroomService) {}
+  constructor(private readonly chatroomService: ChatroomService, private readonly chatroomUserService: ChatroomUserService) {}
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -95,7 +96,7 @@ export class ChatroomController {
     @Body() updateChatroomDto: UpdateChatroomDto,
     @User() user: object
   ) {
-    if (!(await this.chatroomService.isUserChatroomOwner(user['id'], id))) {
+    if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
       throw new ForbiddenException('Unauthorized to edit room');
     }
     return this.chatroomService.update(id, updateChatroomDto);

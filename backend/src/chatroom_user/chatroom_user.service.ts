@@ -63,6 +63,15 @@ export class ChatroomUserService {
     });
   }
 
+  async remove(userId: string, chatroomId: string) {
+    return await this.prisma.chatRoomUser.deleteMany({
+      where: {
+        chatRoomId: chatroomId,
+        userId: userId
+      }
+    });
+  }
+
   async setUserRole(userId: string, chatroomId: string, role: Role) {
     return await this.prisma.chatRoomUser.update({
       where: {
