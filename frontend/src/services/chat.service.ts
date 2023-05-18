@@ -27,8 +27,8 @@ class ChatService {
     this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
   }
 
-  subscribeToRoomDeletion(callback: Function) {
-    this.socketService.subscribe(events.DELETED_ROOM, callback);
+  subscribeToKick(callback: Function) {
+    this.socketService.subscribe(events.KICKED_FROM_ROOM, callback);
   }
 
   joinRoom(chatroomId: number) {

@@ -91,7 +91,7 @@ export default {
     ChatService.subscribeToMessages((message) => {
       ChatService.storeMessage(message);
     });
-    ChatService.subscribeToRoomDeletion((payload) => {
+    ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
   },

@@ -128,7 +128,7 @@ export class ChatGateway
       this.chatroom.remove(chatroom.id);
       this.server
         .to(chatroom.slug)
-        .emit(events.DELETED_ROOM, { chatroomId: chatroom.id });
+        .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
       this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
     } catch (e) {
       throw new WsException((e as Error).message);
