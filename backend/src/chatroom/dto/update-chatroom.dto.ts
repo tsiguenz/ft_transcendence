@@ -1,9 +1,5 @@
 import {
-  IsNotEmpty,
-  IsString,
-  IsIn,
-  IsOptional,
-  ValidateIf
+  IsString
 } from 'class-validator';
 
 export class UpdateChatroomDto {
