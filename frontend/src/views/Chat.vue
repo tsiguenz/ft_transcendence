@@ -60,8 +60,10 @@ export default {
       this.chatStore.activeChatroom = id;
     },
     leaveRoom(id) {
+      if (id == this.currentChatroomId) {
+        this.chatStore.switchToDefaultChatroom();
+      }
       this.chatStore.removeRoom(id);
-      this.chatStore.switchToDefaultChatroom();
     }
   }
 };

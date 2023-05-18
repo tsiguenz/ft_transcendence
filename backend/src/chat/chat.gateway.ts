@@ -107,6 +107,34 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.DELETE_ROOM)
+  async handleDeletion(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (
+      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
+    ) {
+      throw new WsException('Unauthorized to delete room');
+    }
+
+    try {
+      this.chatroom.remove(chatroom.id);
+      this.server
+        .to(chatroom.slug)
+        .emit(events.DELETED_ROOM, { chatroomId: chatroom.id });
+      this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,

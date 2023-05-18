@@ -13,14 +13,12 @@
             <v-col cols="12">
               <v-text-field
                 v-model="newPassword"
-                label="New password*"
+                label="New password"
                 type="password"
-                required
               ></v-text-field>
             </v-col>
           </v-row>
         </v-container>
-        <small>*indicates required field</small>
       </v-card-text>
       <v-card-actions>
         <v-btn color="red-darken-1" variant="text" @click="alertDeleteChatroom">
@@ -43,6 +41,7 @@ import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
+import ChatService from '../services/chat.service';
 
 export default {
   emits: ['create', 'delete'],
@@ -68,7 +67,6 @@ export default {
         );
         this.closeDialog();
       } catch (error) {
-        console.log(error);
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
@@ -91,10 +89,7 @@ export default {
     },
     async deleteChatroom() {
       try {
-        const response = await axios.delete(
-          constants.API_URL + '/chatrooms/' + this.id,
-          {}
-        );
+        ChatService.deleteRoom(this.id);
         this.closeDialog();
         this.$emit('delete', this.id);
       } catch (error) {
