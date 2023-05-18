@@ -10,6 +10,7 @@
           title="Chat"
           :messages="messages"
           @leave="leaveRoom"
+          @delete="leaveRoom"
         />
       </v-col>
       <v-col cols="3">
@@ -39,7 +40,6 @@ export default {
   },
   data() {
     return {
-      // currentChatroomId: 0,
     };
   },
   created() {
@@ -59,8 +59,10 @@ export default {
       this.chatStore.activeChatroom = id;
     },
     leaveRoom(id) {
+      if (id == this.currentChatroomId) {
+        this.chatStore.switchToDefaultChatroom();
+      }
       this.chatStore.removeRoom(id);
-      this.chatStore.switchToDefaultChatroom();
     }
   }
 };

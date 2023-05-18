@@ -15,7 +15,18 @@
         ></v-list-item>
       </template>
       <v-row v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn v-if="currentUserIsAdmin" block>Make admin</v-btn>
+        <v-btn
+          v-if="currentUserIsOwner && user.role === 'USER'"
+          @click="promote(user.id)"
+          block
+          >Make admin</v-btn
+        >
+        <v-btn
+          v-if="currentUserIsOwner && user.role === 'ADMIN'"
+          @click="demote(user.id)"
+          block
+          >Revoke admin</v-btn
+        >
         <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
         <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
         <v-btn
@@ -46,7 +57,6 @@ export default {
   props: ['id'],
   data() {
     return {
-      users: [],
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -56,26 +66,36 @@ export default {
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore, useConnectedUsersStore),
+    users() {
+      return this.chatStore.users;
+    },
     currentUserId() {
       return this.sessionStore.userId;
     },
     currentUserIsAdmin() {
-      const currentUser = this.users.find(
+      const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
 
       return currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
+    },
+    currentUserIsOwner() {
+      const currentUser = this.chatStore.users.find(
+        (user) => user.id == this.currentUserId
+      );
+
+      return currentUser.role === 'OWNER';
     }
   },
   watch: {
     id: {
       handler() {
         if (!this.id) {
-          this.users = [];
+          this.chatStore.users = [];
           return;
         }
         this.getChatroomUsers(this.id).then((users) => {
-          this.users = users;
+          this.chatStore.users = users;
         });
       }
     }
@@ -93,6 +113,44 @@ export default {
     ChatService.disconnect();
   },
   methods: {
+    async promote(userId) {
+      try {
+        const response = await axios.post(
+          constants.API_URL +
+            '/chatrooms/' +
+            this.id +
+            '/users/' +
+            userId +
+            '/promote'
+        );
+        this.chatStore.setUserRole(userId, this.id, response.data.role);
+        return response.data;
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
+    async demote(userId) {
+      try {
+        const response = await axios.post(
+          constants.API_URL +
+            '/chatrooms/' +
+            this.id +
+            '/users/' +
+            userId +
+            '/demote'
+        );
+        this.chatStore.setUserRole(userId, this.id, response.data.role);
+        return response.data;
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
     async getChatroomUsers(chatroomId) {
       try {
         const response = await axios.get(

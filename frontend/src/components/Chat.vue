@@ -3,7 +3,11 @@
     <v-toolbar color="">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="currentUserIsAdmin" icon="mdi-cog"></v-btn>
+      <EditChatroomDialog
+        :id="id"
+        v-if="currentUserIsOwner"
+        @delete="(roomId) => $emit('delete', roomId)"
+      />
       <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
     </v-toolbar>
     <div v-for="item in messages" :key="item.sentAt">
@@ -35,9 +39,14 @@ import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
+import { useChatStore } from '@/store/chat';
+import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 
 export default {
-  emits: ['leave'],
+  components: {
+    EditChatroomDialog
+  },
+  emits: ['leave', 'delete'],
   props: ['id', 'title', 'messages'],
   data() {
     return {
@@ -45,12 +54,17 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore),
+    ...mapStores(useSessionStore, useChatStore),
     currentUserId() {
       return this.sessionStore.userId;
     },
-    currentUserIsAdmin() {
-      // Should be implemented with rooms administration later on
+    currentUserIsOwner() {
+      const currentUser = this.chatStore.users.find(
+        (x) => x.id === this.currentUserId
+      );
+      if (!currentUser || currentUser.role !== 'OWNER') {
+        return false;
+      }
       return true;
     }
   },
@@ -76,6 +90,9 @@ export default {
   mounted() {
     ChatService.subscribeToMessages((message) => {
       ChatService.storeMessage(message);
+    });
+    ChatService.subscribeToKick((payload) => {
+      this.$emit('leave', payload.chatroomId);
     });
   },
   beforeUnmount() {

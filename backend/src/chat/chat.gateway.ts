@@ -14,6 +14,7 @@ import { ChatService } from '../chat/chat.service';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
+import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { UsersService } from '../users/users.service';
 import * as events from './socketioEvents';
 
@@ -25,7 +26,8 @@ export class ChatGateway
     private auth: AuthService,
     private chat: ChatService,
     private users: UsersService,
-    private chatroom: ChatroomService
+    private chatroom: ChatroomService,
+    private chatroomUser: ChatroomUserService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -71,7 +73,7 @@ export class ChatGateway
     }
 
     if (
-      !(await this.chatroom.isUserInChatroom(
+      !(await this.chatroomUser.isUserInChatroom(
         client['decoded'].sub,
         chatroom.id
       ))
@@ -105,6 +107,34 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.DELETE_ROOM)
+  async handleDeletion(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (
+      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
+    ) {
+      throw new WsException('Unauthorized to delete room');
+    }
+
+    try {
+      this.chatroom.remove(chatroom.id);
+      this.server
+        .to(chatroom.slug)
+        .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+      this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
@@ -117,7 +147,7 @@ export class ChatGateway
     }
 
     if (
-      !(await this.chatroom.isUserInChatroom(
+      !(await this.chatroomUser.isUserInChatroom(
         client['decoded'].sub,
         chatroom.id
       ))

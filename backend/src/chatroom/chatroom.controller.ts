@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Patch,
+  Delete,
   Param,
   UseGuards,
   Req,
@@ -19,13 +20,17 @@ import {
 import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
+import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { User } from '../decorator/user.decorator';
 
 @Controller('api/chatrooms')
 @ApiTags('chatrooms')
 export class ChatroomController {
-  constructor(private readonly chatroomService: ChatroomService) {}
+  constructor(
+    private readonly chatroomService: ChatroomService,
+    private readonly chatroomUserService: ChatroomUserService
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -89,19 +94,16 @@ export class ChatroomController {
     required: true,
     description: 'Chatroom id'
   })
-  @Get(':id/users')
-  async findChatroomUsers(@User() user: object, @Param('id') id: string) {
-    const currentUserId = user['id'];
-    const users = await this.chatroomService.findChatroomUsers(id);
-    if (!users.find((u) => u.id == currentUserId)) {
-      throw new ForbiddenException('Unauthorized to list users');
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateChatroomDto: UpdateChatroomDto,
+    @User() user: object
+  ) {
+    if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
+      throw new ForbiddenException('Unauthorized to edit room');
     }
-    const formattedUsers = users.map((user) => ({
-      id: user.id,
-      nickname: user.nickname,
-      role: user.chatrooms[0].role
-    }));
-    return formattedUsers;
+    return this.chatroomService.update(id, updateChatroomDto);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -112,26 +114,13 @@ export class ChatroomController {
     required: true,
     description: 'Chatroom id'
   })
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateChatroomDto: UpdateChatroomDto
-  ) {
-    return this.chatroomService.update(id, updateChatroomDto);
+  @Delete(':id')
+  async remove(@User() user: object, @Param('id') id: string) {
+    if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
+      throw new ForbiddenException('Unauthorized to delete room');
+    }
+    return this.chatroomService.remove(id);
   }
-
-  // @UseGuards(AccessTokenGuard)
-  // @ApiBearerAuth()
-  // @ApiParam({
-  //   name: 'id',
-  //   type: String,
-  //   required: true,
-  //   description: 'Chatroom id'
-  // })
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatroomService.remove(id);
-  // }
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
