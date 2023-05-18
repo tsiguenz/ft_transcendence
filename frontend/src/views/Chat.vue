@@ -10,6 +10,7 @@
           title="Chat"
           :messages="messages"
           @leave="leaveRoom"
+          @delete="leaveRoom"
         />
       </v-col>
       <v-col cols="3">

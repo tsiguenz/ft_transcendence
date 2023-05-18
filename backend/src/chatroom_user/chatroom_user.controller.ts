@@ -72,9 +72,7 @@ export class ChatroomUserController {
   ) {
     if (
       !(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) ||
-      (await this.chatroomUserService.isUserAdmin(
-        userId,
-        chatroomId))
+      (await this.chatroomUserService.isUserAdmin(userId, chatroomId))
     ) {
       throw new ForbiddenException('Unauthorized to promote user');
     }
@@ -107,7 +105,11 @@ export class ChatroomUserController {
   ) {
     if (
       !(await this.chatroomUserService.isUserOwner(user['id'], chatroomId)) ||
-      (await this.chatroomUserService.userHasRole(userId, chatroomId, Role.USER))
+      (await this.chatroomUserService.userHasRole(
+        userId,
+        chatroomId,
+        Role.USER
+      ))
     ) {
       throw new ForbiddenException('Unauthorized to demote user');
     }

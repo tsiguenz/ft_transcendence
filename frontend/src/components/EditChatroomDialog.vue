@@ -23,6 +23,9 @@
         <small>*indicates required field</small>
       </v-card-text>
       <v-card-actions>
+        <v-btn color="red-darken-1" variant="text" @click="alertDeleteChatroom">
+          Delete chatroom
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
           Close
@@ -42,7 +45,7 @@ import swal from 'sweetalert';
 import formatError from '@/utils/lib';
 
 export default {
-  emits: ['create'],
+  emits: ['create', 'delete'],
   props: ['id'],
   data() {
     return {
@@ -66,6 +69,35 @@ export default {
         this.closeDialog();
       } catch (error) {
         console.log(error);
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
+    alertDeleteChatroom() {
+      swal({
+        icon: 'warning',
+        text: 'This will permanently delete the chatroom, do you wish to continue?',
+        buttons: {
+          confirm: 'Delete',
+          cancel: 'Go back'
+        }
+      }).then((confirm) => {
+        if (confirm) {
+          this.deleteChatroom();
+        }
+      });
+    },
+    async deleteChatroom() {
+      try {
+        const response = await axios.delete(
+          constants.API_URL + '/chatrooms/' + this.id,
+          {}
+        );
+        this.closeDialog();
+        this.$emit('delete', this.id);
+      } catch (error) {
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)

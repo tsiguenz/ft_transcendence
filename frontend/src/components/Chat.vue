@@ -3,7 +3,11 @@
     <v-toolbar color="">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <EditChatroomDialog :id="id" v-if="currentUserIsOwner" />
+      <EditChatroomDialog
+        :id="id"
+        v-if="currentUserIsOwner"
+        @delete="(roomId) => $emit('delete', roomId)"
+      />
       <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
     </v-toolbar>
     <div v-for="item in messages" :key="item.sentAt">
@@ -42,7 +46,7 @@ export default {
   components: {
     EditChatroomDialog
   },
-  emits: ['leave'],
+  emits: ['leave', 'delete'],
   props: ['id', 'title', 'messages'],
   data() {
     return {

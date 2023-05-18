@@ -76,8 +76,10 @@ export class ChatroomService {
     });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} chatroom`;
+  async remove(id: string) {
+    return await this.prisma.chatRoom.delete({
+      where: { id: id }
+    });
   }
 
   async join(

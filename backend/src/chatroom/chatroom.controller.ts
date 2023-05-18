@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Patch,
+  Delete,
   Param,
   UseGuards,
   Req,
@@ -105,18 +106,21 @@ export class ChatroomController {
     return this.chatroomService.update(id, updateChatroomDto);
   }
 
-  // @UseGuards(AccessTokenGuard)
-  // @ApiBearerAuth()
-  // @ApiParam({
-  //   name: 'id',
-  //   type: String,
-  //   required: true,
-  //   description: 'Chatroom id'
-  // })
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatroomService.remove(id);
-  // }
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+    description: 'Chatroom id'
+  })
+  @Delete(':id')
+  async remove(@User() user: object, @Param('id') id: string) {
+    if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
+      throw new ForbiddenException('Unauthorized to delete room');
+    }
+    return this.chatroomService.remove(id);
+  }
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
