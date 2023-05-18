@@ -1,26 +1,44 @@
 <template>
-	<v-row class="justify-center"><h4 class="font">{{ disconnectSince }}</h4></v-row>
-	<v-row class="justify-center"><p>Last connection</p></v-row>
+  <v-row class="justify-center"
+    ><h4 class="font">{{ disconnectSince }}</h4></v-row
+  >
+  <v-row class="justify-center"><p>Last connection</p></v-row>
 </template>
 
 <script>
+import axios from 'axios';
+import * as constants from '@/constants.ts';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
+import { mapStores } from 'pinia';
+import { useSessionStore } from '@/store/session';
 export default {
-	props: ['lastConnection'],
+  props: ['lastConnection'],
   data() {
     return {
-			disconnectSince: ''
+      disconnectSince: ''
     };
   },
-	mounted() {
-		this.calculateDifference()
-		setInterval(this.calculateDifference(), 1000)
-	},
+  computed: {
+    ...mapStores(useSessionStore)
+  },
+  mounted() {
+    this.calculateDifference();
+    this.interval = setInterval(this.calculateDifference.bind(this), 1000);
+  },
+  unmounted() {
+    clearInterval(this.interval);
+  },
   methods: {
-    async calculateDifference() {
-console.log("this.lastConnection", this.lastConnection);
-				const lastCoUTC = new Date(this.lastConnection).getTime();
-				const nowUTC = new Date().getTime();
-				this.disconnectSince = new Date(nowUTC - lastCoUTC).toISOString().slice(11, 19);
+    calculateDifference() {
+      if (!this.sessionStore.loggedIn) {
+        return;
+      }
+      const lastCoUTC = new Date(this.lastConnection).getTime();
+      const nowUTC = new Date().getTime();
+      this.disconnectSince = new Date(nowUTC - lastCoUTC)
+        .toISOString()
+        .slice(11, 19);
     }
   }
 };

@@ -46,23 +46,20 @@ export class StatusService {
     return payload.sub;
   }
 
+
   async setLastConnection(socket: Socket) {
     const userId = await this.getUserIdFromSocket(socket);
     if (!userId) return;
-		// need to do this to change to UTC + 2
-		const dateString = new Date().toLocaleString("en-US");
-		const date = new Date(dateString);
     await this.prisma.user
       .update({
         where: {
           id: userId
         },
         data: {
-          lastConnection: date
+          lastConnection: new Date()
         }
       })
-      .catch((e) => {
-				console.log(e);
+      .catch(() => {
         // occur when the user have a good token but is not in the database
         // in case of restart the containers but jwt is still valid
         return socket.disconnect();

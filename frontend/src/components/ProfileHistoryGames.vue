@@ -19,42 +19,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants.ts';
-import swal from 'sweetalert';
-import formatError from '@/utils/lib';
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
-import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
-
 export default {
   data() {
     return {
-      user: {},
       historyGames: [],
       test: []
     };
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
   async mounted() {
-    await this.getProfile();
     await this.putHistoryGames();
   },
   methods: {
-    async getProfile() {
-      try {
-        const response = await axios.get(constants.API_URL + `/users/${this.sessionStore.nickname}/profile`);
-        this.user = response.data;
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-        this.$router.push('/logout');
-      }
-    },
     async putHistoryGames() {
       this.historyGames = {
         score: [

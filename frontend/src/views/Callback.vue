@@ -32,7 +32,7 @@ export default {
       nickname: '',
       accessToken42: ''
     };
-		},
+  },
   computed: {
     ...mapStores(useSessionStore),
     ...mapStores(useConnectedUsersStore)

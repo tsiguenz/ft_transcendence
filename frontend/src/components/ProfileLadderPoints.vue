@@ -1,7 +1,7 @@
 <template>
   <v-container flex class="font">
     <v-row justify="center">
-      <h1>{{ user.ladderPoints }}</h1>
+      <h1>{{ ladderPoints }}</h1>
     </v-row>
     <v-row justify="center">
       <h3>Ladder Points</h3>
@@ -10,42 +10,14 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants.ts';
-import swal from 'sweetalert';
-import formatError from '@/utils/lib';
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
-
 export default {
+  props: ['user'],
   data() {
-    return {
-      user: {},
-      achievements: []
-    };
+    return {};
   },
   computed: {
-    ...mapStores(useSessionStore)
-  },
-  async mounted() {
-    await this.getProfile();
-  },
-  methods: {
-    async getProfile() {
-			if(!this.sessionStore.loggedIn)
-				return ;
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`
-        );
-        this.user = response.data;
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-        this.$router.push('/logout');
-      }
+    ladderPoints() {
+      return this.user.ladderPoints;
     }
   }
 };

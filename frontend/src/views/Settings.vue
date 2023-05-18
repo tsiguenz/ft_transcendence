@@ -1,97 +1,61 @@
 <template>
   <v-container flex>
-    <v-row align="center">
-      <v-col cols="3">
-        <v-sheet class="sheet pa-3">
-          <div class="py-5">
-            <ProfileLadderPoints v-if="userIsMounted" :user="this.user" />
-          </div>
-          <ProfileAchievements />
-        </v-sheet>
-      </v-col>
-      <v-col cols="6">
-        <v-sheet color="transparent">
-          <v-row justify="center">
-            <ProfilePrintAvatar
-              v-if="userIsMounted"
-              :wdt="100"
-              :hgt="100"
-              :urlAvatar="this.avatarPath"
-            />
-          </v-row>
-          <v-row class="justify-center">
-            <h4 class="font ma-3">{{ newNickname }}</h4>
-          </v-row>
-          <ProfileHistoryGames />
-        </v-sheet>
-      </v-col>
-      <v-col cols="3" align="center">
-        <v-sheet class="sheet pa-3">
-          <p class="ma-5">
-            <ProfileLastConnection
-              v-if="userIsMounted"
-              :lastConnection="user.lastConnection"
-            />
-          </p>
-          <v-row class="justify-center"><h2 class="font">12</h2></v-row>
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game won</p></v-row
-          >
-          <v-row class="justify-center"><h2 class="font">23</h2></v-row>
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game played</p></v-row
-          >
-        </v-sheet>
-        <v-btn class="ma-5 log" to="/settings">Settings</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
-  <h1>Profile infos</h1>
-  <p>Nickname: {{ user.nickname }}</p>
-  <p>2fa enable: {{ user.twoFactorEnable }}</p>
-  <p>Created at: {{ user.createdAt }}</p>
-  <p>Ladder points: {{ user.ladderPoints }}</p>
-  <p>Last connection: {{ user.lastConnection }}</p>
-  <img :src="avatarPath" alt="avatar" width="100" height="100" />
-  <p>Avatar path: {{ avatarPath }}</p>
-  <br />
-  <h1>Edit profile</h1>
-  <v-form v-if="!qrcode" v-model="isFormValid">
-    <v-text-field
-      v-model="newNickname"
-      label="Nickname"
-      :rules="[rules.nicknameCharacters]"
-      required
-      @keydown.enter.prevent="dispatchEditProfile"
-    ></v-text-field>
-    <input
-      v-model="newTwoFactorEnable"
-      type="checkbox"
-      label="2fa"
-      checked
-      required
-    />
-    <label for="newTwoFactorEnable">2fa</label>
-    <br />
-    <input type="file" name="avatar" @change="onFileChange" />
-    <br />
-    <v-btn v-if="!qrcode" :disabled="!isFormValid" @click="dispatchEditProfile">
-      submit
-    </v-btn>
-  </v-form>
-  <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
-  <v-form v-if="qrcode">
-    <v-text-field
-      v-model="twoFactorCode"
-      label="Code"
-      required
-      @keydown.enter.prevent="editProfile"
-    ></v-text-field>
-    <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
-  </v-form>
+    <v-row justify="center"><h1 class="font mb-10">Settings</h1></v-row>
+    <v-sheet class="sheet px-5 pt-3 mt-5">
+      <h2 class="font">Change nickname</h2>
+      <v-form v-if="!qrcode" v-model="isFormValid">
+        <v-text-field
+          v-model="newNickname"
+          :rules="[rules.nicknameCharacters]"
+          required
+          @keydown.enter.prevent="dispatchEditProfile"
+        ></v-text-field>
+      </v-form>
+    </v-sheet>
+    <v-sheet class="sheet px-5 pt-3 mt-5">
+      <h2 class="font">Change avatar</h2>
+      <ProfilePrintAvatar
+        v-if="userIsMounted"
+        :wdt="100"
+        :hgt="100"
+        :urlAvatar="this.avatarPath"
+      />
+      <v-file-input type="file" name="avatar" @change="onFileChange" />
+    </v-sheet>
+    <v-form class="sheet" v-if="!qrcode" v-model="isFormValid">
+      <input
+        v-model="newTwoFactorEnable"
+        type="checkbox"
+        label="2fa"
+        checked
+        required
+      />
+      <label for="newTwoFactorEnable">2fa</label>
+      <br />
+      <input type="file" name="avatar" @change="onFileChange" />
+      <br />
+      <v-btn
+        v-if="!qrcode"
+        :disabled="!isFormValid"
+        @click="dispatchEditProfile"
+      >
+        submit
+      </v-btn>
+    </v-form>
+    <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
+    <v-form v-if="qrcode">
+      <v-text-field
+        v-model="twoFactorCode"
+        label="Code"
+        required
+        @keydown.enter.prevent="editProfile"
+      ></v-text-field>
+      <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
+    </v-form>
 
-  <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
-  <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
+    <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
+    <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
+  </v-container>
 </template>
 
 <script>
@@ -243,7 +207,9 @@ export default {
       });
     },
     onFileChange(e) {
+console.log("In onFileChange");
       const avatar = e.target.files[0];
+console.log("avatar ", avatar);
       const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
       const fileSizeMb = avatar.size / 1024 ** 2;
       if (!allowedTypes.includes(avatar.type) || fileSizeMb > 2) {
