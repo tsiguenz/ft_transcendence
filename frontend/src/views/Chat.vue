@@ -21,9 +21,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants';
-import ChatService from '../services/chat.service';
 import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -42,9 +39,6 @@ export default {
     return {
     };
   },
-  created() {
-    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
-  },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
     messages() {
@@ -53,6 +47,9 @@ export default {
     currentChatroomId() {
       return this.chatStore.activeChatroom;
     }
+  },
+  created() {
+    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   methods: {
     async joinChatroom(id) {
