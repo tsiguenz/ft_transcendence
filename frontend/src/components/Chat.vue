@@ -4,8 +4,8 @@
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <EditChatroomDialog
-        :id="id"
         v-if="currentUserIsOwner"
+        :id="id"
         @delete="(roomId) => $emit('delete', roomId)"
       />
       <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import * as constants from '@/constants';
 import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -46,8 +45,8 @@ export default {
   components: {
     EditChatroomDialog
   },
-  emits: ['leave', 'delete'],
   props: ['id', 'title', 'messages'],
+  emits: ['leave', 'delete'],
   data() {
     return {
       newMessage: ''
@@ -79,6 +78,10 @@ export default {
     },
     id: {
       handler() {
+        if (!this.id) {
+          return;
+        }
+        
         ChatService.joinRoom(this.id);
         ChatService.getRoomMessages(this.id, this.lastMessageTime());
       }
