@@ -31,10 +31,10 @@ export class GameGateway {
   @SubscribeMessage('initGame')
   async handleInitGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody() gameDatas: any
+    @MessageBody() datas: any
   ) {
     this.logger.log(`Client init game: ${client.id}`);
-    this.datas = gameDatas;
+    this.datas = datas;
   }
 
   @SubscribeMessage('startGame')
@@ -43,7 +43,7 @@ export class GameGateway {
     setInterval(() => {
       this.gameService.gameLoop(this.datas);
       this.server.emit('loop', this.datas);
-    }, 10);
+    }, 20);
   }
 
   @SubscribeMessage('pressPadUp')
