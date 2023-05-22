@@ -305,4 +305,21 @@ export class UsersService {
 
     return { blockedUsers: blockedUsers.map((x) => x.blockedId) };
   }
+
+  async chatrooms(userId: string) {
+    return await this.prisma.chatRoom.findMany({
+      where: {
+        users: {
+          some: {
+            user: { id: userId }
+          }
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true
+      }
+    });
+  }
 }

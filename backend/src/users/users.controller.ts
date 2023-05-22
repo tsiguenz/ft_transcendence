@@ -177,7 +177,7 @@ export class UsersController {
   @ApiBearerAuth()
   @Get(':nickname/chatrooms')
   async findChatroomsForUser(@User() user: object) {
-    return await this.chatroomService.findChatroomsForUser(user['id']);
+    return await this.usersService.chatrooms(user['id']);
   }
 
   @UseGuards(AccessTokenGuard)

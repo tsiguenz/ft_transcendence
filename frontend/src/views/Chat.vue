@@ -10,6 +10,7 @@
           title="Chat"
           :messages="messages"
           @leave="leaveRoom"
+          @delete="leaveRoom"
         />
       </v-col>
       <v-col cols="3">
@@ -20,9 +21,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants';
-import ChatService from '../services/chat.service';
 import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -39,11 +37,7 @@ export default {
   },
   data() {
     return {
-      // currentChatroomId: 0,
     };
-  },
-  created() {
-    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
@@ -54,13 +48,18 @@ export default {
       return this.chatStore.activeChatroom;
     }
   },
+  created() {
+    BlockUserService.getBlockedUsers(this.sessionStore.nickname);
+  },
   methods: {
     async joinChatroom(id) {
       this.chatStore.activeChatroom = id;
     },
     leaveRoom(id) {
+      if (id == this.currentChatroomId) {
+        this.chatStore.switchToDefaultChatroom();
+      }
       this.chatStore.removeRoom(id);
-      this.chatStore.switchToDefaultChatroom();
     }
   }
 };

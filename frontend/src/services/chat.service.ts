@@ -27,12 +27,20 @@ class ChatService {
     this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
   }
 
+  subscribeToKick(callback: Function) {
+    this.socketService.subscribe(events.KICKED_FROM_ROOM, callback);
+  }
+
   joinRoom(chatroomId: number) {
     this.socketService.send(events.JOIN_ROOM, { chatroomId: chatroomId });
   }
 
   leaveRoom(chatroomId: number) {
     this.socketService.send(events.LEAVE_ROOM, { chatroomId: chatroomId });
+  }
+
+  deleteRoom(chatroomId: number) {
+    this.socketService.send(events.DELETE_ROOM, { chatroomId: chatroomId });
   }
 
   getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {
