@@ -1,23 +1,26 @@
 <template>
-	<v-container flex>
-		<v-row justify="center">
-			<img :src="urlAvatar" alt="avatar" class="rounded-pill" :width='wdt' :height='hgt' />
-		</v-row>
-	</v-container>
-</template>
+	<img
+	  :src="urlAvatar"
+	  alt="avatar"
+	  class="img rounded-pill"
+	  :width="wdt"
+	  :height="hgt"
+	/>
+  </template>
+  
+  <script>
+  
+  export default {
+	props: ['wdt', 'hgt', 'urlAvatar'],
+	data() {
+	  return {};
+	}
+  };
+  </script>
+  <style>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
-
-export default {
-    props: ['wdt', 'hgt', 'urlAvatar'],
-  data() {
-    return {
-		};
-	},
-  computed: {
-    ...mapStores(useSessionStore)
-  },
-};
-</script>
+  .img {
+	border: 3px solid var(--light);
+  }
+  
+  </style>

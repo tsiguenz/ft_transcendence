@@ -55,14 +55,11 @@ export default {
 <style lang="scss" scoped>
 
 .same{
-  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 15%;
 }
-
-.same1{
-  position: absolute;
-  top: 20%;
-}
-
 .ranking-1{
   margin-right: auto;
   margin-left: auto;
