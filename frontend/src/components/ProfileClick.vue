@@ -14,7 +14,7 @@
               class="mx-auto"
                 size="40px"
               >
-                <ProfilePrintAvatar :wdt="width" :hgt="height"></ProfilePrintAvatar>
+                <ProfilePrintAvatar :wdt="width" :hgt="height" :url-avatar="urlAvatar"></ProfilePrintAvatar>
               </v-avatar>
             </v-btn>
           </template>
@@ -23,7 +23,7 @@
               <div class="mx-auto text-center">
                 <v-avatar
                 >
-                <ProfilePrintAvatar :wdt="width" :hgt="height"></ProfilePrintAvatar>
+                <ProfilePrintAvatar :wdt="width" :hgt="height" :url-avatar="urlAvatar"></ProfilePrintAvatar>
                 </v-avatar>
                 <h3>{{ nickname }}</h3>
                 <p class="text-caption mt-1">
@@ -56,7 +56,7 @@ export default {
     ProfilePrintAvatar
   },
   inject: ['connectedUsersStore', 'sessionStore'],
-    props: ['nickname', 'status', 'width', 'height'],
+    props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
   data() {
     return {
       users: [],

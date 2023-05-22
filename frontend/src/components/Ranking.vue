@@ -1,30 +1,31 @@
 <template>
-  <p>{{ users }}</p>
 <div class="rank">
       <figure class="ranking-2" >
     <v-avatar size="180px">
             <v-img
               class="same"
               src="/assets/icons/laurier2.png"
-            ><ProfilePrintAvatar class="same1" :wdt="60" :hgt="60" :url-avatar="users.first"></ProfilePrintAvatar></v-img></v-avatar
-          ><figcaption>#2<br>{{ users.first.nickname }}</figcaption></figure>
+            ><ProfilePrintAvatar class="same1" :wdt="60" :hgt="60" :url-avatar="avatarPath[1]"></ProfilePrintAvatar></v-img></v-avatar
+          ><figcaption>#2<br>{{ users.second.nickname }}<br><p class="points">{{ users.second.ladderPoints }}</p></figcaption></figure>
           <figure class="ranking-1" >
     <v-avatar size="200px">
             <v-img
               class="same"
               src="/assets/icons/laurier.png"
-            ><ProfilePrintAvatar class="same1" :wdt="70" :hgt="70"></ProfilePrintAvatar></v-img>
-            </v-avatar><figcaption>#1<br>{{ users }}</figcaption></figure>
+            ><ProfilePrintAvatar class="same1" :wdt="70" :hgt="70" :url-avatar="avatarPath[0]"></ProfilePrintAvatar></v-img>
+            </v-avatar><figcaption>#1<br>{{ users.first.nickname }}<br><p class="points">{{ users.first.ladderPoints }}</p></figcaption></figure>
             <figure class="ranking-3" >
           <v-avatar class="ranking-3" size="160px">
             <v-img
               class="same"
               src="/assets/icons/laurier3.png"
-            ><ProfilePrintAvatar class="same1" :wdt="50" :hgt="50"></ProfilePrintAvatar></v-img></v-avatar>
-            <figcaption>#3<br>{{ users }}</figcaption></figure></div>
+            ><ProfilePrintAvatar class="same1" :wdt="50" :hgt="50" :url-avatar="avatarPath[2]"></ProfilePrintAvatar></v-img></v-avatar>
+            <figcaption>#3<br>{{ users.third.nickname }}<br><p class="points">{{ users.third.ladderPoints }}</p></figcaption></figure></div>
 </template>
 
 <script>
+import axios from 'axios';
+import * as constants from '@/constants.ts';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
@@ -32,6 +33,22 @@ export default {
     ProfilePrintAvatar
   },
   props: ['users'],
+  data () {
+    return {
+      avatarPath: [],
+    }
+  },
+  async mounted() {
+    await this.getUsersAvatarPath();
+  },
+  methods: {
+  async getUsersAvatarPath() {
+      //Put the 3 users avatar path in an array
+      this.avatarPath[0] = constants.AVATARS_URL + this.users.first.avatarPath;
+      this.avatarPath[1] = constants.AVATARS_URL + this.users.second.avatarPath;
+      this.avatarPath[2] = constants.AVATARS_URL + this.users.third.avatarPath;
+    },
+    },
 };
 </script>
 
@@ -43,7 +60,7 @@ export default {
 
 .same1{
   position: absolute;
-  margin-left: 40px;
+  top: 20%;
 }
 
 .ranking-1{
@@ -78,6 +95,10 @@ figcaption {
   font-size: 40px !important;
   text-align: center;
   font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.points{
+  font-size:medium;
 }
 
 

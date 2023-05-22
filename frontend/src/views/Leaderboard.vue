@@ -1,11 +1,13 @@
 <template>
-  <h1>Leaderboard</h1>
+  <h1 class="title">Leaderboard</h1>
   <br />
-  <Ranking :users="getLeaders()"/>
+  <div v-if="leaders">
+    <Ranking :users="leaders"/>
+  </div>
   <v-table density="compact">
     <thead>
       <tr class="cust-tr">
-        <!-- <th class="cust-th">Id</th> -->
+        <th class="cust-th"></th>
         <th class="cust-th">Nickname</th>
         <th class="cust-th">Ladder points</th>
         <th class="cust-th">Status</th>
@@ -13,9 +15,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <!-- <td>{{ user.id }}</td> -->
-        <td class="cust-td hgt-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)" :width="40" :height="40"></ProfileClick><p>{{ user.nickname }}</p></td>
+      <tr  v-for="(user, index) in users" :key="user.id" :class="{'isprofile': isMyProfile(user.nickname)}">
+        <td class="indexRank"> {{ index + 1 }} </td>
+        <td class="cust-td hgt-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)" :width="40" :height="40" :url-avatar="getAvatarPath(user)"></ProfileClick><p>{{ user.nickname }}</p></td>
         <td class=" hgt-td">{{ user.ladderPoints }}</td>
         <td class=" hgt-td">{{ userStatus(user) }}</td>
         <td class=" hgt-td">
@@ -48,6 +50,13 @@ export default {
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
   },
+  computed: { leaders() {
+      if (this.users.length > 0) {
+        return { first: this.users[0], second: this.users[1], third: this.users[2] };
+      }
+      return 0;
+    }
+  },
   watch: {
     connectedUsersStore: {
       handler() {
@@ -56,16 +65,8 @@ export default {
       deep: true
     }
   },
-  created() {
-    console.log('leaderboard is created')
-    
-  },
-  async abeforeMount() {
-    console.log('leaderboard before mount')
+  async mounted() {
     await this.getUsers();
-  },
-  mounted() {
-    console.log('leaderboard is mouted')
   },
   methods: { 
     async getUsers() {
@@ -117,7 +118,14 @@ export default {
     getLeaders() {
       console.log('in gettop3', this.users);
       return { first: this.users[0], second: this.users[1], third: this.users[2] };
-    }
+    },
+    getAvatarPath(user) {
+    console.log(user.avatarPath);
+    return constants.AVATARS_URL + user.avatarPath;
+  },
+  isMyProfile(name) {
+    return name === this.sessionStore.nickname;
+  }
   },
 };
 </script>
@@ -134,6 +142,10 @@ export default {
   border-radius: 5px;
   box-shadow: 5px 5px 5px var(--light-purple);
   border-color: var(--light-purple);
+}
+
+tr:not(.isprofile) {
+  background-color: var(--dark-purple);
 }
 
 .cust-th{
@@ -158,6 +170,21 @@ export default {
 .cont{
   margin-top: auto;
   margin-bottom: auto;
+  
+}
+
+.title{
+  color: #ffff;
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.indexRank{
+  color: #ffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 5%;
 }
 
 </style>
