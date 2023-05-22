@@ -113,7 +113,7 @@ export class UsersController {
   @ApiBearerAuth()
   @Get(':nickname/profile')
   getProfile(@User() user: object) {
-    return this.usersService.getUserById(user['id']);
+    return user;
   }
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)

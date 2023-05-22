@@ -68,24 +68,6 @@ export class UsersService {
     return users;
   }
 
-	async getProfile(userId: string) {
-		const user = await this.prisma.user.findUnique({
-			where: {
-				id: userId
-			},
-      select: {
-        id: true,
-        nickname: true,
-        ladderPoints: true,
-        avatarPath: true,
-        createdAt: true,
-				lastConnection: true,
-				twoFactorEnable: true
-    	}
-		});
-		return user;
-	}
-
   async deleteUser(user: object) {
     this.deleteAvatar(user['avatarPath']);
     const deleteUser = await this.prisma.user.delete({

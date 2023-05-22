@@ -1,28 +1,57 @@
 <template>
   <v-container flex>
     <v-row justify="center"><h1 class="font mb-10">Settings</h1></v-row>
-    <v-sheet class="sheet px-5 pt-3 mt-5">
+    <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change nickname</h2>
-      <v-form v-if="!qrcode" v-model="isFormValid">
+			You are {{ this.user.nickname }}
+      <v-form class="ma-5" v-model="isFormValid">
         <v-text-field
           v-model="newNickname"
           :rules="[rules.nicknameCharacters]"
           required
-          @keydown.enter.prevent="dispatchEditProfile"
+          @keydown.enter.prevent="editNickname"
         ></v-text-field>
       </v-form>
+      <v-btn
+				class="btn"
+        :disabled="!isFormValid"
+        @click="editNickname"
+      >
+        submit
+      </v-btn>
     </v-sheet>
-    <v-sheet class="sheet px-5 pt-3 mt-5">
+    <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change avatar</h2>
-      <ProfilePrintAvatar
+		<v-row justify="center">
+    <ProfilePrintAvatar
+				class="my-3"
         v-if="userIsMounted"
-        :wdt="100"
-        :hgt="100"
+        :wdt="150"
+        :hgt="150"
         :urlAvatar="this.avatarPath"
       />
-      <v-file-input type="file" name="avatar" @change="onFileChange" />
+			</v-row>
+      <v-file-input class="my-5" type="file" name="avatar" @change="onFileChange" />
+      <v-btn
+				class="btn"
+        :disabled="!isValidAvatar"
+        @click="editAvatar"
+      >
+        submit
+      </v-btn>
     </v-sheet>
-    <v-form class="sheet" v-if="!qrcode" v-model="isFormValid">
+
+
+
+
+
+
+
+
+		<v-sheet class="sheet">
+		<v-btn v-if="!newTwoFactorEnable">Enabled TFA</v-btn>
+		<v-btn v-if="newTwoFactorEnable">Disabled TFA</v-btn>
+    <v-form v-if="!qrcode">
       <input
         v-model="newTwoFactorEnable"
         type="checkbox"
@@ -31,8 +60,6 @@
         required
       />
       <label for="newTwoFactorEnable">2fa</label>
-      <br />
-      <input type="file" name="avatar" @change="onFileChange" />
       <br />
       <v-btn
         v-if="!qrcode"
@@ -52,6 +79,7 @@
       ></v-text-field>
       <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
     </v-form>
+		</v-sheet>
 
     <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
     <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
@@ -89,6 +117,7 @@ export default {
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
+			isValidAvatar: false,
       userIsMounted: false,
       rules: {
         nicknameCharacters: (v) =>
@@ -121,6 +150,53 @@ export default {
           text: formatError(error.response.data.message)
         });
         this.$router.push('/logout');
+      }
+    },
+    async editAvatar() {
+      try {
+        const jwt = this.$cookie.getCookie('jwt');
+        const response = await axios.put(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
+          {
+            nickname: this.newNickname,
+            twoFactorEnable: this.newTwoFactorEnable,
+            twoFactorCode: this.twoFactorCode
+          }
+        );
+        if (this.newAvatar) await this.uploadAvatar(jwt);
+				this.getProfile();
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
+    async editNickname() {
+      if (!this.isFormValid) {
+        swal({
+          icon: 'error',
+          text: 'Invalid character or length in nickname'
+        });
+        return;
+      }
+      try {
+        const jwt = this.$cookie.getCookie('jwt');
+        const response = await axios.put(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
+          {
+            nickname: this.newNickname,
+            twoFactorEnable: this.newTwoFactorEnable,
+            twoFactorCode: this.twoFactorCode
+          }
+        );
+        this.sessionStore.nickname = this.newNickname;
+				this.getProfile();
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
       }
     },
     async editProfile() {
@@ -207,18 +283,19 @@ export default {
       });
     },
     onFileChange(e) {
-console.log("In onFileChange");
       const avatar = e.target.files[0];
-console.log("avatar ", avatar);
+			if (!avatar) { return ;}
       const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
       const fileSizeMb = avatar.size / 1024 ** 2;
-      if (!allowedTypes.includes(avatar.type) || fileSizeMb > 2) {
+      if (!allowedTypes.includes(avatar.type) || fileSizeMb > 2 || fileSizeMb <= 0 ){
         swal({
           icon: 'error',
           text: 'Invalid file type (png / jpeg / jpg) or size (max 2MB)'
         });
         e.target.value = '';
       }
+			else
+				this.isValidAvatar = true;
       this.newAvatar = avatar;
     },
     async uploadAvatar(jwt) {
@@ -247,5 +324,21 @@ console.log("avatar ", avatar);
   background: var(--dark-purple);
   border-radius: 30px;
   border: 3px solid var(--light);
+}
+.btn {
+  background-image: linear-gradient(
+    to right,
+    var(--light) 0%,
+    var(--dark-purple) 51%,
+    var(--light) 100%
+  );
+  width: 250px;
+  bottom: 0;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  border-radius: 5px;
+  display: flex;
 }
 </style>

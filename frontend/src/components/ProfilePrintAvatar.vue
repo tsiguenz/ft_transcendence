@@ -2,7 +2,7 @@
   <img
     :src="urlAvatar"
     alt="avatar"
-    class="rounded-pill"
+    class="img rounded-pill"
     :width="wdt"
     :height="hgt"
   />
@@ -16,9 +16,11 @@ export default {
   props: ['wdt', 'hgt', 'urlAvatar'],
   data() {
     return {};
-  },
-  computed: {
-    ...mapStores(useSessionStore)
   }
 };
 </script>
+<style>
+.img {
+  border: 3px solid var(--light);
+}
+</style>
