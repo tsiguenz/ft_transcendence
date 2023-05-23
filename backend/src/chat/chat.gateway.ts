@@ -15,6 +15,7 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { UsersService } from '../users/users.service';
 import * as events from './socketioEvents';
 
