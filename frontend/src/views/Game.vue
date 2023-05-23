@@ -1,8 +1,10 @@
 <template>
   <h1>Game</h1>
-  <!--  <p v-if="ball">ball: {{ ball }}</p> -->
+  <!--
+  <p v-if="ball">ball: {{ ball }}</p>
   <p v-if="pad1">pad1: {{ pad1 }}</p>
   <p v-if="pad2">pad2: {{ pad2 }}</p>
+  -->
   <div>
     <canvas id="canvas"></canvas>
   </div>
@@ -76,34 +78,41 @@ export default {
       this.socketioGame.send('initGame', gameDatas);
     },
     init() {
-      console.log('init');
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
       // TODO: create input to choose game parameters
       this.map = {
         height: this.canvas.height,
-        width: this.canvas.width
+        width: this.canvas.width,
+        padOffset: 10
+      };
+      const padInfos = {
+        height: this.map.height / 5,
+        width: this.map.width / 100,
+        speed: 1
       };
       this.ball = {
         x: this.map.width / 2,
         y: this.map.height / 2,
         radius: 5,
-        speed: 1,
+        speed: 3,
         dx: 1,
         dy: 1
       };
       this.pad1 = {
         x: 0,
-        y: this.map.height / 2,
-        length: this.map.height / 4,
-        speed: 1,
+        y: this.map.height / 2 - padInfos.height / 2,
+        height: padInfos.height,
+        width: padInfos.width,
+        speed: padInfos.speed,
         dy: 0
       };
       this.pad2 = {
-        x: this.map.width,
-        y: this.map.height / 2,
-        length: this.map.height / 4,
-        speed: 1,
+        x: this.map.width - padInfos.width,
+        y: this.map.height / 2 - padInfos.height / 2,
+        height: padInfos.height,
+        width: padInfos.width,
+        speed: padInfos.speed,
         dy: 0
       };
       this.score = {
@@ -112,6 +121,7 @@ export default {
       };
     },
     draw() {
+      if (!this.map) return;
       this.ctx.clearRect(0, 0, this.map.width, this.map.height);
       this.writeScore();
       this.createCenterDotLine();
@@ -143,7 +153,7 @@ export default {
     },
     drawPad(pad) {
       this.ctx.beginPath();
-      this.ctx.rect(pad.x - 5, pad.y - pad.length / 2, 10, pad.length);
+      this.ctx.rect(pad.x, pad.y, pad.width, pad.height);
       this.ctx.closePath();
       this.ctx.fillStyle = 'white';
       this.ctx.fill();
