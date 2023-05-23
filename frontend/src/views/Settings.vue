@@ -1,9 +1,9 @@
 <template>
-  <v-container flex>
+  <v-container>
     <v-row justify="center"><h1 class="font mb-10">Settings</h1></v-row>
     <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change nickname</h2>
-			You are {{ this.user.nickname }}
+      You are {{ this.user.nickname }}
       <v-form class="ma-5" v-model="isFormValid">
         <v-text-field
           v-model="newNickname"
@@ -12,76 +12,76 @@
           @keydown.enter.prevent="editNickname"
         ></v-text-field>
       </v-form>
-      <v-btn
-				class="btn"
-        :disabled="!isFormValid"
-        @click="editNickname"
-      >
+      <v-btn class="btn" :disabled="!isFormValid" @click="editNickname">
         submit
       </v-btn>
     </v-sheet>
     <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change avatar</h2>
-		<v-row justify="center">
-    <ProfilePrintAvatar
-				class="my-3"
-        v-if="userIsMounted"
-        :wdt="150"
-        :hgt="150"
-        :urlAvatar="this.avatarPath"
+      <v-row justify="center">
+        <ProfilePrintAvatar
+          class="my-3"
+          v-if="userIsMounted"
+          :wdt="150"
+          :hgt="150"
+          :urlAvatar="this.avatarPath"
+        />
+      </v-row>
+      <v-file-input
+        class="my-5"
+        type="file"
+        name="avatar"
+        @change="onFileChange"
       />
-			</v-row>
-      <v-file-input class="my-5" type="file" name="avatar" @change="onFileChange" />
-      <v-btn
-				class="btn"
-        :disabled="!isValidAvatar"
-        @click="editAvatar"
-      >
+      <v-btn class="btn" :disabled="!isValidAvatar" @click="editProfile">
         submit
       </v-btn>
     </v-sheet>
-
-
-
-
-
-
-
-
-		<v-sheet class="sheet">
-		<v-btn v-if="!newTwoFactorEnable" @click="editTFA">Enabled TFA</v-btn>
-		<v-btn v-if="newTwoFactorEnable">Disabled TFA</v-btn>
-    <v-form v-if="!qrcode">
-      <input
-        v-model="newTwoFactorEnable"
-        type="checkbox"
-        label="2fa"
-        checked
-        required
-      />
-      <label for="newTwoFactorEnable">2fa</label>
-      <br />
+    <v-sheet class="sheet pa-5 mt-5">
+      <h2 class="font">Manage two-factor authentification</h2>
+      <p v-if="newTwoFactorEnable">Your account is protected with 2FA</p>
+      <p v-if="!newTwoFactorEnable">Your account is not protected with 2FA</p>
       <v-btn
-        v-if="!qrcode"
-        :disabled="!isFormValid"
-        @click="dispatchEditProfile"
+        v-if="!newTwoFactorEnable && !qrcode"
+        class="btn"
+        @click="generate2faQrcode"
+        >Enabled TFA</v-btn
       >
-        submit
-      </v-btn>
-    </v-form>
-    <img v-if="qrcode" :src="qrcode" alt="qrcode" width="200" height="200" />
-    <v-form v-if="qrcode">
-      <v-text-field
-        v-model="twoFactorCode"
-        label="Code"
-        required
-        @keydown.enter.prevent="editProfile"
-      ></v-text-field>
-      <v-btn v-if="qrcode" @click="editProfile">Validate code</v-btn>
-    </v-form>
-		</v-sheet>
+      <v-btn
+        v-if="newTwoFactorEnable && !qrcode"
+        class="btn"
+        @click="generate2faQrcode"
+        >Disabled TFA</v-btn
+      >
+      <v-dialog v-model="dialog" persistent>
+        <v-row align="center" justify="center">
+          <v-sheet class="sheet pa-10" height="100%" width="500">
+            <v-row class="justify-center ma-5 mb-10">
+              Scan this QR Code with Google Authenticator
+            </v-row>
+            <v-row class="justify-center ma-5 mb-10">
+              <img :src="qrcode" alt="qrcode" width="200" height="200" />
+            </v-row>
+            <v-form v-if="qrcode">
+              <v-row class="justify-center ma-3">
+                <v-text-field
+                  v-model="twoFactorCode"
+                  label="Enter the generated code"
+                  required
+                  @keydown.enter.prevent="editProfile"
+                ></v-text-field>
+              </v-row>
+              <v-row class="justify-center ma-3">
+                <v-btn v-if="qrcode" class="btn" @click="editProfile"
+                  >Validate code</v-btn
+                >
+              </v-row>
+            </v-form>
+          </v-sheet>
+        </v-row>
+      </v-dialog>
+    </v-sheet>
 
-    <v-btn v-if="!qrcode" to="/logout">Logout</v-btn>
     <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
   </v-container>
 </template>
@@ -117,8 +117,9 @@ export default {
       twoFactorCode: '',
       qrcode: '',
       isFormValid: false,
-			isValidAvatar: false,
+      isValidAvatar: false,
       userIsMounted: false,
+      dialog: false,
       rules: {
         nicknameCharacters: (v) =>
           /^[a-zA-Z0-9-]{1,8}$/.test(v) ||
@@ -164,7 +165,7 @@ export default {
           }
         );
         if (this.newAvatar) await this.uploadAvatar(jwt);
-				this.getProfile();
+        this.getProfile();
       } catch (error) {
         swal({
           icon: 'error',
@@ -191,7 +192,7 @@ export default {
           }
         );
         this.sessionStore.nickname = this.newNickname;
-				this.getProfile();
+        this.getProfile();
       } catch (error) {
         swal({
           icon: 'error',
@@ -212,20 +213,22 @@ export default {
         );
         this.sessionStore.nickname = this.newNickname;
         if (this.newAvatar) await this.uploadAvatar(jwt);
-        swal({
-          icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
-          text: formatError(response.data.message)
-        });
-        this.$router.push('/home');
+        //        swal({
+        //          icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
+        //          text: formatError(response.data.message)
+        //        });
+        //        this.$router.push('/home');
       } catch (error) {
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
         });
       }
+      this.getProfile();
+      this.qrcode = '';
+      this.dialog = false;
     },
     async editTFA() {
-console.log("editTFA");
       try {
         const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.put(
@@ -242,7 +245,6 @@ console.log("editTFA");
           text: formatError(error.response.data.message)
         });
       }
-console.log("editTFA 2");
       try {
         const response = await axios.get(
           constants.API_URL + '/2fa/generate-qrcode'
@@ -270,7 +272,13 @@ console.log("editTFA 2");
       }
     },
     async generate2faQrcode() {
-console.log("generate@faQrcode");
+      this.dialog = true;
+      this.newTwoFactorEnable = !this.newTwoFactorEnable;
+      if (!this.newTwoFactorEnable) {
+        this.dialog = false;
+        this.editProfile();
+        return;
+      }
       try {
         const response = await axios.get(
           constants.API_URL + '/2fa/generate-qrcode'
@@ -316,18 +324,22 @@ console.log("generate@faQrcode");
     },
     onFileChange(e) {
       const avatar = e.target.files[0];
-			if (!avatar) { return ;}
+      if (!avatar) {
+        return;
+      }
       const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
       const fileSizeMb = avatar.size / 1024 ** 2;
-      if (!allowedTypes.includes(avatar.type) || fileSizeMb > 2 || fileSizeMb <= 0 ){
+      if (
+        !allowedTypes.includes(avatar.type) ||
+        fileSizeMb > 2 ||
+        fileSizeMb <= 0
+      ) {
         swal({
           icon: 'error',
           text: 'Invalid file type (png / jpeg / jpg) or size (max 2MB)'
         });
         e.target.value = '';
-      }
-			else
-				this.isValidAvatar = true;
+      } else this.isValidAvatar = true;
       this.newAvatar = avatar;
     },
     async uploadAvatar(jwt) {

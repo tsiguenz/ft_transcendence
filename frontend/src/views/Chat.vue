@@ -36,8 +36,7 @@ export default {
     ChatroomUsers
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
