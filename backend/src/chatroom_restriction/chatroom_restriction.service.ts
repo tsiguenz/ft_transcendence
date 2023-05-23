@@ -27,7 +27,10 @@ export class ChatroomRestrictionService {
     return await this.prisma.chatRoomRestriction.findFirst({
       where: {
         chatRoomId: chatroomId,
-        userId: userId
+        userId: userId,
+        restrictedUntil: {
+          gte: new Date(),
+        }
       }
     });
   }

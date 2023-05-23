@@ -62,12 +62,12 @@ class ChatService {
     this.chatStore.removeUser(payload);
   }
 
-  muteUser(userId: string, chatroomId: string, until: Date) {
-    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'MUTED', until });
+  muteUser(userId: string, chatroomId: string, time: number) {
+    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'MUTED', time });
   }
 
-  banUser(userId: string, chatroomId: string, until: Date) {
-    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'BANNED', until });
+  banUser(userId: string, chatroomId: string, time: number) {
+    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'BANNED', time });
   }
 }
 

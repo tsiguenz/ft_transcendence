@@ -45,6 +45,10 @@ export class ChatGateway
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
 
+      if (await this.chatroomRestriction.isUserRestricted(user.id, chatroom.id)) {
+        return ;
+      }
+
       const message = await this.chat.saveMessage(
         client['decoded'].sub,
         payload.chatroomId,
@@ -146,7 +150,7 @@ export class ChatGateway
       userId: string;
       chatroomId: string;
       restrictionType: string;
-      until: Date;
+      time: number;
     }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
@@ -154,6 +158,10 @@ export class ChatGateway
       return;
     }
 
+    if (!(await this.users.getUserById(client['decoded'].sub))) {
+      return;
+    }
+    
     if (
       !(await this.chatroomUser.isUserAdmin(
         client['decoded'].sub,
@@ -164,19 +172,26 @@ export class ChatGateway
       throw new WsException('Unauthorized to restrict user');
     }
 
+    const date = new Date();
+    const until = new Date(date.getTime() + payload.time * 1000 * 60);
+    const restrictionType = this.chatroomRestriction.stringToRestrictionType(payload.restrictionType);
+
     try {
       this.chatroomRestriction.create(
         payload.userId,
         chatroom.id,
-        this.chatroomRestriction.stringToRestrictionType(
-          payload.restrictionType
-        ),
-        payload.until
+        restrictionType,
+        until
       );
-      // this.server
-      //   .to(chatroom.slug)
-      //   .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
-      // this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+      
+      if (restrictionType == RestrictionType.MUTED) { return ; }
+
+      const socket = await this.getUserSocket(payload.userId);
+      if (!socket) { return ; }
+
+      socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+      socket.leave(chatroom.slug);
+      this.chatroomUser.remove(payload.userId, chatroom.id);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -253,5 +268,15 @@ export class ChatGateway
     if (!user) {
       client.disconnect();
     }
+  }
+
+  async getUserSocket(userId: string) {
+    const sockets = await this.server.fetchSockets();
+    for (const socket of sockets) {
+      if (socket['decoded'].sub == userId) { 
+        return socket;
+      }
+    }
+    return null;
   }
 }

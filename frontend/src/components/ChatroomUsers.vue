@@ -28,7 +28,7 @@
           >Revoke admin</v-btn
         >
         <RestrictUserDialog v-if="currentUserIsAdmin" action="Mute" :nickname="user.nickname" :userId="user.id" @restrict="mute" />
-        <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
+        <RestrictUserDialog v-if="currentUserIsAdmin" action="Ban" :nickname="user.nickname" :userId="user.id" @restrict="ban" />
         <v-btn
           v-if="!isUserBlocked(user.id)"
           @click="blockUser(user.nickname)"
@@ -200,8 +200,8 @@ export default {
     mute(params) {
       ChatService.muteUser(params.userId, this.id, params.time);
     },
-    ban(userId) {
-      ChatService.banUser(userId, this.id, new Date());
+    ban(params) {
+      ChatService.banUser(params.userId, this.id, params.time);
     }
   }
 };

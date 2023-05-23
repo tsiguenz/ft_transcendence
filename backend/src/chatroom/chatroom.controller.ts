@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { User } from '../decorator/user.decorator';
 
@@ -29,7 +30,8 @@ import { User } from '../decorator/user.decorator';
 export class ChatroomController {
   constructor(
     private readonly chatroomService: ChatroomService,
-    private readonly chatroomUserService: ChatroomUserService
+    private readonly chatroomUserService: ChatroomUserService,
+    private readonly chatroomRestrictionService: ChatroomRestrictionService
   ) {}
 
   @UseGuards(AccessTokenGuard)
@@ -142,6 +144,9 @@ export class ChatroomController {
     @Param('id') id: string,
     @Body('password') password: string
   ) {
+    if (await this.chatroomRestrictionService.isUserBanned(user['id'], id)) {
+      throw new ForbiddenException('Unauthorized to join room');
+    }
     return await this.chatroomService.join(user['id'], id, password);
   }
 }

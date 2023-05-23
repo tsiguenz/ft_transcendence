@@ -45,13 +45,13 @@ export default {
   data() {
     return {
       dialog: false,
-      banTime: 0 
+      banTime: 15
     };
   },
   methods: {
     closeDialog() {
       this.dialog = false;
-      this.banTime = 0;
+      this.banTime = 15;
     },
     restrict() {
       this.$emit('restrict', { userId: this.userId, time: this.banTime });
