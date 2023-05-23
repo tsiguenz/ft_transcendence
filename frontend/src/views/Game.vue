@@ -100,7 +100,7 @@ export default {
         dy: 1
       };
       this.pad1 = {
-        x: 0,
+        x: this.map.padOffset,
         y: this.map.height / 2 - padInfos.height / 2,
         height: padInfos.height,
         width: padInfos.width,
@@ -108,7 +108,7 @@ export default {
         dy: 0
       };
       this.pad2 = {
-        x: this.map.width - padInfos.width,
+        x: this.map.width - padInfos.width - this.map.padOffset,
         y: this.map.height / 2 - padInfos.height / 2,
         height: padInfos.height,
         width: padInfos.width,
