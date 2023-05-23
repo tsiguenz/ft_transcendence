@@ -61,6 +61,7 @@ export default {
     },
     pushChatroom(chatroom) {
       this.chatStore.addRoom(chatroom);
+      this.join(chatroom.id);
     },
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
