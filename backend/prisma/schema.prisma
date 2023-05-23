@@ -120,6 +120,7 @@ model BlockedUser {
 }
 
 model ChatRoomRestriction {
+  id                String      @id @default(uuid())
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
   chatRoom          ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
@@ -127,7 +128,6 @@ model ChatRoomRestriction {
   type              RestrictionType
   restrictedUntil   DateTime
 
-  @@id([userId, chatRoomId], name: "chatrooms_users_pkey")
   @@map("chatrooms_restrictions")
 }
 

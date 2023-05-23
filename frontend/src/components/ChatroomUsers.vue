@@ -27,7 +27,7 @@
           block
           >Revoke admin</v-btn
         >
-        <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
+        <RestrictUserDialog v-if="currentUserIsAdmin" action="Mute" :nickname="user.nickname" :userId="user.id" @restrict="mute" />
         <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
         <v-btn
           v-if="!isUserBlocked(user.id)"
@@ -52,11 +52,15 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import RestrictUserDialog from '../components/RestrictUserDialog.vue';
 
 export default {
+  components: {
+    RestrictUserDialog
+  },
   props: ['id'],
   data() {
-    return {
+    return { 
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -192,6 +196,12 @@ export default {
     },
     isUserBlocked(userId) {
       return BlockUserService.isUserBlocked(userId);
+    },
+    mute(params) {
+      ChatService.muteUser(params.userId, this.id, params.time);
+    },
+    ban(userId) {
+      ChatService.banUser(userId, this.id, new Date());
     }
   }
 };

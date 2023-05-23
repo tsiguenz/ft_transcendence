@@ -14,7 +14,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ChatroomUserModule } from './chatroom_user/chatroom_user.module';
 import { ChatroomRestrictionService } from './chatroom_restriction/chatroom_restriction.service';
 
-
 // TODO: remember when we said global is bad? Well, it's bad here too.
 @Module({
   imports: [
@@ -31,6 +30,13 @@ import { ChatroomRestrictionService } from './chatroom_restriction/chatroom_rest
       serveRoot: '/'
     })
   ],
-  providers: [ChatGateway, ChatService, TwoFaService, UsersService, JwtService, ChatroomRestrictionService]
+  providers: [
+    ChatGateway,
+    ChatService,
+    TwoFaService,
+    UsersService,
+    JwtService,
+    ChatroomRestrictionService
+  ]
 })
 export class AppModule {}

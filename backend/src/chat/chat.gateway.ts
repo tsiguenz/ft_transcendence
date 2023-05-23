@@ -141,24 +141,38 @@ export class ChatGateway
   @SubscribeMessage(events.RESTRICT_USER)
   async handleRestrict(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { userId: string, chatroomId: string, restrictionType: string, until: Date }
+    @MessageBody()
+    payload: {
+      userId: string;
+      chatroomId: string;
+      restrictionType: string;
+      until: Date;
+    }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
-    let restriction = RestrictionType.MUTED;
-
-
     if (!chatroom) {
       return;
     }
 
     if (
-      !(await this.chatroomUser.isUserAdmin(client['decoded'].sub, chatroom.id)) || !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
+      !(await this.chatroomUser.isUserAdmin(
+        client['decoded'].sub,
+        chatroom.id
+      )) &&
+      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
     ) {
       throw new WsException('Unauthorized to restrict user');
     }
 
     try {
-      this.chatroomRestriction.create(payload.userId, chatroom.id, this.chatroomRestriction.stringToRestrictionType(payload.restrictionType), payload.until);
+      this.chatroomRestriction.create(
+        payload.userId,
+        chatroom.id,
+        this.chatroomRestriction.stringToRestrictionType(
+          payload.restrictionType
+        ),
+        payload.until
+      );
       // this.server
       //   .to(chatroom.slug)
       //   .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });

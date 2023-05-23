@@ -1,6 +1,4 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RestrictionType, ChatRoomRestriction } from '@prisma/client';
 import * as argon from 'argon2';
@@ -22,7 +20,10 @@ export class ChatroomRestrictionService {
     });
   }
 
-  async findOne(userId: string, chatroomId: string): Promise<ChatRoomRestriction> {
+  async findOne(
+    userId: string,
+    chatroomId: string
+  ): Promise<ChatRoomRestriction> {
     return await this.prisma.chatRoomRestriction.findFirst({
       where: {
         chatRoomId: chatroomId,
@@ -61,7 +62,11 @@ export class ChatroomRestrictionService {
     return !!(await this.findOne(userId, chatroomId));
   }
 
-  async userHasRestriction(userId: string, chatroomId: string, type: RestrictionType) {
+  async userHasRestriction(
+    userId: string,
+    chatroomId: string,
+    type: RestrictionType
+  ) {
     const restriction = await this.findOne(userId, chatroomId);
 
     if (!restriction || restriction.type !== type) {
@@ -71,15 +76,26 @@ export class ChatroomRestrictionService {
   }
 
   async isUserMuted(userId: string, chatroomId: string) {
-    return await this.userHasRestriction(userId, chatroomId, RestrictionType.MUTED);
+    return await this.userHasRestriction(
+      userId,
+      chatroomId,
+      RestrictionType.MUTED
+    );
   }
 
   async isUserBanned(userId: string, chatroomId: string) {
-    return await this.userHasRestriction(userId, chatroomId, RestrictionType.BANNED);
+    return await this.userHasRestriction(
+      userId,
+      chatroomId,
+      RestrictionType.BANNED
+    );
   }
 
   stringToRestrictionType(type: string): RestrictionType {
-    const conversionTable = { 'MUTED': RestrictionType.MUTED, 'BANNED': RestrictionType.BANNED };
+    const conversionTable = {
+      MUTED: RestrictionType.MUTED,
+      BANNED: RestrictionType.BANNED
+    };
     return conversionTable[type];
   }
 }
