@@ -17,6 +17,7 @@ import { ChatroomService } from '../chatroom/chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { UsersService } from '../users/users.service';
+import { RestrictionType } from '@prisma/client';
 import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -28,7 +29,8 @@ export class ChatGateway
     private chat: ChatService,
     private users: UsersService,
     private chatroom: ChatroomService,
-    private chatroomUser: ChatroomUserService
+    private chatroomUser: ChatroomUserService,
+    private chatroomRestriction: ChatroomRestrictionService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -131,6 +133,36 @@ export class ChatGateway
         .to(chatroom.slug)
         .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
       this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.RESTRICT_USER)
+  async handleRestrict(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { userId: string, chatroomId: string, restrictionType: string, until: Date }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+    let restriction = RestrictionType.MUTED;
+
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (
+      !(await this.chatroomUser.isUserAdmin(client['decoded'].sub, chatroom.id)) || !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
+    ) {
+      throw new WsException('Unauthorized to restrict user');
+    }
+
+    try {
+      this.chatroomRestriction.create(payload.userId, chatroom.id, this.chatroomRestriction.stringToRestrictionType(payload.restrictionType), payload.until);
+      // this.server
+      //   .to(chatroom.slug)
+      //   .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+      // this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
     } catch (e) {
       throw new WsException((e as Error).message);
     }

@@ -77,4 +77,9 @@ export class ChatroomRestrictionService {
   async isUserBanned(userId: string, chatroomId: string) {
     return await this.userHasRestriction(userId, chatroomId, RestrictionType.BANNED);
   }
+
+  stringToRestrictionType(type: string): RestrictionType {
+    const conversionTable = { 'MUTED': RestrictionType.MUTED, 'BANNED': RestrictionType.BANNED };
+    return conversionTable[type];
+  }
 }
