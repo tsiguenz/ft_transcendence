@@ -174,13 +174,20 @@ div {
   width: 50%;
   margin: 0 auto;
 }
+
 canvas {
   height: 100%;
   width: 100%;
   background-color: black;
 }
+
 p {
   text-align: center;
   font-size: 2em;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3em;
 }
 </style>
