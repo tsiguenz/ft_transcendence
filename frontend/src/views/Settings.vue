@@ -49,7 +49,7 @@
 
 
 		<v-sheet class="sheet">
-		<v-btn v-if="!newTwoFactorEnable">Enabled TFA</v-btn>
+		<v-btn v-if="!newTwoFactorEnable" @click="editTFA">Enabled TFA</v-btn>
 		<v-btn v-if="newTwoFactorEnable">Disabled TFA</v-btn>
     <v-form v-if="!qrcode">
       <input
@@ -224,6 +224,37 @@ export default {
         });
       }
     },
+    async editTFA() {
+console.log("editTFA");
+      try {
+        const jwt = this.$cookie.getCookie('jwt');
+        const response = await axios.put(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
+          {
+            nickname: this.newNickname,
+            twoFactorEnable: this.newTwoFactorEnable,
+            twoFactorCode: this.twoFactorCode
+          }
+        );
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+console.log("editTFA 2");
+      try {
+        const response = await axios.get(
+          constants.API_URL + '/2fa/generate-qrcode'
+        );
+        this.qrcode = response.data.qrcode;
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
+    },
     async dispatchEditProfile() {
       if (!this.isFormValid) {
         swal({
@@ -239,6 +270,7 @@ export default {
       }
     },
     async generate2faQrcode() {
+console.log("generate@faQrcode");
       try {
         const response = await axios.get(
           constants.API_URL + '/2fa/generate-qrcode'
