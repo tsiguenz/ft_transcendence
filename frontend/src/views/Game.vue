@@ -42,6 +42,7 @@ export default {
     });
   },
   mounted() {
+    this.runGame();
     document.addEventListener('keydown', (e) => {
       if (e.keyCode === 38) {
         this.socketioGame.send('pressPadUp');
@@ -56,7 +57,6 @@ export default {
         this.socketioGame.send('releasePadDown');
       }
     });
-    this.runGame();
   },
   beforeUnmount() {
     this.socketioGame.disconnect();
@@ -94,8 +94,8 @@ export default {
       this.ball = {
         x: this.map.width / 2,
         y: this.map.height / 2,
-        radius: 5,
-        speed: 3,
+        radius: 3,
+        speed: 1,
         dx: 1,
         dy: 1
       };
@@ -159,7 +159,7 @@ export default {
       this.ctx.fill();
     },
     writeScore() {
-      this.ctx.font = '20px Arial';
+      this.ctx.font = '20px Poppins';
       this.ctx.fillStyle = 'white';
       this.ctx.fillText(this.score.player1, this.map.width / 2 - 25, 20);
       this.ctx.fillText(this.score.player2, this.map.width / 2 + 15, 20);
@@ -178,7 +178,9 @@ div {
 canvas {
   height: 100%;
   width: 100%;
-  background-color: black;
+  background-color: var(--dark-alt);
+  border-radius: 30px;
+  border: 3px solid var(--light);
 }
 
 p {

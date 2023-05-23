@@ -13,7 +13,7 @@ import { GameService } from './game.service';
 export class GameGateway {
   constructor(private gameService: GameService) {}
   datas = {};
-  interval;
+  interval = null;
   playersInGame = 0;
 
   @WebSocketServer() server: Server;
@@ -27,10 +27,13 @@ export class GameGateway {
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.datas = {};
     this.logger.log(`Client disconnected: ${client.id}`);
     this.playersInGame--;
-    if (this.playersInGame === 0) clearInterval(this.interval);
+    if (this.playersInGame === 0) {
+      clearInterval(this.interval);
+      this.interval = null;
+      this.datas = {};
+    }
   }
 
   @SubscribeMessage('initGame')
@@ -38,12 +41,14 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() datas: any
   ) {
+    if (this.interval) return;
     this.logger.log(`Client init game: ${client.id}`);
     this.datas = datas;
   }
 
   @SubscribeMessage('startGame')
   async handleStartGame(@ConnectedSocket() client: Socket) {
+    if (this.interval) return;
     this.logger.log(`Client start game: ${client.id}`);
     this.interval = setInterval(() => {
       if (!this.playersInGame) {
@@ -51,7 +56,7 @@ export class GameGateway {
       }
       this.gameService.gameLoop(this.datas);
       this.server.emit('loop', this.datas);
-    }, 20);
+    }, 10);
   }
 
   @SubscribeMessage('pressPadUp')
