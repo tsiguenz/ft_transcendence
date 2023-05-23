@@ -116,11 +116,9 @@ export default {
         : 'Disconnected';
     },
     getLeaders() {
-      console.log('in gettop3', this.users);
       return { first: this.users[0], second: this.users[1], third: this.users[2] };
     },
     getAvatarPath(user) {
-    console.log(user.avatarPath);
     return constants.AVATARS_URL + user.avatarPath;
   },
   isMyProfile(name) {

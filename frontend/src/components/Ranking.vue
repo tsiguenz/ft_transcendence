@@ -5,21 +5,21 @@
             <v-img
               class="same"
               src="/assets/icons/laurier2.png"
-            ><ProfilePrintAvatar class="same1" :wdt="60" :hgt="60" :url-avatar="avatarPath[1]"></ProfilePrintAvatar></v-img></v-avatar
+            ><ProfilePrintAvatar :wdt="60" :hgt="60" :url-avatar="avatarPath[1]"></ProfilePrintAvatar></v-img></v-avatar
           ><figcaption>#2<br>{{ users.second.nickname }}<br><p class="points">{{ users.second.ladderPoints }}</p></figcaption></figure>
           <figure class="ranking-1" >
     <v-avatar size="200px">
             <v-img
               class="same"
               src="/assets/icons/laurier.png"
-            ><ProfilePrintAvatar class="same1" :wdt="70" :hgt="70" :url-avatar="avatarPath[0]"></ProfilePrintAvatar></v-img>
+            ><ProfilePrintAvatar :wdt="70" :hgt="70" :url-avatar="avatarPath[0]"></ProfilePrintAvatar></v-img>
             </v-avatar><figcaption>#1<br>{{ users.first.nickname }}<br><p class="points">{{ users.first.ladderPoints }}</p></figcaption></figure>
             <figure class="ranking-3" >
           <v-avatar class="ranking-3" size="160px">
             <v-img
               class="same"
               src="/assets/icons/laurier3.png"
-            ><ProfilePrintAvatar class="same1" :wdt="50" :hgt="50" :url-avatar="avatarPath[2]"></ProfilePrintAvatar></v-img></v-avatar>
+            ><ProfilePrintAvatar :wdt="50" :hgt="50" :url-avatar="avatarPath[2]"></ProfilePrintAvatar></v-img></v-avatar>
             <figcaption>#3<br>{{ users.third.nickname }}<br><p class="points">{{ users.third.ladderPoints }}</p></figcaption></figure></div>
 </template>
 
