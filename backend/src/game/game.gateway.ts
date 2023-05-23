@@ -14,25 +14,33 @@ export class GameGateway {
   constructor(private gameService: GameService) {}
   datas = {};
   interval = null;
-  playersInGame = 0;
+  usersTokens = [];
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('GameGateway');
 
   @SubscribeMessage('connect')
   async handleConnection(@ConnectedSocket() client: Socket) {
+    if (
+      this.usersTokens.includes(client.handshake.auth.token) ||
+      this.usersTokens.length === 2
+    )
+      return;
     this.logger.log(`Client connected: ${client.id}`);
-    this.playersInGame++;
+    this.usersTokens.push(client.handshake.auth.token);
   }
 
   @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    this.playersInGame--;
-    if (this.playersInGame === 0) {
+    this.usersTokens = this.usersTokens.filter(
+      (token) => token !== client.handshake.auth.token
+    );
+    if (!this.usersTokens.length) {
       clearInterval(this.interval);
       this.interval = null;
       this.datas = {};
+      this.logger.log(`Game stopped by ${client.id}`);
     }
   }
 
@@ -51,7 +59,7 @@ export class GameGateway {
     if (this.interval) return;
     this.logger.log(`Client start game: ${client.id}`);
     this.interval = setInterval(() => {
-      if (!this.playersInGame) {
+      if (!this.usersTokens.length) {
         this.datas = {};
       }
       this.gameService.gameLoop(this.datas);
@@ -60,22 +68,22 @@ export class GameGateway {
   }
 
   @SubscribeMessage('pressPadUp')
-  async handlePressPadUp() {
-    this.gameService.handlePressPadUp(this.server, this.datas);
+  async handlePressPadUp(@ConnectedSocket() client: Socket) {
+    this.gameService.handlePressPadUp(client, this.datas, this.usersTokens);
   }
 
   @SubscribeMessage('pressPadDown')
-  async handlePressPadDown() {
-    this.gameService.handlePressPadDown(this.server, this.datas);
+  async handlePressPadDown(@ConnectedSocket() client: Socket) {
+    this.gameService.handlePressPadDown(client, this.datas, this.usersTokens);
   }
 
   @SubscribeMessage('releasePadUp')
-  async handleReleasePadUp() {
-    this.gameService.handleReleasePadUp(this.server, this.datas);
+  async handleReleasePadUp(@ConnectedSocket() client: Socket) {
+    this.gameService.handleReleasePadUp(client, this.datas, this.usersTokens);
   }
 
   @SubscribeMessage('releasePadDown')
-  async handleReleasePadDown() {
-    this.gameService.handleReleasePadDown(this.server, this.datas);
+  async handleReleasePadDown(@ConnectedSocket() client: Socket) {
+    this.gameService.handleReleasePadDown(client, this.datas, this.usersTokens);
   }
 }

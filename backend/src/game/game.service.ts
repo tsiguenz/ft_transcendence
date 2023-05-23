@@ -21,20 +21,48 @@ export class GameService {
     this.movePad(pad2);
   }
 
-  handlePressPadUp(socket: Server, datas: any): void {
-    datas.pad1.dy = -1;
+  handlePressPadUp(
+    client: Socket,
+    datas: any,
+    usersTokens: Array<string>
+  ): void {
+    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
+      datas.pad1.dy = -1;
+    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
+      datas.pad2.dy = -1;
   }
 
-  handleReleasePadUp(socket: Server, datas: any): void {
-    datas.pad1.dy = 0;
+  handleReleasePadUp(
+    client: Socket,
+    datas: any,
+    usersTokens: Array<string>
+  ): void {
+    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
+      datas.pad1.dy = 0;
+    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
+      datas.pad2.dy = 0;
   }
 
-  handlePressPadDown(socket: Server, datas: any): void {
-    datas.pad1.dy = 1;
+  handlePressPadDown(
+    client: Socket,
+    datas: any,
+    usersTokens: Array<string>
+  ): void {
+    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
+      datas.pad1.dy = 1;
+    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
+      datas.pad2.dy = 1;
   }
 
-  handleReleasePadDown(socket: Server, datas: any): void {
-    datas.pad1.dy = 0;
+  handleReleasePadDown(
+    client: Socket,
+    datas: any,
+    usersTokens: Array<string>
+  ): void {
+    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
+      datas.pad1.dy = 0;
+    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
+      datas.pad2.dy = 0;
   }
 
   moveBall(ball): void {
