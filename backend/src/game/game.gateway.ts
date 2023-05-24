@@ -2,8 +2,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   ConnectedSocket,
-  WebSocketServer,
-  MessageBody
+  WebSocketServer
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -20,7 +19,6 @@ export class GameGateway {
   ) {}
   datas = {};
   // useless
-  interval = null;
   // useless
   usersTokens = [];
   rooms = new Map();
@@ -32,6 +30,20 @@ export class GameGateway {
   async handleConnection(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
     if (await this.gameService.setDecodedTokenToClient(client)) return;
+  }
+
+  @SubscribeMessage('disconnect')
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    const userId = client['decoded'].sub;
+    const room = this.gameService.getRoomIdByUserId(userId, this.rooms);
+    if (!room) return;
+    client.leave(room);
+    this.logger.log(`Client leave room: ${room}`);
+    this.logger.log(`Client disconnected: ${client.id}`);
+  }
+
+  @SubscribeMessage('connectToRoom')
+  async handleConnectToRoom(@ConnectedSocket() client: Socket) {
     const userId = client['decoded'].sub;
     if (
       this.gameService.isUserAlreadyInRoom(client['decoded'].sub, this.rooms)
@@ -48,39 +60,29 @@ export class GameGateway {
       this.logger.log(`Client joined room: ${joinableRoom}`);
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
+      this.gameService.initDatas(this.rooms, roomId);
       client.join(roomId);
       this.logger.log(`Client created room: ${roomId}`);
     }
   }
 
-  @SubscribeMessage('disconnect')
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const userId = client['decoded'].sub;
-    const room = this.gameService.getRoomIdByUserId(userId, this.rooms);
-    if (!room) return;
-    client.leave(room);
-    this.logger.log(`Client leave room: ${room}`);
-    this.logger.log(`Client disconnected: ${client.id}`);
-  }
-
-  @SubscribeMessage('initGame')
-  async handleInitGame(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() datas: any
-  ) {
-    if (this.interval) return;
-    this.logger.log(`Client init game: ${client.id}`);
-    this.datas = datas;
-  }
-
   @SubscribeMessage('startGame')
   async handleStartGame(@ConnectedSocket() client: Socket) {
-    if (this.interval) return;
+    const roomId = this.gameService.getRoomIdByUserId(
+      client['decoded'].sub,
+      this.rooms
+    );
+    const room = this.rooms.get(roomId);
+    if (room.interval || room.players.length !== 2) return;
     this.logger.log(`Client start game: ${client.id}`);
-    this.interval = setInterval(() => {
-      this.gameService.gameLoop(this.datas);
-      this.server.emit('loop', this.datas);
-    }, 10);
+    room.interval = setInterval(
+      (roomId) => {
+        this.gameService.gameLoop(this.rooms, roomId);
+        client.to(roomId).emit('gameLoop', this.rooms.get(roomId).datas);
+      },
+      10,
+      roomId
+    );
   }
 
   @SubscribeMessage('pressPadUp')

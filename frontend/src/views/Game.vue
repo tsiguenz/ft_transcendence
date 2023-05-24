@@ -32,7 +32,7 @@ export default {
     this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
   },
   beforeMount() {
-    this.socketioGame.subscribe('loop', (datas) => {
+    this.socketioGame.subscribe('gameLoop', (datas) => {
       this.ball = datas.ball;
       this.pad1 = datas.pad1;
       this.pad2 = datas.pad2;
@@ -64,9 +64,11 @@ export default {
   methods: {
     runGame() {
       this.init();
-      this.sendGameDatas();
+      //this.sendGameDatas();
+      this.socketioGame.send('connectToRoom');
       this.socketioGame.send('startGame');
     },
+    // function for custom games
     sendGameDatas() {
       const gameDatas = {
         map: this.map,

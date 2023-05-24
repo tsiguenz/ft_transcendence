@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,7 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 export class GameService {
   constructor(private prisma: PrismaService, private auth: AuthService) {}
 
-  gameLoop(datas: any): void {
+  gameLoop(rooms: any, roomId: string): void {
+    const room = rooms.get(roomId);
+    const datas = room.datas;
     if (!datas) return;
     const map = datas.map;
     const ball = datas.ball;
@@ -21,6 +23,7 @@ export class GameService {
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
+    if (this.isGameEnded(score)) this.stopGame(rooms, roomId);
   }
 
   handlePressPadUp(
@@ -229,9 +232,67 @@ export class GameService {
     return room.id;
   }
 
+  isGameEnded(score: any): boolean {
+    return score.player1 === 10 || score.player2 === 10;
+  }
+
   stopGame(rooms: any, roomId: string): void {
     const room = rooms.get(roomId);
     clearInterval(room.interval);
     rooms.delete(roomId);
+  }
+
+  getDatasFromRoom(rooms: any, roomId: string): any {
+    const room = rooms.get(roomId);
+    return room.datas;
+  }
+
+  initDatas(rooms: any, roomId: string): void {
+    const room = rooms.get(roomId);
+    const map = {
+      height: 150,
+      width: 300,
+      padOffset: 10
+    };
+    const padInfos = {
+      height: map.height / 5,
+      width: map.width / 100,
+      speed: 1
+    };
+    const ball = {
+      x: map.width / 2,
+      y: map.height / 2,
+      radius: 3,
+      speed: 1,
+      dx: 1,
+      dy: 1
+    };
+    const pad1 = {
+      x: map.padOffset,
+      y: map.height / 2 - padInfos.height / 2,
+      height: padInfos.height,
+      width: padInfos.width,
+      speed: padInfos.speed,
+      dy: 0
+    };
+    const pad2 = {
+      x: map.width - padInfos.width - map.padOffset,
+      y: map.height / 2 - padInfos.height / 2,
+      height: padInfos.height,
+      width: padInfos.width,
+      speed: padInfos.speed,
+      dy: 0
+    };
+    const score = {
+      player1: 0,
+      player2: 0
+    };
+    room.datas = {
+      map: map,
+      ball: ball,
+      pad1: pad1,
+      pad2: pad2,
+      score: score
+    };
   }
 }
