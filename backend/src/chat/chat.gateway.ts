@@ -45,8 +45,10 @@ export class ChatGateway
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
 
-      if (await this.chatroomRestriction.isUserRestricted(user.id, chatroom.id)) {
-        return ;
+      if (
+        await this.chatroomRestriction.isUserRestricted(user.id, chatroom.id)
+      ) {
+        return;
       }
 
       const message = await this.chat.saveMessage(
@@ -142,6 +144,49 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.KICK_USER)
+  async handleKick(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { userId: string; chatroomId: string }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!chatroom) {
+      return;
+    }
+
+    if (!(await this.users.getUserById(payload.userId))) {
+      return;
+    }
+
+    if (
+      (await this.chatroomUser.isUserOwner(payload.userId, chatroom.id)) ||
+      (!(await this.chatroomUser.isUserAdmin(
+        client['decoded'].sub,
+        chatroom.id
+      )) &&
+        !(await this.chatroomUser.isUserOwner(
+          client['decoded'].sub,
+          chatroom.id
+        )))
+    ) {
+      throw new WsException('Unauthorized to kick user');
+    }
+
+    try {
+      const socket = await this.getUserSocket(payload.userId);
+      if (!socket) {
+        return;
+      }
+
+      socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+      socket.leave(chatroom.slug);
+      this.chatroomUser.remove(payload.userId, chatroom.id);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   @SubscribeMessage(events.RESTRICT_USER)
   async handleRestrict(
     @ConnectedSocket() client: Socket,
@@ -158,23 +203,29 @@ export class ChatGateway
       return;
     }
 
-    if (!(await this.users.getUserById(client['decoded'].sub))) {
+    if (!(await this.users.getUserById(payload.userId))) {
       return;
     }
-    
+
     if (
-      !(await this.chatroomUser.isUserAdmin(
+      (await this.chatroomUser.isUserOwner(payload.userId, chatroom.id)) ||
+      (!(await this.chatroomUser.isUserAdmin(
         client['decoded'].sub,
         chatroom.id
       )) &&
-      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
+        !(await this.chatroomUser.isUserOwner(
+          client['decoded'].sub,
+          chatroom.id
+        )))
     ) {
       throw new WsException('Unauthorized to restrict user');
     }
 
     const date = new Date();
     const until = new Date(date.getTime() + payload.time * 1000 * 60);
-    const restrictionType = this.chatroomRestriction.stringToRestrictionType(payload.restrictionType);
+    const restrictionType = this.chatroomRestriction.stringToRestrictionType(
+      payload.restrictionType
+    );
 
     try {
       this.chatroomRestriction.create(
@@ -183,11 +234,15 @@ export class ChatGateway
         restrictionType,
         until
       );
-      
-      if (restrictionType == RestrictionType.MUTED) { return ; }
+
+      if (restrictionType == RestrictionType.MUTED) {
+        return;
+      }
 
       const socket = await this.getUserSocket(payload.userId);
-      if (!socket) { return ; }
+      if (!socket) {
+        return;
+      }
 
       socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
       socket.leave(chatroom.slug);
@@ -273,7 +328,7 @@ export class ChatGateway
   async getUserSocket(userId: string) {
     const sockets = await this.server.fetchSockets();
     for (const socket of sockets) {
-      if (socket['decoded'].sub == userId) { 
+      if (socket['decoded'].sub == userId) {
         return socket;
       }
     }

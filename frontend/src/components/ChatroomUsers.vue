@@ -27,8 +27,26 @@
           block
           >Revoke admin</v-btn
         >
-        <RestrictUserDialog v-if="currentUserIsAdmin" action="Mute" :nickname="user.nickname" :userId="user.id" @restrict="mute" />
-        <RestrictUserDialog v-if="currentUserIsAdmin" action="Ban" :nickname="user.nickname" :userId="user.id" @restrict="ban" />
+        <v-btn
+          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
+          @click="kick(user.id)"
+          block
+          >Kick</v-btn
+        >
+        <RestrictUserDialog
+          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
+          action="Mute"
+          :nickname="user.nickname"
+          :userId="user.id"
+          @restrict="mute"
+        />
+        <RestrictUserDialog
+          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
+          action="Ban"
+          :nickname="user.nickname"
+          :userId="user.id"
+          @restrict="ban"
+        />
         <v-btn
           v-if="!isUserBlocked(user.id)"
           @click="blockUser(user.nickname)"
@@ -60,7 +78,7 @@ export default {
   },
   props: ['id'],
   data() {
-    return { 
+    return {
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -175,24 +193,10 @@ export default {
       return this.connectedUsersStore.isConnected(id);
     },
     async blockUser(username) {
-      try {
-        BlockUserService.blockUser(username);
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
+      BlockUserService.blockUser(username);
     },
     async unblockUser(username) {
-      try {
-        BlockUserService.unblockUser(username);
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
+      BlockUserService.unblockUser(username);
     },
     isUserBlocked(userId) {
       return BlockUserService.isUserBlocked(userId);
@@ -202,6 +206,9 @@ export default {
     },
     ban(params) {
       ChatService.banUser(params.userId, this.id, params.time);
+    },
+    kick(userId) {
+      ChatService.kickUser(userId, this.id);
     }
   }
 };

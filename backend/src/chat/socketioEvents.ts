@@ -9,3 +9,5 @@ export const USER_CONNECT = 'user_connect';
 export const USER_DISCONNECT = 'user_disconnect';
 export const GET_CONNECTED_USERS = 'get_connected_users';
 export const RESTRICT_USER = 'restrict_user';
+export const KICK_USER = 'kick_user';
+export const EXCEPTION = 'exception';

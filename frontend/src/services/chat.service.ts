@@ -11,8 +11,9 @@ class ChatService {
     private chatStore: useChatStore = useChatStore()
   ) {}
 
-  setup(jwt: string) {
+  setup(jwt: string, callback: Function) {
     this.socketService.setupSocketConnection(jwt);
+    this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
   disconnect() {
@@ -63,11 +64,25 @@ class ChatService {
   }
 
   muteUser(userId: string, chatroomId: string, time: number) {
-    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'MUTED', time });
+    this.socketService.send(events.RESTRICT_USER, {
+      userId,
+      chatroomId,
+      restrictionType: 'MUTED',
+      time
+    });
   }
 
   banUser(userId: string, chatroomId: string, time: number) {
-    this.socketService.send(events.RESTRICT_USER, { userId, chatroomId, restrictionType: 'BANNED', time });
+    this.socketService.send(events.RESTRICT_USER, {
+      userId,
+      chatroomId,
+      restrictionType: 'BANNED',
+      time
+    });
+  }
+
+  kickUser(userId: string, chatroomId: string) {
+    this.socketService.send(events.KICK_USER, { userId, chatroomId });
   }
 }
 

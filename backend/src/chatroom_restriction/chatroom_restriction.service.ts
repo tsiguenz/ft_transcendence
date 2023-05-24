@@ -29,7 +29,7 @@ export class ChatroomRestrictionService {
         chatRoomId: chatroomId,
         userId: userId,
         restrictedUntil: {
-          gte: new Date(),
+          gte: new Date()
         }
       }
     });
