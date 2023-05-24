@@ -1,10 +1,12 @@
 <template>
-  <v-container>
+  <v-container flex>
     <v-row justify="center"><h1 class="font mb-10">Settings</h1></v-row>
+		<v-row class="mb-10">
+		<v-col cols="4">
     <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change nickname</h2>
       You are {{ this.user.nickname }}
-      <v-form class="ma-5" v-model="isFormValid">
+      <v-form class="ma-5" v-model="isValidForm">
         <v-text-field
           v-model="newNickname"
           :rules="[rules.nicknameCharacters]"
@@ -12,10 +14,12 @@
           @keydown.enter.prevent="editNickname"
         ></v-text-field>
       </v-form>
-      <v-btn class="btn" :disabled="!isFormValid" @click="editNickname">
+      <v-btn class="log" width="100%" :disabled="!isValidForm" @click="editNickname">
         submit
       </v-btn>
     </v-sheet>
+		</v-col>
+		<v-col cols="4">
     <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Change avatar</h2>
       <v-row justify="center">
@@ -33,29 +37,36 @@
         name="avatar"
         @change="onFileChange"
       />
-      <v-btn class="btn" :disabled="!isValidAvatar" @click="editProfile">
+      <v-btn class="log" width="100%" :disabled="!isValidAvatar" @click="editTFA">
         submit
       </v-btn>
     </v-sheet>
+		</v-col>
+		<v-col cols="4">
     <v-sheet class="sheet pa-5 mt-5">
       <h2 class="font">Manage two-factor authentification</h2>
-      <p v-if="newTwoFactorEnable">Your account is protected with 2FA</p>
-      <p v-if="!newTwoFactorEnable">Your account is not protected with 2FA</p>
+			<v-row class="ma-5 justify-center">
       <v-btn
-        v-if="!newTwoFactorEnable && !qrcode"
-        class="btn"
+        :disabled="newTwoFactorEnable && !qrcode"
+        class="log"
         @click="generate2faQrcode"
-        >Enabled TFA</v-btn
+        >Enable</v-btn
       >
+			</v-row>
+			<v-row class="ma-5 justify-center">
       <v-btn
-        v-if="newTwoFactorEnable && !qrcode"
-        class="btn"
+        :disabled="!newTwoFactorEnable && !qrcode"
+        class="log"
         @click="generate2faQrcode"
-        >Disabled TFA</v-btn
+        >Disable</v-btn
       >
+			</v-row>
       <v-dialog v-model="dialog" persistent>
         <v-row align="center" justify="center">
           <v-sheet class="sheet pa-10" height="100%" width="500">
+                <v-row justify="end"><v-btn class="close" @click="dialog = false"
+                  ><v-icon icon="mdi-close"></v-icon
+                ></v-btn></v-row>
             <v-row class="justify-center ma-5 mb-10">
               Scan this QR Code with Google Authenticator
             </v-row>
@@ -68,11 +79,11 @@
                   v-model="twoFactorCode"
                   label="Enter the generated code"
                   required
-                  @keydown.enter.prevent="editProfile"
+                  @keydown.enter.prevent="editTFA"
                 ></v-text-field>
               </v-row>
               <v-row class="justify-center ma-3">
-                <v-btn v-if="qrcode" class="btn" @click="editProfile"
+                <v-btn v-if="qrcode" class="btn" @click="editTFA"
                   >Validate code</v-btn
                 >
               </v-row>
@@ -81,8 +92,10 @@
         </v-row>
       </v-dialog>
     </v-sheet>
+		</v-col>
+		</v-row>
 
-    <v-btn v-if="!qrcode" @click="alertDeleteAccount">Delete Account</v-btn>
+    <v-row class="ma-5 justify-center"><v-btn class="log" width="100%" @click="alertDeleteAccount">Delete Account</v-btn></v-row>
   </v-container>
 </template>
 
@@ -116,7 +129,7 @@ export default {
       avatarPath: '',
       twoFactorCode: '',
       qrcode: '',
-      isFormValid: false,
+      isValidForm: false,
       isValidAvatar: false,
       userIsMounted: false,
       dialog: false,
@@ -165,16 +178,16 @@ export default {
           }
         );
         if (this.newAvatar) await this.uploadAvatar(jwt);
-        this.getProfile();
       } catch (error) {
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
         });
       }
+        this.getProfile();
     },
     async editNickname() {
-      if (!this.isFormValid) {
+      if (!this.isValidForm) {
         swal({
           icon: 'error',
           text: 'Invalid character or length in nickname'
@@ -192,41 +205,13 @@ export default {
           }
         );
         this.sessionStore.nickname = this.newNickname;
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: formatError(error.response.data.message)
+        });
+      }
         this.getProfile();
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
-    },
-    async editProfile() {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.put(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
-          {
-            nickname: this.newNickname,
-            twoFactorEnable: this.newTwoFactorEnable,
-            twoFactorCode: this.twoFactorCode
-          }
-        );
-        this.sessionStore.nickname = this.newNickname;
-        if (this.newAvatar) await this.uploadAvatar(jwt);
-        //        swal({
-        //          icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
-        //          text: formatError(response.data.message)
-        //        });
-        //        this.$router.push('/home');
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
-      this.getProfile();
-      this.qrcode = '';
-      this.dialog = false;
     },
     async editTFA() {
       try {
@@ -239,44 +224,24 @@ export default {
             twoFactorCode: this.twoFactorCode
           }
         );
+        this.sessionStore.nickname = this.newNickname;
+        if (this.newAvatar) await this.uploadAvatar(jwt);
       } catch (error) {
         swal({
           icon: 'error',
           text: formatError(error.response.data.message)
         });
       }
-      try {
-        const response = await axios.get(
-          constants.API_URL + '/2fa/generate-qrcode'
-        );
-        this.qrcode = response.data.qrcode;
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
-    },
-    async dispatchEditProfile() {
-      if (!this.isFormValid) {
-        swal({
-          icon: 'error',
-          text: 'Invalid character or length in nickname'
-        });
-        return;
-      }
-      if (this.newTwoFactorEnable && !this.user.twoFactorEnable) {
-        await this.generate2faQrcode();
-      } else {
-        await this.editProfile();
-      }
+      this.getProfile();
+      this.qrcode = '';
+      this.dialog = false;
     },
     async generate2faQrcode() {
       this.dialog = true;
       this.newTwoFactorEnable = !this.newTwoFactorEnable;
       if (!this.newTwoFactorEnable) {
         this.dialog = false;
-        this.editProfile();
+        this.editTFA();
         return;
       }
       try {
@@ -364,25 +329,17 @@ export default {
 .font {
   font-family: 'Poppins', serif;
 }
+.close {
+  background: var(--dark-purple);
+}
 .sheet {
   background: var(--dark-purple);
   border-radius: 30px;
   border: 3px solid var(--light);
+	text-align: center;
+	height: 100%
 }
-.btn {
-  background-image: linear-gradient(
-    to right,
-    var(--light) 0%,
-    var(--dark-purple) 51%,
-    var(--light) 100%
-  );
-  width: 250px;
-  bottom: 0;
-  text-align: center;
-  text-transform: uppercase;
-  transition: 0.5s;
-  background-size: 200% auto;
-  border-radius: 5px;
-  display: flex;
+.disable-events {
+	pointer-events: none
 }
 </style>

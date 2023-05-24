@@ -1,26 +1,26 @@
 <template>
-  <img
-    :src="urlAvatar"
-    alt="avatar"
-    class="img rounded-pill"
-    :width="wdt"
-    :height="hgt"
-  />
-</template>
+	<img
+	  :src="urlAvatar"
+	  alt="avatar"
+	  class="img rounded-pill"
+	  :width="wdt"
+	  :height="hgt"
+	/>
+  </template>
+  
+  <script>
+  
+  export default {
+	props: ['wdt', 'hgt', 'urlAvatar'],
+	data() {
+	  return {};
+	}
+  };
+  </script>
+  <style>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
-
-export default {
-  props: ['wdt', 'hgt', 'urlAvatar'],
-  data() {
-    return {};
+  .img {
+	border: 3px solid var(--light);
   }
-};
-</script>
-<style>
-.img {
-  border: 3px solid var(--light);
-}
-</style>
+  
+  </style>

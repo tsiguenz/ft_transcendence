@@ -54,6 +54,24 @@ export class UsersService {
     return user;
   }
 
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true,
+        createdAt: true,
+				lastConnection: true,
+				twoFactorEnable: true
+      }
+    });
+    return user;
+  }
+
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
       select: {
@@ -61,8 +79,10 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true,
-				lastConnection: true
+        createdAt: true
+      },
+      orderBy: {
+        ladderPoints: 'desc'
       }
     });
     return users;

@@ -8,7 +8,7 @@
       variant="outlined"
       @keydown.enter.prevent="verify"
     ></v-text-field>
-    <v-btn @click="verify">Validate two factor code</v-btn>
+    <v-btn class="log" @click="verify">Validate two factor code</v-btn>
   </v-form>
 </template>
 

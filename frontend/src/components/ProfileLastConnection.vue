@@ -1,8 +1,15 @@
 <template>
+	<div v-if="!isLog">
   <v-row class="justify-center"
     ><h4 class="font">{{ disconnectSince }}</h4></v-row
   >
   <v-row class="justify-center"><p>Last connection</p></v-row>
+	</div>
+	<div v-else>
+  <v-row class="justify-center"
+    ><h4 class="font">Online</h4></v-row
+  >
+	</div>
 </template>
 
 <script>
@@ -16,6 +23,7 @@ export default {
   props: ['lastConnection'],
   data() {
     return {
+			isLog: false,
       disconnectSince: ''
     };
   },
@@ -31,15 +39,17 @@ export default {
   },
   methods: {
     calculateDifference() {
-      if (!this.sessionStore.loggedIn) {
+      if (this.sessionStore.loggedIn) {
+				this.isLog = true;
         return;
       }
+				this.isLog = false;
       const lastCoUTC = new Date(this.lastConnection).getTime();
       const nowUTC = new Date().getTime();
       this.disconnectSince = new Date(nowUTC - lastCoUTC)
         .toISOString()
         .slice(11, 19);
-    }
+    },
   }
 };
 </script>
