@@ -8,66 +8,38 @@ import { v4 as uuidv4 } from 'uuid';
 export class GameService {
   constructor(private prisma: PrismaService, private auth: AuthService) {}
 
-  gameLoop(rooms: any, roomId: string): void {
+  gameLoop(rooms: any, roomId: string) {
     const room = rooms.get(roomId);
     const datas = room.datas;
-    if (!datas) return;
+    if (!datas) return null;
     const map = datas.map;
     const ball = datas.ball;
     const pad1 = datas.pad1;
     const pad2 = datas.pad2;
     const score = datas.score;
-    if (!map || !ball || !pad1 || !pad2) return;
+    if (!map || !ball || !pad1 || !pad2) return null;
     this.checkCollision(pad1, pad2, ball, map);
     this.checkGoal(ball, map, score);
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
-    if (this.isGameEnded(score)) this.stopGame(rooms, roomId);
+    if (this.isGameEnded(score)) return this.stopGame(rooms, roomId);
+    return null;
   }
 
-  handlePressPadUp(
-    client: Socket,
-    datas: any,
-    usersTokens: Array<string>
-  ): void {
-    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
-      datas.pad1.dy = -1;
-    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
-      datas.pad2.dy = -1;
+  handlePressPadUp(userId: string, data: any): void {
+    if (userId === data.score.player1.id) data.pad1.dy = -1;
+    if (userId === data.score.player2.id) data.pad2.dy = -1;
   }
 
-  handleReleasePadUp(
-    client: Socket,
-    datas: any,
-    usersTokens: Array<string>
-  ): void {
-    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
-      datas.pad1.dy = 0;
-    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
-      datas.pad2.dy = 0;
+  handlePressPadDown(userId: string, data: any): void {
+    if (userId === data.score.player1.id) data.pad1.dy = 1;
+    if (userId === data.score.player2.id) data.pad2.dy = 1;
   }
 
-  handlePressPadDown(
-    client: Socket,
-    datas: any,
-    usersTokens: Array<string>
-  ): void {
-    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
-      datas.pad1.dy = 1;
-    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
-      datas.pad2.dy = 1;
-  }
-
-  handleReleasePadDown(
-    client: Socket,
-    datas: any,
-    usersTokens: Array<string>
-  ): void {
-    if (usersTokens.indexOf(client.handshake.auth.token) === 0)
-      datas.pad1.dy = 0;
-    if (usersTokens.indexOf(client.handshake.auth.token) === 1)
-      datas.pad2.dy = 0;
+  handleStopPad(userId: string, data: any): void {
+    if (userId === data.score.player1.id) data.pad1.dy = 0;
+    if (userId === data.score.player2.id) data.pad2.dy = 0;
   }
 
   moveBall(ball): void {
@@ -147,11 +119,11 @@ export class GameService {
 
   checkGoal(ball: any, map: any, score: any): void {
     if (ball.x <= 0) {
-      score.player2 += 1;
+      score.player2.points += 1;
       this.resetBall(ball, map);
     }
     if (ball.x >= map.width) {
-      score.player1 += 1;
+      score.player1.points += 1;
       this.resetBall(ball, map);
     }
   }
@@ -210,11 +182,10 @@ export class GameService {
     return 0;
   }
 
-  getJoinableRoom(rooms: any): Array<string> {
+  getJoinableRoom(rooms: any): string {
     const it = rooms[Symbol.iterator]();
-    for (const room of it) {
+    for (const room of it)
       if (room[1].players.length === 1 && !room[1].isStarted) return room[0];
-    }
     return null;
   }
 
@@ -233,13 +204,38 @@ export class GameService {
   }
 
   isGameEnded(score: any): boolean {
-    return score.player1 === 10 || score.player2 === 10;
+    return score.player1.points === 3 || score.player2.points === 3;
   }
 
   stopGame(rooms: any, roomId: string): void {
     const room = rooms.get(roomId);
+    const score = room.datas.score;
     clearInterval(room.interval);
     rooms.delete(roomId);
+    return score;
+  }
+
+  async storeDataToDb(room: any): Promise<void> {
+    const roomId = room.id;
+    const isRanked = true;
+    const player1 = room.players[0];
+    const player2 = room.players[1];
+    const winnerId = player1.points > player2.points ? player1.id : player2.id;
+    const loserId = winnerId === player1.id ? player2.id : player1.id;
+    const winnePoints =
+      winnerId === player1.id ? player1.points : player2.points;
+    const loserPoints =
+      winnerId === player1.id ? player2.points : player1.points;
+    //    await this.prisma.game.create({
+    //      data: {
+    //        roomId,
+    //        isRanked,
+    //        winnerId,
+    //        loserId,
+    //        winnePoints,
+    //        loserPoints
+    //      }
+    //    });
   }
 
   getDatasFromRoom(rooms: any, roomId: string): any {
@@ -284,8 +280,8 @@ export class GameService {
       dy: 0
     };
     const score = {
-      player1: 0,
-      player2: 0
+      player1: { id: room.players[0], points: 0 },
+      player2: { id: room.players[1], points: 0 }
     };
     room.datas = {
       map: map,

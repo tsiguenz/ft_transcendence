@@ -5,9 +5,10 @@
   <p v-if="pad1">pad1: {{ pad1 }}</p>
   <p v-if="pad2">pad2: {{ pad2 }}</p>
   -->
-  <div>
+  <div v-if="!winnerId">
     <canvas id="canvas"></canvas>
   </div>
+  <p v-else>The winner is {{ winnerId }}</p>
 </template>
 
 <script>
@@ -25,7 +26,8 @@ export default {
       pad1: null,
       pad2: null,
       map: null,
-      score: null
+      score: null,
+      winnerId: null
     };
   },
   created() {
@@ -40,23 +42,23 @@ export default {
       this.score = datas.score;
       this.draw();
     });
+    this.socketioGame.subscribe('gameOver', (res) => {
+      document.removeEventListener('keydown', this.handleKeyDown);
+      document.removeEventListener('keyup', this.handleKeyUp);
+      this.canvas = null;
+      this.ctx = null;
+      const score = res.score;
+      this.winnerId =
+        score.player1.points > score.player2.points
+          ? score.player1.id
+          : score.player2.id;
+      console.log(`the winner is ${this.winnerId}`);
+    });
   },
   mounted() {
     this.runGame();
-    document.addEventListener('keydown', (e) => {
-      if (e.keyCode === 38) {
-        this.socketioGame.send('pressPadUp');
-      } else if (e.keyCode === 40) {
-        this.socketioGame.send('pressPadDown');
-      }
-    });
-    document.addEventListener('keyup', (e) => {
-      if (e.keyCode === 38) {
-        this.socketioGame.send('releasePadUp');
-      } else if (e.keyCode === 40) {
-        this.socketioGame.send('releasePadDown');
-      }
-    });
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keyup', this.handleKeyUp);
   },
   beforeUnmount() {
     this.socketioGame.disconnect();
@@ -82,45 +84,6 @@ export default {
     init() {
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
-      // TODO: create input to choose game parameters
-      this.map = {
-        height: this.canvas.height,
-        width: this.canvas.width,
-        padOffset: 10
-      };
-      const padInfos = {
-        height: this.map.height / 5,
-        width: this.map.width / 100,
-        speed: 1
-      };
-      this.ball = {
-        x: this.map.width / 2,
-        y: this.map.height / 2,
-        radius: 3,
-        speed: 1,
-        dx: 1,
-        dy: 1
-      };
-      this.pad1 = {
-        x: this.map.padOffset,
-        y: this.map.height / 2 - padInfos.height / 2,
-        height: padInfos.height,
-        width: padInfos.width,
-        speed: padInfos.speed,
-        dy: 0
-      };
-      this.pad2 = {
-        x: this.map.width - padInfos.width - this.map.padOffset,
-        y: this.map.height / 2 - padInfos.height / 2,
-        height: padInfos.height,
-        width: padInfos.width,
-        speed: padInfos.speed,
-        dy: 0
-      };
-      this.score = {
-        player1: 0,
-        player2: 0
-      };
     },
     draw() {
       if (!this.map) return;
@@ -163,8 +126,19 @@ export default {
     writeScore() {
       this.ctx.font = '20px Poppins';
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(this.score.player1, this.map.width / 2 - 25, 20);
-      this.ctx.fillText(this.score.player2, this.map.width / 2 + 15, 20);
+      this.ctx.fillText(this.score.player1.points, this.map.width / 2 - 25, 20);
+      this.ctx.fillText(this.score.player2.points, this.map.width / 2 + 15, 20);
+    },
+    handleKeyDown(e) {
+      if (e.keyCode === 38) {
+        this.socketioGame.send('pressPadUp');
+      } else if (e.keyCode === 40) {
+        this.socketioGame.send('pressPadDown');
+      }
+    },
+    handleKeyUp(e) {
+      if (e.keyCode === 38 || e.keyCode === 40)
+        this.socketioGame.send('stopPad');
     }
   }
 };

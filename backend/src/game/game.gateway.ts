@@ -19,7 +19,6 @@ export class GameGateway {
   ) {}
   datas = {};
   // useless
-  // useless
   usersTokens = [];
   rooms = new Map();
 
@@ -57,10 +56,10 @@ export class GameGateway {
     if (joinableRoom) {
       this.rooms.get(joinableRoom).players.push(userId);
       client.join(joinableRoom);
+      this.gameService.initDatas(this.rooms, joinableRoom);
       this.logger.log(`Client joined room: ${joinableRoom}`);
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
-      this.gameService.initDatas(this.rooms, roomId);
       client.join(roomId);
       this.logger.log(`Client created room: ${roomId}`);
     }
@@ -77,8 +76,13 @@ export class GameGateway {
     this.logger.log(`Client start game: ${client.id}`);
     room.interval = setInterval(
       (roomId) => {
-        this.gameService.gameLoop(this.rooms, roomId);
-        client.to(roomId).emit('gameLoop', this.rooms.get(roomId).datas);
+        const res = this.gameService.gameLoop(this.rooms, roomId);
+        const room = this.rooms.get(roomId);
+        if (room) client.to(roomId).emit('gameLoop', room.datas);
+        else {
+          this.logger.log(`Game is over: ${roomId}`);
+          client.to(roomId).emit('gameOver', { score: res });
+        }
       },
       10,
       roomId
@@ -87,21 +91,31 @@ export class GameGateway {
 
   @SubscribeMessage('pressPadUp')
   async handlePressPadUp(@ConnectedSocket() client: Socket) {
-    this.gameService.handlePressPadUp(client, this.datas, this.usersTokens);
+    const roomId = this.gameService.getRoomIdByUserId(
+      client['decoded'].sub,
+      this.rooms
+    );
+    const data = this.rooms.get(roomId).datas;
+    this.gameService.handlePressPadUp(client['decoded'].sub, data);
   }
 
   @SubscribeMessage('pressPadDown')
   async handlePressPadDown(@ConnectedSocket() client: Socket) {
-    this.gameService.handlePressPadDown(client, this.datas, this.usersTokens);
+    const roomId = this.gameService.getRoomIdByUserId(
+      client['decoded'].sub,
+      this.rooms
+    );
+    const data = this.rooms.get(roomId).datas;
+    this.gameService.handlePressPadDown(client['decoded'].sub, data);
   }
 
-  @SubscribeMessage('releasePadUp')
-  async handleReleasePadUp(@ConnectedSocket() client: Socket) {
-    this.gameService.handleReleasePadUp(client, this.datas, this.usersTokens);
-  }
-
-  @SubscribeMessage('releasePadDown')
-  async handleReleasePadDown(@ConnectedSocket() client: Socket) {
-    this.gameService.handleReleasePadDown(client, this.datas, this.usersTokens);
+  @SubscribeMessage('stopPad')
+  async handleStopPad(@ConnectedSocket() client: Socket) {
+    const roomId = this.gameService.getRoomIdByUserId(
+      client['decoded'].sub,
+      this.rooms
+    );
+    const data = this.rooms.get(roomId).datas;
+    this.gameService.handleStopPad(client['decoded'].sub, data);
   }
 }
