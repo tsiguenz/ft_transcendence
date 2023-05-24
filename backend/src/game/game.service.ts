@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Socket, Server } from 'socket.io';
+import { AuthService } from '../auth/auth.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GameService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private auth: AuthService) {}
 
   gameLoop(datas: any): void {
     if (!datas) return;
@@ -172,5 +174,64 @@ export class GameService {
 
   getBottomPadPosition(pad: any): number {
     return pad.y + pad.height;
+  }
+
+  isUserAlreadyInRoom(userId: string, rooms: any): boolean {
+    const it = rooms[Symbol.iterator]();
+    for (const room of it) {
+      if (room[1].players.find((player) => player === userId)) return true;
+    }
+    return false;
+  }
+
+  getRoomIdByUserId(userId: string, rooms: any): string {
+    const it = rooms[Symbol.iterator]();
+    for (const room of it) {
+      if (room[1].players.find((player) => player === userId)) return room[0];
+    }
+    return null;
+  }
+
+  async setDecodedTokenToClient(client: Socket): Promise<number> {
+    const token = client.handshake.auth.token;
+    if (!token) {
+      client.disconnect();
+      return 1;
+    }
+    try {
+      client['decoded'] = await this.auth.verifyJwt(token);
+    } catch (error) {
+      client.disconnect();
+      return 1;
+    }
+    return 0;
+  }
+
+  getJoinableRoom(rooms: any): Array<string> {
+    const it = rooms[Symbol.iterator]();
+    for (const room of it) {
+      if (room[1].players.length === 1 && !room[1].isStarted) return room[0];
+    }
+    return null;
+  }
+
+  createRoom(rooms: any, userId: string): string {
+    const room = {
+      id: uuidv4(),
+      players: [userId]
+    };
+    rooms.set(room.id, {
+      interval: null,
+      isStarted: false,
+      players: room.players,
+      datas: {}
+    });
+    return room.id;
+  }
+
+  stopGame(rooms: any, roomId: string): void {
+    const room = rooms.get(roomId);
+    clearInterval(room.interval);
+    rooms.delete(roomId);
   }
 }
