@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class GameService {
   constructor(private prisma: PrismaService, private auth: AuthService) {}
 
-  gameLoop(rooms: any, roomId: string) {
+  async gameLoop(rooms: any, roomId: string) {
     const room = rooms.get(roomId);
     const datas = room.datas;
     if (!datas) return null;
@@ -23,23 +23,42 @@ export class GameService {
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
-    if (this.isGameEnded(score)) return this.stopGame(rooms, roomId);
+    if (this.isGameEnded(score)) return await this.stopGame(rooms, roomId);
     return null;
   }
 
-  handlePressPadUp(userId: string, data: any): void {
-    if (userId === data.score.player1.id) data.pad1.dy = -1;
-    if (userId === data.score.player2.id) data.pad2.dy = -1;
+  async stopGame(rooms: any, roomId: string): Promise<any> {
+    const room = rooms.get(roomId);
+    const score = room.datas.score;
+    clearInterval(room.interval);
+    await this.storeDataToDb(room, roomId);
+    rooms.delete(roomId);
+    return score;
   }
 
-  handlePressPadDown(userId: string, data: any): void {
-    if (userId === data.score.player1.id) data.pad1.dy = 1;
-    if (userId === data.score.player2.id) data.pad2.dy = 1;
+  async storeDataToDb(room: any, roomId: string): Promise<void> {
+    const score = room.datas.score;
+    const player1 = score.player1;
+    const player2 = score.player2;
+    const winner = player1.points > player2.points ? player1 : player2;
+    const loser = winner.id === player1.id ? player2 : player1;
+    await this.prisma.game.create({
+      data: {
+        id: roomId,
+        isRanked: room.datas.isRanked,
+        winnerId: winner.id,
+        loserId: loser.id,
+        previousWinnerRating: 0,
+        previousLoserRating: 0,
+        winnerScore: winner.points,
+        loserScore: loser.points
+      }
+    });
   }
 
-  handleStopPad(userId: string, data: any): void {
-    if (userId === data.score.player1.id) data.pad1.dy = 0;
-    if (userId === data.score.player2.id) data.pad2.dy = 0;
+  handleMovePad(userId: string, data: any, dy: number): void {
+    const pad = userId === data.score.player1.id ? data.pad1 : data.pad2;
+    pad.dy = dy;
   }
 
   moveBall(ball): void {
@@ -207,37 +226,6 @@ export class GameService {
     return score.player1.points === 3 || score.player2.points === 3;
   }
 
-  stopGame(rooms: any, roomId: string): void {
-    const room = rooms.get(roomId);
-    const score = room.datas.score;
-    clearInterval(room.interval);
-    rooms.delete(roomId);
-    return score;
-  }
-
-  async storeDataToDb(room: any): Promise<void> {
-    const roomId = room.id;
-    const isRanked = true;
-    const player1 = room.players[0];
-    const player2 = room.players[1];
-    const winnerId = player1.points > player2.points ? player1.id : player2.id;
-    const loserId = winnerId === player1.id ? player2.id : player1.id;
-    const winnePoints =
-      winnerId === player1.id ? player1.points : player2.points;
-    const loserPoints =
-      winnerId === player1.id ? player2.points : player1.points;
-    //    await this.prisma.game.create({
-    //      data: {
-    //        roomId,
-    //        isRanked,
-    //        winnerId,
-    //        loserId,
-    //        winnePoints,
-    //        loserPoints
-    //      }
-    //    });
-  }
-
   getDatasFromRoom(rooms: any, roomId: string): any {
     const room = rooms.get(roomId);
     return room.datas;
@@ -288,7 +276,8 @@ export class GameService {
       ball: ball,
       pad1: pad1,
       pad2: pad2,
-      score: score
+      score: score,
+      isRanked: true
     };
   }
 }

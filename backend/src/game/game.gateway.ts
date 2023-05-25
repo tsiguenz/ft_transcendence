@@ -2,7 +2,8 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   ConnectedSocket,
-  WebSocketServer
+  WebSocketServer,
+  MessageBody
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -32,7 +33,7 @@ export class GameGateway {
   }
 
   @SubscribeMessage('disconnect')
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
+  handleDisconnect(@ConnectedSocket() client: Socket) {
     const userId = client['decoded'].sub;
     const room = this.gameService.getRoomIdByUserId(userId, this.rooms);
     if (!room) return;
@@ -42,7 +43,7 @@ export class GameGateway {
   }
 
   @SubscribeMessage('connectToRoom')
-  async handleConnectToRoom(@ConnectedSocket() client: Socket) {
+  handleConnectToRoom(@ConnectedSocket() client: Socket) {
     const userId = client['decoded'].sub;
     if (
       this.gameService.isUserAlreadyInRoom(client['decoded'].sub, this.rooms)
@@ -54,10 +55,26 @@ export class GameGateway {
     }
     const joinableRoom = this.gameService.getJoinableRoom(this.rooms);
     if (joinableRoom) {
-      this.rooms.get(joinableRoom).players.push(userId);
-      client.join(joinableRoom);
+      const room = this.rooms.get(joinableRoom);
+      room.players.push(userId);
       this.gameService.initDatas(this.rooms, joinableRoom);
+      client.join(joinableRoom);
       this.logger.log(`Client joined room: ${joinableRoom}`);
+      this.logger.log(`Start game: ${joinableRoom}`);
+      room.interval = setInterval(
+        async (joinableRoom) => {
+          const res = await this.gameService.gameLoop(this.rooms, joinableRoom);
+          const room = this.rooms.get(joinableRoom);
+          if (!res) client.to(joinableRoom).emit('gameLoop', room.datas);
+          else {
+            this.logger.log(`Game is over: ${joinableRoom}`);
+            client.to(joinableRoom).emit('gameOver', { score: res });
+          }
+        },
+        10,
+        joinableRoom
+      );
+      console.log();
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
       client.join(roomId);
@@ -65,57 +82,16 @@ export class GameGateway {
     }
   }
 
-  @SubscribeMessage('startGame')
-  async handleStartGame(@ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.getRoomIdByUserId(
-      client['decoded'].sub,
-      this.rooms
-    );
-    const room = this.rooms.get(roomId);
-    if (room.interval || room.players.length !== 2) return;
-    this.logger.log(`Client start game: ${client.id}`);
-    room.interval = setInterval(
-      (roomId) => {
-        const res = this.gameService.gameLoop(this.rooms, roomId);
-        const room = this.rooms.get(roomId);
-        if (room) client.to(roomId).emit('gameLoop', room.datas);
-        else {
-          this.logger.log(`Game is over: ${roomId}`);
-          client.to(roomId).emit('gameOver', { score: res });
-        }
-      },
-      10,
-      roomId
-    );
-  }
-
-  @SubscribeMessage('pressPadUp')
-  async handlePressPadUp(@ConnectedSocket() client: Socket) {
+  @SubscribeMessage('movePad')
+  handleMovePad(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('dy') dy: number
+  ) {
     const roomId = this.gameService.getRoomIdByUserId(
       client['decoded'].sub,
       this.rooms
     );
     const data = this.rooms.get(roomId).datas;
-    this.gameService.handlePressPadUp(client['decoded'].sub, data);
-  }
-
-  @SubscribeMessage('pressPadDown')
-  async handlePressPadDown(@ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.getRoomIdByUserId(
-      client['decoded'].sub,
-      this.rooms
-    );
-    const data = this.rooms.get(roomId).datas;
-    this.gameService.handlePressPadDown(client['decoded'].sub, data);
-  }
-
-  @SubscribeMessage('stopPad')
-  async handleStopPad(@ConnectedSocket() client: Socket) {
-    const roomId = this.gameService.getRoomIdByUserId(
-      client['decoded'].sub,
-      this.rooms
-    );
-    const data = this.rooms.get(roomId).datas;
-    this.gameService.handleStopPad(client['decoded'].sub, data);
+    this.gameService.handleMovePad(client['decoded'].sub, data, dy);
   }
 }

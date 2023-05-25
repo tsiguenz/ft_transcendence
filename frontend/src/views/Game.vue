@@ -5,10 +5,11 @@
   <p v-if="pad1">pad1: {{ pad1 }}</p>
   <p v-if="pad2">pad2: {{ pad2 }}</p>
   -->
-  <div v-if="!winnerId">
+  <button v-if="!inGame" @click="runGame">Run game (or reconnect)</button>
+  <div v-show="inGame">
     <canvas id="canvas"></canvas>
   </div>
-  <p v-else>The winner is {{ winnerId }}</p>
+  <p v-if="winnerId">The winner is {{ winnerId }}</p>
 </template>
 
 <script>
@@ -20,55 +21,47 @@ export default {
       socketioGame: new SocketioService(GAME_SOCKET_URL),
       canvas: null,
       ctx: null,
-      height: null,
-      width: null,
       ball: null,
       pad1: null,
       pad2: null,
       map: null,
       score: null,
-      winnerId: null
+      winnerId: null,
+      inGame: false
     };
   },
-  created() {
-    this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
-  },
-  beforeMount() {
-    this.socketioGame.subscribe('gameLoop', (datas) => {
-      this.ball = datas.ball;
-      this.pad1 = datas.pad1;
-      this.pad2 = datas.pad2;
-      this.map = datas.map;
-      this.score = datas.score;
-      this.draw();
-    });
-    this.socketioGame.subscribe('gameOver', (res) => {
-      document.removeEventListener('keydown', this.handleKeyDown);
-      document.removeEventListener('keyup', this.handleKeyUp);
-      this.canvas = null;
-      this.ctx = null;
-      const score = res.score;
-      this.winnerId =
-        score.player1.points > score.player2.points
-          ? score.player1.id
-          : score.player2.id;
-      console.log(`the winner is ${this.winnerId}`);
-    });
-  },
-  mounted() {
-    this.runGame();
-    document.addEventListener('keydown', this.handleKeyDown);
-    document.addEventListener('keyup', this.handleKeyUp);
-  },
+  mounted() {},
   beforeUnmount() {
     this.socketioGame.disconnect();
   },
   methods: {
     runGame() {
+      this.inGame = true;
+      this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
+      this.socketioGame.subscribe('gameLoop', (datas) => {
+        this.ball = datas.ball;
+        this.pad1 = datas.pad1;
+        this.pad2 = datas.pad2;
+        this.map = datas.map;
+        this.score = datas.score;
+        this.draw();
+      });
+      this.socketioGame.subscribe('gameOver', (res) => {
+        document.removeEventListener('keydown', this.handleKeyDown);
+        document.removeEventListener('keyup', this.handleKeyUp);
+        this.canvas = null;
+        this.ctx = null;
+        const score = res.score;
+        this.winnerId =
+          score.player1.points > score.player2.points
+            ? score.player1.id
+            : score.player2.id;
+      });
       this.init();
       //this.sendGameDatas();
       this.socketioGame.send('connectToRoom');
-      this.socketioGame.send('startGame');
+      document.addEventListener('keydown', this.handleKeyDown);
+      document.addEventListener('keyup', this.handleKeyUp);
     },
     // function for custom games
     sendGameDatas() {
@@ -131,14 +124,14 @@ export default {
     },
     handleKeyDown(e) {
       if (e.keyCode === 38) {
-        this.socketioGame.send('pressPadUp');
+        this.socketioGame.send('movePad', { dy: -1 });
       } else if (e.keyCode === 40) {
-        this.socketioGame.send('pressPadDown');
+        this.socketioGame.send('movePad', { dy: 1 });
       }
     },
     handleKeyUp(e) {
       if (e.keyCode === 38 || e.keyCode === 40)
-        this.socketioGame.send('stopPad');
+        this.socketioGame.send('movePad', { dy: 0 });
     }
   }
 };
