@@ -4,7 +4,7 @@
         <v-list-subheader>Connected Friends</v-list-subheader>
         <div class="online-btn" @click="getFriendsProfile()"><tbody>
            <tr v-for="user in connectedFriends" :key="user.id">
-            <td class="connected" > <ProfileClick :nickname="user.nickname" :width="40" :height="40" :url-avatar="user.avatarPath"></ProfileClick></td>
+            <td class="connected" > <ProfileClick :nickname="user.nickname" :width="40" :height="40" :url-avatar="user.avatarPath" :status="userStatus(user)"></ProfileClick></td>
             <td>{{ user.nickname }}</td>
            </tr>
         </tbody></div>
@@ -78,9 +78,10 @@ export default {
     }
 },
     userStatus(user) {
-      return this.connectedUsers.includes(user.id)
-        ? 'Connected'
-        : 'Disconnected';
+      if (this.connectedUsers.includes(user.id)){
+        return true;
+      }
+      return false;
     },
     getAvatarPath(user) {
       return constants.AVATARS_URL + user.avatarPath;

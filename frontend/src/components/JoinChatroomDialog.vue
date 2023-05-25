@@ -1,10 +1,4 @@
 <template>
-  <v-dialog v-model="dialog" width="1024">
-    <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" block @click="getJoinableRooms()">
-        Join room
-      </v-btn>
-    </template>
     <v-card>
       <v-card-title>
         <span class="text-h5">Join chatroom</span>
@@ -13,21 +7,16 @@
         <v-container>
           <v-list>
             <v-list-subheader>Chatrooms</v-list-subheader>
-            <v-list-group
+            <v-list-item
               v-for="chatroom in chatrooms"
               :key="chatroom.id"
-              :value="chatroom.name"
             >
-              <template v-slot:activator="{ props }">
-                <v-list-item
-                  v-bind="props"
-                  :prepend-icon="
-                    chatroom.type === 'PROTECTED' ? 'mdi-lock' : 'mdi-earth'
-                  "
-                  :title="chatroom.name"
-                ></v-list-item>
-              </template>
-              <v-row class="ma-0">
+                <v-icon>
+                  {{ chatroom.type === 'PROTECTED' ? 'mdi-lock' : 'mdi-earth' }}
+                </v-icon>
+                <v-list-item-title>{{ chatroom.name }}</v-list-item-title>
+              <v-list-item-action>
+                <v-row>
                 <v-col cols="8" pa-0>
                   <v-text-field
                     v-if="chatroom.type === 'PROTECTED'"
@@ -38,24 +27,19 @@
                     required
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
-                  <v-btn size="x-large" block @click="joinRoom(chatroom)"
-                    >Join</v-btn
-                  >
-                </v-col>
+                
               </v-row>
-            </v-list-group>
+                <v-btn size="x-large" @click="joinRoom(chatroom)">Join</v-btn>
+              </v-list-item-action>
+            </v-list-item>
           </v-list>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
-          Close
-        </v-btn>
+        
       </v-card-actions>
     </v-card>
-  </v-dialog>
 </template>
 
 <script>
@@ -69,8 +53,12 @@ export default {
   data() {
     return {
       chatrooms: [],
-      dialog: false
+      dialog: true  // make the dialog open by default
     };
+  },
+  created() {
+    // Load joinable rooms when the component is created
+    this.getJoinableRooms();
   },
   methods: {
     closeDialog() {

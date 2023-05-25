@@ -1,23 +1,18 @@
 <template>
   <v-table class="friends" density="compact">
     <thead>
-      <h3>My friends</h3>
-      <tr>
-        <th class="text-left">Nickname</th>
-        <th class="text-left">Ladder points</th>
-        <th class="text-left">Avatar</th>
-        <th class="text-left"></th>
+      <tr class="cust-tr">
+        <th class="cust-th">Nickname</th>
+        <th class="cust-th">Ladder points</th>
+        <th class="cust-th"></th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="friend in friends" :key="friend.nickname">
-        <td>{{ friend.nickname }}</td>
-        <td>{{ friend.ladderPoints }}</td>
-        <td>
-          <img :src="friend.avatarPath" alt="avatar" width="50" height="50" />
-        </td>
+      <tr  v-for="friend in friends" :key="friend.id">
+        <td class="cust-td hgt-td"> <ProfileClick :nickname="friend.nickname" :status="userStatus(friend)" :width="40" :height="40" :url-avatar="getAvatarPath(friend)"></ProfileClick><p>{{ friend.nickname }}</p></td>
+        <td class=" hgt-td">{{ friend.ladderPoints }}</td>
         <td class=" hgt-td">
-          <IsFriend :friendname="friend.nickname" @delete="deleteFriend(friend.nickname)" ></IsFriend>
+          <IsFriend :friendname="friend.nickname" @delete="deleteFriend(friend.nickname)"></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -32,16 +27,22 @@ import axios from 'axios';
 import swall from 'sweetalert';
 import formatError from '@/utils/lib';
 import IsFriend from '../components/IsFriend.vue';
+import ProfileClick from '../components/ProfileClick.vue';
 
 export default {
   components: {
-    IsFriend
+    IsFriend,
+    ProfileClick
   },
+  inject: ['connectedUsersStore', 'sessionStore'],
   data() {
     return {
       friends: [],
       newFriend: '',
-      renderPage: 0
+      renderPage: 0,
+      connectedUsers: this.connectedUsersStore.connectedUsers,
+      connectedFriends: []
+
     };
   },
   computed: {
@@ -50,10 +51,17 @@ export default {
   watch: {
     async renderPage() {
       await this.getFriends();
+    },
+    connectedUsersStore: {
+      handler() {
+        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+      },
+      deep: true
     }
   },
   async mounted() {
     await this.getFriends();
+    this.getConnectedFriends();
   },
   methods: {
     async getFriends() {
@@ -125,7 +133,24 @@ export default {
           button: 'OK'
         });
       }
+    },
+    userStatus(user) {
+      if (this.connectedUsers.includes(user.id)){
+        return true;
+      }
+      return false;
+    },
+    getConnectedFriends() {
+        this.connectedFriends = [];
+        for (let i = 0; i < this.friends.length; i++) {
+            if (this.connectedUsers.includes(this.friends[i].id)) {
+                this.connectedFriends.push(this.friends[i]);
+        }
     }
+  },
+  getAvatarPath(user) {
+    return user.avatarPath;
+  },
   }
 };
 </script>
@@ -133,11 +158,31 @@ export default {
 <style lang="scss" scoped>
 .friends{
   padding-top: 12px;
+  text-align: center;
   background-color: var(--dark-purple);
   border-style: solid;
   border-radius: 5px;
   box-shadow: 5px 5px 5px var(--light-purple);
   border-color: var(--light-purple);
+}
+
+.cust-th{
+  color: #ffff !important;
+  text-transform: uppercase;
+}
+
+.hgt-td{
+  height: 60px !important;
+}
+
+.cust-td{
+  display: flex !important;
+  padding: 1rem;
+  p{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10px;
+  }
 }
 
 </style>

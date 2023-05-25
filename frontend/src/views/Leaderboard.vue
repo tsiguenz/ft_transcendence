@@ -10,7 +10,6 @@
         <th class="cust-th"></th>
         <th class="cust-th">Nickname</th>
         <th class="cust-th">Ladder points</th>
-        <th class="cust-th">Status</th>
         <th class="cust-th"></th>
       </tr>
     </thead>
@@ -19,7 +18,6 @@
         <td class="indexRank"> {{ index + 1 }} </td>
         <td class="cust-td hgt-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)" :width="40" :height="40" :url-avatar="getAvatarPath(user)"></ProfileClick><p>{{ user.nickname }}</p></td>
         <td class=" hgt-td">{{ user.ladderPoints }}</td>
-        <td class=" hgt-td">{{ userStatus(user) }}</td>
         <td class=" hgt-td">
           <IsFriend :friendname="user.nickname"></IsFriend>
         </td>
@@ -111,9 +109,10 @@ export default {
       }
     },
     userStatus(user) {
-      return this.connectedUsers.includes(user.id)
-        ? 'Connected'
-        : 'Disconnected';
+      if (this.connectedUsers.includes(user.id)){
+        return true;
+      }
+      return false;
     },
     getLeaders() {
       return { first: this.users[0], second: this.users[1], third: this.users[2] };

@@ -1,45 +1,16 @@
 <template>
-  <v-card class="borderR">
-    <v-btn :class="`${showFriends == true ? 'activebtn' : 'inactivebtn'}`"  @click="$emit('toggleFriendsView')"><v-avatar rounded="0" size="25px">
-          <v-img
-            class="icons-avatar"
-            src="/assets/icons/friends.png"
-          ></v-img></v-avatar
-        >My friends</v-btn>
-  </v-card>
-  <v-card class="borderR">
-    <v-btn  @click="$emit('togglePublicChannelView')"><v-avatar rounded="0" size="25px">
-          <v-img
-            class="icons-avatar"
-            src="/assets/icons/friends.png"
-          ></v-img></v-avatar
-        >Public Channels</v-btn>
-  </v-card>
-  <v-card>
-    <v-list class="soc">
-      <p class="titleMessages">MESSAGES</p>
-      <v-list-item
-      :class="{'activeR': chatroom.id === activeRoomId && !showFriends, 'inactiveR': chatroom.id !== activeRoomId && !showFriends}"
-        v-for="chatroom in chatrooms"
-        :key="chatroom.id"
-        :title="chatroom.name"
-        :value="chatroom.name"
-        :active="chatroom.id == id"
-        @click="join(chatroom.id) && $emit('toggleChatView')"
-      ></v-list-item>
-    </v-list>
-  </v-card>
-  <!-- <v-row no-gutters>
-    <v-col cols="8" class="pa-0">
+    <v-row no-gutters>
+    <v-col>
       <JoinChatroomDialog @join="pushChatroom" />
     </v-col>
-    <v-col cols="4" class="pa-0">
+    <!-- <v-col cols="4" class="pa-0">
       <NewChatroomDialog @create="pushChatroom" />
-    </v-col>
-  </v-row> -->
+    </v-col> -->
+  </v-row>
 </template>
 
 <script>
+
 import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';

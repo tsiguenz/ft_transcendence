@@ -17,6 +17,7 @@ import swall from 'sweetalert';
 
 export default {
   props: ['friendname'],
+  emits: ['delete'],
   data() {
     return {
       users: [],
