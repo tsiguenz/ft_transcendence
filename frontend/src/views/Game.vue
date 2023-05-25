@@ -32,6 +32,8 @@ export default {
   },
   mounted() {},
   beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('keyup', this.handleKeyUp);
     this.socketioGame.disconnect();
   },
   methods: {
