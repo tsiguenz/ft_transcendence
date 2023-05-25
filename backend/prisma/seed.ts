@@ -4,11 +4,11 @@ import * as argon from 'argon2';
 
 const prisma = new PrismaClient();
 
-// TODO: setup an account with 2fa enabled for testing
 async function populateUsers() {
   await prisma.user.upsert({
-    where: { nickname: 'gmorange' },
+    where: { id: '1' },
     create: {
+      id: '1',
       nickname: 'gmorange',
       ladderPoints: 682,
       hash: await argon.hash('gmetire')
@@ -16,8 +16,9 @@ async function populateUsers() {
     update: {}
   });
   await prisma.user.upsert({
-    where: { nickname: 'abourdar' },
+    where: { id: '2' },
     create: {
+      id: '2',
       nickname: 'abourdar',
       ladderPoints: 836,
       hash: await argon.hash('pioupiou')
@@ -25,8 +26,9 @@ async function populateUsers() {
     update: {}
   });
   await prisma.user.upsert({
-    where: { nickname: 'lpassera' },
+    where: { id: '3' },
     create: {
+      id: '3',
       nickname: 'lpassera',
       ladderPoints: 712,
       hash: await argon.hash('dudududududuel')
@@ -34,8 +36,9 @@ async function populateUsers() {
     update: {}
   });
   await prisma.user.upsert({
-    where: { nickname: 'tsiguenz' },
+    where: { id: '4' },
     create: {
+      id: '4',
       nickname: 'tsiguenz',
       // oopsi miss click
       ladderPoints: 999999999,
@@ -56,11 +59,36 @@ async function populateChatrooms() {
   });
 }
 
+async function populateGames() {
+  const users = await prisma.user.findMany();
+  for (let i = 0; i < 100; i++) {
+    const winner = users[Math.floor(Math.random() * users.length)];
+    const loser = users[Math.floor(Math.random() * users.length)];
+    const randomBoolean = Math.random() >= 0.5;
+    const randomScore1 = Math.floor(Math.random() * 10) + 1;
+    const randomScore2 = Math.floor(Math.random() * 10) + 1;
+    await prisma.game.upsert({
+      where: { id: i.toString() },
+      create: {
+        id: i.toString(),
+        isRanked: randomBoolean,
+        winnerId: winner.id,
+        loserId: loser.id,
+        previousWinnerRating: winner.ladderPoints,
+        previousLoserRating: loser.ladderPoints,
+        winnerScore: randomScore1,
+        loserScore: randomScore2
+      },
+      update: {}
+    });
+  }
+}
+
 async function main() {
   await populateUsers();
   await populateChatrooms();
+  await populateGames();
   // await populateMessages();
-  // await populateGames();
 }
 
 main()
