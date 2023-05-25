@@ -65,16 +65,15 @@ export class GameGateway {
         async (joinableRoom) => {
           const res = await this.gameService.gameLoop(this.rooms, joinableRoom);
           const room = this.rooms.get(joinableRoom);
-          if (!res) client.to(joinableRoom).emit('gameLoop', room.datas);
+          if (!res) this.server.to(joinableRoom).emit('gameLoop', room.datas);
           else {
             this.logger.log(`Game is over: ${joinableRoom}`);
-            client.to(joinableRoom).emit('gameOver', { score: res });
+            this.server.to(joinableRoom).emit('gameOver', { score: res });
           }
         },
         10,
         joinableRoom
       );
-      console.log();
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
       client.join(roomId);

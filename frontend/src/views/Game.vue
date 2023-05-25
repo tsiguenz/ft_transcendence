@@ -6,7 +6,7 @@
   <p v-if="pad2">pad2: {{ pad2 }}</p>
   -->
   <button v-if="!inGame" @click="runGame">Run game (or reconnect)</button>
-  <div v-show="inGame">
+  <div v-if="!winnerId" v-show="inGame">
     <canvas id="canvas"></canvas>
   </div>
   <p v-if="winnerId">The winner is {{ winnerId }}</p>
