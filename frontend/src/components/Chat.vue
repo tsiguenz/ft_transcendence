@@ -1,5 +1,5 @@
 <template>
-  <v-list ref="chat" height="1000" class="overflow-y-auto">
+  <v-list ref="chat"  class="overflow-y-auto">
     <v-toolbar color="">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -8,7 +8,7 @@
         :id="id"
         @delete="(roomId) => $emit('delete', roomId)"
       />
-      <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
+      <v-btn v-if="id && chatStore.hasJoinedRoom" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
     </v-toolbar>
     <div v-for="item in messages" :key="item.sentAt">
       <p class="text-right ma-2">
@@ -28,6 +28,7 @@
     </div>
   </v-list>
   <v-text-field
+  v-if="id && chatStore.hasJoinedRoom"
     v-model="newMessage"
     label="Message"
     @keyup.enter="sendMessage"
@@ -78,6 +79,7 @@ export default {
     },
     id: {
       handler() {
+        console.log(this.id);
         if (!this.id) {
           return;
         }
@@ -122,7 +124,8 @@ export default {
         return new Date(null);
       }
       return new Date(this.messages.at(-1).sentAt);
-    }
+    },
+   
   }
 };
 </script>

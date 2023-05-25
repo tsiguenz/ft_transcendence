@@ -1,29 +1,12 @@
 <template>
-  <h1>Friends</h1>
-  <v-sheet width="100%">
-    <v-row>
-      <v-col cols="12" md="4">
-        <v-form @submit.prevent>
-          <v-text-field
-            v-model="newFriend"
-            label="Friend's nickname"
-            block
-          ></v-text-field>
-        </v-form>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-btn type="submit" block class="mt-2" @click="addFriend(newFriend)"
-          >Add as friend</v-btn
-        >
-      </v-col>
-    </v-row>
-  </v-sheet>
-  <v-table density="compact">
+  <v-table class="friends" density="compact">
     <thead>
+      <h3>My friends</h3>
       <tr>
         <th class="text-left">Nickname</th>
         <th class="text-left">Ladder points</th>
         <th class="text-left">Avatar</th>
+        <th class="text-left"></th>
       </tr>
     </thead>
     <tbody>
@@ -33,10 +16,8 @@
         <td>
           <img :src="friend.avatarPath" alt="avatar" width="50" height="50" />
         </td>
-        <td>
-          <v-btn size="small" @click="deleteFriend(friend.nickname)"
-            >Delete friend</v-btn
-          >
+        <td class=" hgt-td">
+          <IsFriend :friendname="friend.nickname" @delete="deleteFriend(friend.nickname)" ></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -50,8 +31,12 @@ import * as constants from '@/constants.ts';
 import axios from 'axios';
 import swall from 'sweetalert';
 import formatError from '@/utils/lib';
+import IsFriend from '../components/IsFriend.vue';
 
 export default {
+  components: {
+    IsFriend
+  },
   data() {
     return {
       friends: [],
@@ -144,3 +129,15 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.friends{
+  padding-top: 12px;
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--light-purple);
+  border-color: var(--light-purple);
+}
+
+</style>

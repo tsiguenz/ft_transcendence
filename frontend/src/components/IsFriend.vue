@@ -3,7 +3,7 @@
         v-if="getStatusFriend(friendname) && !hover && !isMyProfile(friendname)"
         color="#600FDF"
     size="x-small" icon @mouseenter="hover = true"><img src="/assets/icons/add-friend.png" :width='20' :height='20' /></v-btn>
-    <v-btn v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)" color="#0F0124" size="x-small" icon @mouseleave="hover = false" @click="deleteFriend(friendname)"><img src="/assets/icons/trash.png" :width='20' :height='20' /></v-btn>
+    <v-btn v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)" color="#0F0124" size="x-small" icon @mouseleave="hover = false" @click="$emit('delete')"><img src="/assets/icons/trash.png" :width='20' :height='20' /></v-btn>
     <v-btn v-if="!getStatusFriend(friendname) && !isMyProfile(friendname)" color="#0F0124" size="x-small" icon  @click="addFriend(friendname)"><img src="/assets/icons/add-user.png" :width='20' :height='20' /></v-btn>
 </template>
 

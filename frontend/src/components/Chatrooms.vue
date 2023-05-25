@@ -1,14 +1,22 @@
 <template>
-  <v-card height="1000">
+  <v-card>
+    <v-btn class="btn"  @click="$emit('toggleFriendsView')"><v-avatar rounded="0" size="25px">
+          <v-img
+            class="icons-avatar"
+            src="/assets/icons/friends.png"
+          ></v-img></v-avatar
+        >My friends</v-btn>
+  </v-card>
+  <v-card>
     <v-list>
-      <v-list-subheader>Chatrooms</v-list-subheader>
+      <h2>Social</h2>
       <v-list-item
         v-for="chatroom in chatrooms"
         :key="chatroom.id"
         :title="chatroom.name"
         :value="chatroom.name"
         :active="chatroom.id == id"
-        @click="join(chatroom.id)"
+        @click="join(chatroom.id) && $emit('toggleChatView')"
       ></v-list-item>
     </v-list>
   </v-card>
@@ -87,3 +95,21 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+
+.btn{
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.v-avatar{
+  margin-right: 10px;
+}
+
+h2{
+  margin-left: 10px;
+}
+</style>

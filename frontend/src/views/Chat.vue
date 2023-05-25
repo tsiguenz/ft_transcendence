@@ -2,19 +2,22 @@
   <v-container fluid>
     <v-row justify="space-between" align="start">
       <v-col cols="3">
-        <Chatrooms :id="currentChatroomId" @join="joinChatroom" />
+        <Chatrooms :id="currentChatroomId" @join="joinChatroom" @toggleFriendsView="toggleFriendsView" @toggleChatView="toggleChatView"/>
       </v-col>
       <v-col cols="6">
         <Chat
+          v-if="!showFriends"
           :id="currentChatroomId"
           title="Chat"
           :messages="messages"
           @leave="leaveRoom"
           @delete="leaveRoom"
         />
+        <Friends v-else />
       </v-col>
       <v-col cols="3">
-        <ChatroomUsers :id="currentChatroomId" />
+        <ChatroomUsers v-if="!showFriends" :id="currentChatroomId" />
+        <OnlineFriends v-else />
       </v-col>
     </v-row>
   </v-container>
@@ -28,15 +31,20 @@ import { useChatStore } from '@/store/chat';
 import Chat from '../components/Chat.vue';
 import Chatrooms from '../components/Chatrooms.vue';
 import ChatroomUsers from '../components/ChatroomUsers.vue';
+import Friends from '../components/Friends.vue';
+import OnlineFriends from '../components/OnlineFriends.vue';
 
 export default {
   components: {
     Chat,
     Chatrooms,
-    ChatroomUsers
+    ChatroomUsers,
+    Friends,
+    OnlineFriends
   },
   data() {
     return {
+      showFriends: false
     };
   },
   computed: {
@@ -54,13 +62,27 @@ export default {
   methods: {
     async joinChatroom(id) {
       this.chatStore.activeChatroom = id;
+      this.chatStore.hasJoinedRoom = true; 
+      this.showFriends = false;
     },
     leaveRoom(id) {
       if (id == this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
       }
       this.chatStore.removeRoom(id);
-    }
+      this.chatStore.hasJoinedRoom = false; 
+    },
+    toggleFriendsView() {
+    this.showFriends = true;
+  },
+  toggleChatView() {
+    this.showFriends = false;
+  }
   }
 };
 </script>
+
+<style scoped>
+
+
+</style>
