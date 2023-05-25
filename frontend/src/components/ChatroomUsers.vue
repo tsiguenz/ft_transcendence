@@ -14,51 +14,54 @@
           :title="user.nickname"
         ></v-list-item>
       </template>
-      <v-row v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn
-          v-if="currentUserIsOwner && user.role === 'USER'"
-          @click="promote(user.id)"
-          block
-          >Make admin</v-btn
-        >
-        <v-btn
-          v-if="currentUserIsOwner && user.role === 'ADMIN'"
-          @click="demote(user.id)"
-          block
-          >Revoke admin</v-btn
-        >
-        <v-btn
-          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
-          @click="kick(user.id)"
-          block
-          >Kick</v-btn
-        >
-        <RestrictUserDialog
-          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
-          action="Mute"
-          :nickname="user.nickname"
-          :userId="user.id"
-          @restrict="mute"
-        />
-        <v-btn
-          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
-          @click="unmute(user.id)"
-          block
-          >Unmute</v-btn
-        >
-        <RestrictUserDialog
-          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
-          action="Ban"
-          :nickname="user.nickname"
-          :userId="user.id"
-          @restrict="ban"
-        />
-        <v-btn
-          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
-          @click="unban(user.id)"
-          block
-          >Unban</v-btn
-        >
+      <div v-if="!isCurrentUser(user.id)" class="ma-0">
+        <div v-if="currentUserIsOwner">
+          <v-btn
+            v-if="user.role === 'USER'"
+            @click="promote(user.id)"
+            block
+            >Make admin</v-btn
+          >
+          <v-btn
+            v-else-if="user.role === 'ADMIN'"
+            @click="demote(user.id)"
+            block
+            >Revoke admin</v-btn
+          >
+        </div>
+        <div v-if="canBeAdministered(user.role)">
+          <v-btn
+            @click="kick(user.id)"
+            block
+            >Kick</v-btn
+          >
+          <v-btn
+            v-if="isUserMuted(user.id)"
+            @click="unmute(user.id)"
+            block
+            >Unmute</v-btn
+          >
+          <RestrictUserDialog
+            v-else
+            action="Mute"
+            :nickname="user.nickname"
+            :userId="user.id"
+            @restrict="mute"
+          />
+          <v-btn
+            v-if="isUserBanned(user.id)"
+            @click="unban(user.id)"
+            block
+            >Unban</v-btn
+          >
+          <RestrictUserDialog
+            v-else
+            action="Ban"
+            :nickname="user.nickname"
+            :userId="user.id"
+            @restrict="ban"
+          />
+        </div>
         <v-btn
           v-if="!isUserBlocked(user.id)"
           @click="blockUser(user.nickname)"
@@ -66,7 +69,7 @@
           >Block</v-btn
         >
         <v-btn v-else @click="unblockUser(user.nickname)" block>Unblock</v-btn>
-      </v-row>
+      </div>
     </v-list-group>
   </v-list>
 </template>
@@ -197,6 +200,15 @@ export default {
           text: formatError(error.response.data.message)
         });
       }
+    },
+    canBeAdministered(userRole) {
+      return this.currentUserIsAdmin && userRole !== 'OWNER';
+    },
+    isUserMuted(userId) {
+      return this.chatStore.getUserRestrictions(userId).filter(restriction => restriction.type == 'MUTED').length;
+    },
+    isUserBanned(userId) {
+      return this.chatStore.getUserRestrictions(userId).filter(restriction => restriction.type == 'BANNED').length;
     },
     isCurrentUser(userId) {
       return this.currentUserId === userId;

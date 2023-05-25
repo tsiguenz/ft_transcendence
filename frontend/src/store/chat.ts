@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-// import { useSessionStore } from '@/store/session';
 
 export const useChatStore = defineStore('chat', {
   state() {
@@ -82,6 +81,11 @@ export const useChatStore = defineStore('chat', {
     setUserRole(userId, chatroomId, role) {
       const i = this.users.findIndex((e) => e.id == userId);
       this.users[i].role = role;
+    },
+
+    getUserRestrictions(userId) {
+      const i = this.users.findIndex((e) => e.id == userId);
+      return this.users[i].restrictions.filter(restriction => new Date(restriction.restrictedUntil) >= new Date() );
     },
 
     isUserOnline(userId: number, chatroomId: number) {
