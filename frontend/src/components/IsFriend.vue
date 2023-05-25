@@ -50,7 +50,6 @@ export default {
         );
         this.friends = response.data.map(friend => friend.nickname);
         } catch(error) {
-        console.log("error");
         }
     },
     async deleteFriend(nickname) {

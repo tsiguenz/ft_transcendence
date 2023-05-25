@@ -107,18 +107,10 @@ import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
-import ProfileLadderPoints from '../components/ProfileLadderPoints.vue';
-import ProfileAchievements from '../components/ProfileAchievements.vue';
-import ProfileHistoryGames from '../components/ProfileHistoryGames.vue';
-import ProfileLastConnection from '../components/ProfileLastConnection.vue';
 
 export default {
   components: {
-    ProfilePrintAvatar,
-    ProfileLadderPoints,
-    ProfileAchievements,
-    ProfileHistoryGames,
-    ProfileLastConnection
+    ProfilePrintAvatar
   },
   data() {
     return {

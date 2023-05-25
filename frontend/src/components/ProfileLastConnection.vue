@@ -1,9 +1,9 @@
 <template>
 	<div v-if="!isLog">
+  <v-row class="justify-center"><h4 class="font">Disconnect since :</h4></v-row>
   <v-row class="justify-center"
-    ><h4 class="font">{{ disconnectSince }}</h4></v-row
+    ><p class="font">{{ disconnectSince }}</p></v-row
   >
-  <v-row class="justify-center"><p>Last connection</p></v-row>
 	</div>
 	<div v-else>
   <v-row class="justify-center"
@@ -20,11 +20,13 @@ import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 export default {
-  props: ['lastConnection'],
+  props: ['user'],
+  inject: ['connectedUsersStore'],
   data() {
     return {
 			isLog: false,
-      disconnectSince: ''
+      disconnectSince: '',
+      connectedUsers: this.connectedUsersStore.connectedUsers
     };
   },
   computed: {
@@ -32,23 +34,16 @@ export default {
   },
   mounted() {
     this.calculateDifference();
-    this.interval = setInterval(this.calculateDifference.bind(this), 1000);
-  },
-  unmounted() {
-    clearInterval(this.interval);
   },
   methods: {
     calculateDifference() {
-      if (this.sessionStore.loggedIn) {
+      if (this.connectedUsers.includes(this.user.id)) {
 				this.isLog = true;
         return;
       }
 				this.isLog = false;
-      const lastCoUTC = new Date(this.lastConnection).getTime();
-      const nowUTC = new Date().getTime();
-      this.disconnectSince = new Date(nowUTC - lastCoUTC)
-        .toISOString()
-        .slice(11, 19);
+      const lastCoUTC = new Date(this.user.lastConnection).getTime();
+			this.disconnectSince = new Date(lastCoUTC).toLocaleString();
     },
   }
 };

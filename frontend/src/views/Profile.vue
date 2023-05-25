@@ -30,7 +30,7 @@
           <p class="ma-5">
             <ProfileLastConnection
               v-if="userIsMounted"
-              :lastConnection="user.lastConnection"
+              :user="user"
             />
           </p>
           <v-row class="justify-center"><h2 class="font">12</h2></v-row>
@@ -73,6 +73,7 @@ export default {
     return {
       user: {},
       userIsMounted: false,
+			currentUser: ''
     };
   },
   computed: {
@@ -86,12 +87,12 @@ export default {
       try {
         const response = await axios.get(
           constants.API_URL + `/users/${this.sessionStore.nickname}`
+//          constants.API_URL + `/users/gmorange`
         );
         this.user = response.data;
-console.log(this.user.avatarPath);
 				this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
-console.log(this.user.avatarPath);
         this.userIsMounted = true;
+				this.currentUser = this.user.nickname;
       } catch (error) {
         swal({
           icon: 'error',
