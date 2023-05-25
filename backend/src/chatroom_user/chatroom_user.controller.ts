@@ -7,7 +7,8 @@ import {
   Param,
   UseGuards,
   Req,
-  ForbiddenException
+  ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -76,6 +77,11 @@ export class ChatroomUserController {
     ) {
       throw new ForbiddenException('Unauthorized to promote user');
     }
+
+    if (!(await this.chatroomUserService.isUserInChatroom(userId, chatroomId))) {
+      throw new NotFoundException('User not found');
+    }
+
     return await this.chatroomUserService.setUserRole(
       userId,
       chatroomId,
@@ -113,6 +119,11 @@ export class ChatroomUserController {
     ) {
       throw new ForbiddenException('Unauthorized to demote user');
     }
+
+    if (!(await this.chatroomUserService.isUserInChatroom(userId, chatroomId))) {
+      throw new NotFoundException('User not found');
+    }
+
     return await this.chatroomUserService.setUserRole(
       userId,
       chatroomId,
