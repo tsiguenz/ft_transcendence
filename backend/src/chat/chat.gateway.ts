@@ -227,6 +227,8 @@ export class ChatGateway
       payload.restrictionType
     );
 
+    if (!restrictionType) { throw new WsException('Unknown restriction type'); }
+
     try {
       this.chatroomRestriction.create(
         payload.userId,
@@ -247,6 +249,56 @@ export class ChatGateway
       socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
       socket.leave(chatroom.slug);
       this.chatroomUser.remove(payload.userId, chatroom.id);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.UNRESTRICT_USER)
+  async handleUnrestrict(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      userId: string;
+      chatroomId: string;
+      restrictionType: string;
+    }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+    if (!chatroom) {
+      return;
+    }
+
+    if (!(await this.users.getUserById(payload.userId))) {
+      return;
+    }
+
+    if (
+      (await this.chatroomUser.isUserOwner(payload.userId, chatroom.id)) ||
+      (!(await this.chatroomUser.isUserAdmin(
+        client['decoded'].sub,
+        chatroom.id
+      )) &&
+        !(await this.chatroomUser.isUserOwner(
+          client['decoded'].sub,
+          chatroom.id
+        )))
+    ) {
+      throw new WsException('Unauthorized to unrestrict user');
+    }
+
+    const restrictionType = this.chatroomRestriction.stringToRestrictionType(
+      payload.restrictionType
+    );
+
+    if (!restrictionType) { throw new WsException('Unknown restriction type'); }
+
+    try {
+      this.chatroomRestriction.remove(
+        payload.userId,
+        chatroom.id,
+        restrictionType
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }

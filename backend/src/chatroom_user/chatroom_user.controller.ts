@@ -46,7 +46,8 @@ export class ChatroomUserController {
     const formattedUsers = users.map((user) => ({
       id: user.id,
       nickname: user.nickname,
-      role: user.chatrooms[0].role
+      role: user.chatrooms[0].role,
+      restrictions: user.restrictions
     }));
     return formattedUsers;
   }

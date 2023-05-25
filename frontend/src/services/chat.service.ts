@@ -81,6 +81,22 @@ class ChatService {
     });
   }
 
+  unmuteUser(userId: string, chatroomId: string) {
+    this.socketService.send(events.UNRESTRICT_USER, {
+      userId,
+      chatroomId,
+      restrictionType: 'MUTED'
+    });
+  }
+
+  unbanUser(userId: string, chatroomId: string) {
+    this.socketService.send(events.UNRESTRICT_USER, {
+      userId,
+      chatroomId,
+      restrictionType: 'BANNED'
+    });
+  }
+
   kickUser(userId: string, chatroomId: string) {
     this.socketService.send(events.KICK_USER, { userId, chatroomId });
   }

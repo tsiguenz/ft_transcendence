@@ -40,6 +40,12 @@
           :userId="user.id"
           @restrict="mute"
         />
+        <v-btn
+          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
+          @click="unmute(user.id)"
+          block
+          >Unmute</v-btn
+        >
         <RestrictUserDialog
           v-if="currentUserIsAdmin && user.role !== 'OWNER'"
           action="Ban"
@@ -47,6 +53,12 @@
           :userId="user.id"
           @restrict="ban"
         />
+        <v-btn
+          v-if="currentUserIsAdmin && user.role !== 'OWNER'"
+          @click="unban(user.id)"
+          block
+          >Unban</v-btn
+        >
         <v-btn
           v-if="!isUserBlocked(user.id)"
           @click="blockUser(user.nickname)"
@@ -206,6 +218,12 @@ export default {
     },
     ban(params) {
       ChatService.banUser(params.userId, this.id, params.time);
+    },
+    unmute(userId) {
+      ChatService.unmuteUser(userId, this.id);
+    },
+    unban(userId) {
+      ChatService.unbanUser(userId, this.id);
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);
