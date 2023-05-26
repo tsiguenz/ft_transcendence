@@ -125,14 +125,15 @@ export default {
       this.ctx.fillText(this.score.player2.points, this.map.width / 2 + 15, 20);
     },
     handleKeyDown(e) {
-      if (e.keyCode === 38) {
+      console.log(e);
+      if (e.key === 'ArrowUp') {
         this.socketioGame.send('movePad', { dy: -1 });
-      } else if (e.keyCode === 40) {
+      } else if (e.key === 'ArrowDown') {
         this.socketioGame.send('movePad', { dy: 1 });
       }
     },
     handleKeyUp(e) {
-      if (e.keyCode === 38 || e.keyCode === 40)
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
         this.socketioGame.send('movePad', { dy: 0 });
     }
   }
