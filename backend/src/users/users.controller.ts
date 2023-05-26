@@ -94,6 +94,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are deleting a friend from'
+  })
   @Delete(':nickname/friends/:friendNickname')
   deleteFriend(
     @Param('friendNickname') friendNickname: string,
@@ -104,6 +110,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are getting friends from'
+  })
   @Get(':nickname/friends')
   getFriends(@User() user: object) {
     return this.usersService.getFriends(user['id']);
@@ -111,6 +123,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are getting the profile'
+  })
   @Get(':nickname/profile')
   getProfile(@User() user: object) {
     return this.usersService.getProfile(user['id']);
@@ -119,11 +137,16 @@ export class UsersController {
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are editing the profile'
+  })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        nickname: { type: 'string', description: 'The new unique nickname' },
         twoFactorEnable: {
           type: 'boolean',
           description: 'Enable or disable two factor authentication'
@@ -139,6 +162,12 @@ export class UsersController {
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are editing the avatar'
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -175,6 +204,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are getting the chatrooms'
+  })
   @Get(':nickname/chatrooms')
   async findChatroomsForUser(@User() user: object) {
     return await this.usersService.chatrooms(user['id']);
@@ -182,6 +217,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are blocking'
+  })
   @Post(':nickname/block')
   async blockUser(@Param('nickname') nickname: string, @User() user: object) {
     const toBlock = await this.usersService.getUser(nickname);
@@ -195,6 +236,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are unblocking'
+  })
   @Post(':nickname/unblock')
   async unblockUser(@Param('nickname') nickname: string, @User() user: object) {
     const toUnblock = await this.usersService.getUser(nickname);
@@ -205,6 +252,12 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard, IsCurrentUserGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: 'Nickname of the user you are getting the blocked users'
+  })
   @Get(':nickname/blocked')
   async getBlockedUsers(
     @Param('nickname') nickname: string,
