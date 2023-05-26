@@ -227,7 +227,9 @@ export class ChatGateway
       payload.restrictionType
     );
 
-    if (!restrictionType) { throw new WsException('Unknown restriction type'); }
+    if (!restrictionType) {
+      throw new WsException('Unknown restriction type');
+    }
 
     try {
       this.chatroomRestriction.create(
@@ -291,7 +293,9 @@ export class ChatGateway
       payload.restrictionType
     );
 
-    if (!restrictionType) { throw new WsException('Unknown restriction type'); }
+    if (!restrictionType) {
+      throw new WsException('Unknown restriction type');
+    }
 
     try {
       this.chatroomRestriction.remove(

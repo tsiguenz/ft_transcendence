@@ -16,10 +16,7 @@
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
         <div v-if="currentUserIsOwner">
-          <v-btn
-            v-if="user.role === 'USER'"
-            @click="promote(user.id)"
-            block
+          <v-btn v-if="user.role === 'USER'" @click="promote(user.id)" block
             >Make admin</v-btn
           >
           <v-btn
@@ -30,15 +27,8 @@
           >
         </div>
         <div v-if="canBeAdministered(user.role)">
-          <v-btn
-            @click="kick(user.id)"
-            block
-            >Kick</v-btn
-          >
-          <v-btn
-            v-if="isUserMuted(user.id)"
-            @click="unmute(user.id)"
-            block
+          <v-btn @click="kick(user.id)" block>Kick</v-btn>
+          <v-btn v-if="isUserMuted(user.id)" @click="unmute(user.id)" block
             >Unmute</v-btn
           >
           <RestrictUserDialog
@@ -48,10 +38,7 @@
             :userId="user.id"
             @restrict="mute"
           />
-          <v-btn
-            v-if="isUserBanned(user.id)"
-            @click="unban(user.id)"
-            block
+          <v-btn v-if="isUserBanned(user.id)" @click="unban(user.id)" block
             >Unban</v-btn
           >
           <RestrictUserDialog
@@ -205,10 +192,14 @@ export default {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
     },
     isUserMuted(userId) {
-      return this.chatStore.getUserRestrictions(userId).filter(restriction => restriction.type == 'MUTED').length;
+      return this.chatStore
+        .getUserRestrictions(userId)
+        .filter((restriction) => restriction.type == 'MUTED').length;
     },
     isUserBanned(userId) {
-      return this.chatStore.getUserRestrictions(userId).filter(restriction => restriction.type == 'BANNED').length;
+      return this.chatStore
+        .getUserRestrictions(userId)
+        .filter((restriction) => restriction.type == 'BANNED').length;
     },
     isCurrentUser(userId) {
       return this.currentUserId === userId;
@@ -227,15 +218,19 @@ export default {
     },
     mute(params) {
       ChatService.muteUser(params.userId, this.id, params.time);
+      this.chatStore.setUserRestriction(params.userId, 'MUTED', params.time);
     },
     ban(params) {
       ChatService.banUser(params.userId, this.id, params.time);
+      this.chatStore.setUserRestriction(params.userId, 'BANNED', params.time);
     },
     unmute(userId) {
       ChatService.unmuteUser(userId, this.id);
+      this.chatStore.removeUserRestriction(userId, 'MUTED');
     },
     unban(userId) {
       ChatService.unbanUser(userId, this.id);
+      this.chatStore.removeUserRestriction(userId, 'BANNED');
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);

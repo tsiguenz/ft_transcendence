@@ -83,9 +83,27 @@ export const useChatStore = defineStore('chat', {
       this.users[i].role = role;
     },
 
+    setUserRestriction(userId, type, duration) {
+      const date = new Date();
+      const until = new Date(date.getTime() + duration * 1000 * 60);
+      const i = this.users.findIndex((e) => e.id == userId);
+      const restriction = { type: type, restrictedUntil: until };
+
+      this.users[i].restrictions.push(restriction);
+    },
+
+    removeUserRestriction(userId, type) {
+      const i = this.users.findIndex((e) => e.id == userId);
+      this.users[i].restrictions = this.users[i].restrictions.filter(
+        (restriction) => restriction.type !== type
+      );
+    },
+
     getUserRestrictions(userId) {
       const i = this.users.findIndex((e) => e.id == userId);
-      return this.users[i].restrictions.filter(restriction => new Date(restriction.restrictedUntil) >= new Date() );
+      return this.users[i].restrictions.filter(
+        (restriction) => new Date(restriction.restrictedUntil) >= new Date()
+      );
     },
 
     isUserOnline(userId: number, chatroomId: number) {

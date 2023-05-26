@@ -27,7 +27,7 @@ export class ChatroomUserService {
           select: {
             role: true,
             chatRoom: false,
-            userId: false,
+            userId: false
           },
           where: {
             chatRoomId: chatroomId
@@ -36,12 +36,12 @@ export class ChatroomUserService {
         restrictions: {
           select: {
             type: true,
-            restrictedUntil: true,
+            restrictedUntil: true
           },
           where: {
             chatRoomId: chatroomId,
             restrictedUntil: {
-              gte: new Date(),
+              gte: new Date()
             }
           }
         }
