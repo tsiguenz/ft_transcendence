@@ -1,15 +1,15 @@
 <template>
-	<div v-if="!isLog">
-  <v-row class="justify-center"><h4 class="font">Disconnect since :</h4></v-row>
-  <v-row class="justify-center"
-    ><p class="font">{{ disconnectSince }}</p></v-row
-  >
-	</div>
-	<div v-else>
-  <v-row class="justify-center"
-    ><h4 class="font">Online</h4></v-row
-  >
-	</div>
+  <div v-if="!isLog">
+    <v-row class="justify-center"
+      ><h4 class="font">Disconnect since :</h4></v-row
+    >
+    <v-row class="justify-center"
+      ><p class="font">{{ disconnectSince }}</p></v-row
+    >
+  </div>
+  <div v-else>
+    <v-row class="justify-center"><h4 class="font">Online</h4></v-row>
+  </div>
 </template>
 
 <script>
@@ -24,7 +24,7 @@ export default {
   inject: ['connectedUsersStore'],
   data() {
     return {
-			isLog: false,
+      isLog: false,
       disconnectSince: '',
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
@@ -38,13 +38,13 @@ export default {
   methods: {
     calculateDifference() {
       if (this.connectedUsers.includes(this.user.id)) {
-				this.isLog = true;
+        this.isLog = true;
         return;
       }
-				this.isLog = false;
+      this.isLog = false;
       const lastCoUTC = new Date(this.user.lastConnection).getTime();
-			this.disconnectSince = new Date(lastCoUTC).toLocaleString();
-    },
+      this.disconnectSince = new Date(lastCoUTC).toLocaleString();
+    }
   }
 };
 </script>

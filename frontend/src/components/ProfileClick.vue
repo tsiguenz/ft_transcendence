@@ -1,48 +1,43 @@
 <template>
-    <v-container class="cont">
-      <v-row>
-        <v-menu
-          min-width="200px"
-        >
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              v-bind="props"
-              size="40px"
-            >
-              <v-avatar
-              class="mx-auto"
-                size="40px"
-              >
-                <ProfilePrintAvatar :wdt="width" :hgt="height" :url-avatar="urlAvatar"></ProfilePrintAvatar>
+  <v-container class="cont">
+    <v-row>
+      <v-menu min-width="200px">
+        <template #activator="{ props }">
+          <v-btn icon v-bind="props" size="40px">
+            <v-avatar class="mx-auto" size="40px">
+              <ProfilePrintAvatar
+                :wdt="width"
+                :hgt="height"
+                :url-avatar="urlAvatar"
+              ></ProfilePrintAvatar>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-text class="conttext">
+            <div class="mx-auto text-center">
+              <v-avatar>
+                <ProfilePrintAvatar
+                  :wdt="width"
+                  :hgt="height"
+                  :url-avatar="urlAvatar"
+                ></ProfilePrintAvatar>
               </v-avatar>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-text class="conttext">
-              <div class="mx-auto text-center">
-                <v-avatar
-                >
-                <ProfilePrintAvatar :wdt="width" :hgt="height" :url-avatar="urlAvatar"></ProfilePrintAvatar>
-                </v-avatar>
-                <h3>{{ nickname }}</h3>
-                <p class="text-caption mt-1">
-                  {{ status }}
-                </p>
-                <v-divider class="my-3"></v-divider>
-                <v-btn
-                  rounded
-                  variant="text"
-                >
-                  Show Profile
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-menu>
-      </v-row>
-    </v-container>
-  </template>
+              <h3>{{ nickname }}</h3>
+              <p class="text-caption mt-1">
+                {{ status }}
+              </p>
+              <v-divider class="my-3"></v-divider>
+              <router-link class="button" :to="'/otherUserProfile/' + nickname"
+                >Show Profile</router-link
+              >
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-menu>
+    </v-row>
+  </v-container>
+</template>
 
 <script>
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
@@ -52,11 +47,11 @@ import formatError from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
-    components: {
+  components: {
     ProfilePrintAvatar
   },
   inject: ['connectedUsersStore', 'sessionStore'],
-    props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
+  props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
   data() {
     return {
       users: [],
@@ -104,14 +99,12 @@ export default {
 </script>
 
 <style lang="scss">
-
-.cont{
-    width: 1%;
-    margin: 0;
+.cont {
+  width: 1%;
+  margin: 0;
 }
 
-.conttext{
-    background: var(--dark-alt);
+.conttext {
+  background: var(--dark-alt);
 }
-
 </style>

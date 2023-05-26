@@ -154,10 +154,10 @@ export default {
         this.setErrorMessage(error.response.data.message);
       }
     },
-		reset() {
-			this.$refs.form.reset();
-			this.dialog = false;
-		},
+    reset() {
+      this.$refs.form.reset();
+      this.dialog = false;
+    },
     signin42() {
       window.location.href = this.auth42;
     },

@@ -46,6 +46,12 @@ const router = createRouter({
       component: () => import('../views/Profile.vue')
     },
     {
+      path: '/otherUserProfile/:otherUser',
+      name: 'OtherUserProfile',
+      component: () => import('../views/OtherUserProfile.vue'),
+      props: true
+    },
+    {
       path: '/settings',
       name: 'Settings',
       component: () => import('../views/Settings.vue')

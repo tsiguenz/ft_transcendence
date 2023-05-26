@@ -1,10 +1,29 @@
 <template>
-    <v-btn
-        v-if="getStatusFriend(friendname) && !hover && !isMyProfile(friendname)"
-        color="#600FDF"
-    size="x-small" icon @mouseenter="hover = true"><img src="/assets/icons/add-friend.png" :width='20' :height='20' /></v-btn>
-    <v-btn v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)" color="#0F0124" size="x-small" icon @mouseleave="hover = false" @click="deleteFriend(friendname)"><img src="/assets/icons/trash.png" :width='20' :height='20' /></v-btn>
-    <v-btn v-if="!getStatusFriend(friendname) && !isMyProfile(friendname)" color="#0F0124" size="x-small" icon  @click="addFriend(friendname)"><img src="/assets/icons/add-user.png" :width='20' :height='20' /></v-btn>
+  <v-btn
+    v-if="getStatusFriend(friendname) && !hover && !isMyProfile(friendname)"
+    color="#600FDF"
+    size="x-small"
+    icon
+    @mouseenter="hover = true"
+    ><img src="/assets/icons/add-friend.png" :width="20" :height="20"
+  /></v-btn>
+  <v-btn
+    v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)"
+    color="#0F0124"
+    size="x-small"
+    icon
+    @mouseleave="hover = false"
+    @click="deleteFriend(friendname)"
+    ><img src="/assets/icons/trash.png" :width="20" :height="20"
+  /></v-btn>
+  <v-btn
+    v-if="!getStatusFriend(friendname) && !isMyProfile(friendname)"
+    color="#0F0124"
+    size="x-small"
+    icon
+    @click="addFriend(friendname)"
+    ><img src="/assets/icons/add-user.png" :width="20" :height="20"
+  /></v-btn>
 </template>
 
 <script>
@@ -20,37 +39,35 @@ export default {
   data() {
     return {
       users: [],
-        friends: [],
-        hover: false,
+      friends: [],
+      hover: false
     };
   },
-    computed: {
-        ...mapStores(useSessionStore)
-    },
-    watch:{
-        friends(){
-            this.getFriends();
-        }
-    },
-    async mounted() {
-        await this.getFriends();
-    },
-    methods: {
+  computed: {
+    ...mapStores(useSessionStore)
+  },
+  watch: {
+    friends() {
+      this.getFriends();
+    }
+  },
+  async mounted() {
+    await this.getFriends();
+  },
+  methods: {
     async getFriends() {
-        try {
+      try {
         const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.get(
-            constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends`,
-            {
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
+          {
             headers: {
-                Authorization: 'Bearer ' + jwt
-            } 
+              Authorization: 'Bearer ' + jwt
             }
+          }
         );
-        this.friends = response.data.map(friend => friend.nickname);
-        } catch(error) {
-        }
+        this.friends = response.data.map((friend) => friend.nickname);
+      } catch (error) {}
     },
     async deleteFriend(nickname) {
       try {
@@ -95,12 +112,12 @@ export default {
         });
       }
     },
-    getStatusFriend(friendname){
-        return this.friends.includes(friendname);
+    getStatusFriend(friendname) {
+      return this.friends.includes(friendname);
     },
-    isMyProfile(friendname){
-        return friendname == this.sessionStore.nickname;
+    isMyProfile(friendname) {
+      return friendname == this.sessionStore.nickname;
     }
-}
+  }
 };
 </script>

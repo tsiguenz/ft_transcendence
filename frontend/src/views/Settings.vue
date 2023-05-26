@@ -1,101 +1,116 @@
 <template>
   <v-container flex>
     <v-row justify="center"><h1 class="font mb-10">Settings</h1></v-row>
-		<v-row class="mb-10">
-		<v-col cols="4">
-    <v-sheet class="sheet pa-5 mt-5">
-      <h2 class="font">Change nickname</h2>
-      You are {{ this.user.nickname }}
-      <v-form class="ma-5" v-model="isValidForm">
-        <v-text-field
-          v-model="newNickname"
-          :rules="[rules.nicknameCharacters]"
-          required
-          @keydown.enter.prevent="editNickname"
-        ></v-text-field>
-      </v-form>
-      <v-btn class="log" width="100%" :disabled="!isValidForm" @click="editNickname">
-        submit
-      </v-btn>
-    </v-sheet>
-		</v-col>
-		<v-col cols="4">
-    <v-sheet class="sheet pa-5 mt-5">
-      <h2 class="font">Change avatar</h2>
-      <v-row justify="center">
-        <ProfilePrintAvatar
-          class="my-3"
-          v-if="userIsMounted"
-          :wdt="150"
-          :hgt="150"
-          :urlAvatar="this.avatarPath"
-        />
-      </v-row>
-      <v-file-input
-        class="my-5"
-        type="file"
-        name="avatar"
-        @change="onFileChange"
-      />
-      <v-btn class="log" width="100%" :disabled="!isValidAvatar" @click="editTFA">
-        submit
-      </v-btn>
-    </v-sheet>
-		</v-col>
-		<v-col cols="4">
-    <v-sheet class="sheet pa-5 mt-5">
-      <h2 class="font">Manage two-factor authentification</h2>
-			<v-row class="ma-5 justify-center">
-      <v-btn
-        :disabled="newTwoFactorEnable && !qrcode"
-        class="log"
-        @click="generate2faQrcode"
-        >Enable</v-btn
-      >
-			</v-row>
-			<v-row class="ma-5 justify-center">
-      <v-btn
-        :disabled="!newTwoFactorEnable && !qrcode"
-        class="log"
-        @click="generate2faQrcode"
-        >Disable</v-btn
-      >
-			</v-row>
-      <v-dialog v-model="dialog" persistent>
-        <v-row align="center" justify="center">
-          <v-sheet class="sheet pa-10" height="100%" width="500">
-                <v-row justify="end"><v-btn class="close" @click="dialog = false"
-                  ><v-icon icon="mdi-close"></v-icon
-                ></v-btn></v-row>
-            <v-row class="justify-center ma-5 mb-10">
-              Scan this QR Code with Google Authenticator
+    <v-row class="mb-10">
+      <v-col cols="4">
+        <v-sheet class="sheet pa-5 mt-5">
+          <h2 class="font">Change nickname</h2>
+          You are {{ this.user.nickname }}
+          <v-form class="ma-5" v-model="isValidForm">
+            <v-text-field
+              v-model="newNickname"
+              :rules="[rules.nicknameCharacters]"
+              required
+              @keydown.enter.prevent="editNickname"
+            ></v-text-field>
+          </v-form>
+          <v-btn
+            class="log"
+            width="100%"
+            :disabled="!isValidForm"
+            @click="editNickname"
+          >
+            submit
+          </v-btn>
+        </v-sheet>
+      </v-col>
+      <v-col cols="4">
+        <v-sheet class="sheet pa-5 mt-5">
+          <h2 class="font">Change avatar</h2>
+          <v-row justify="center">
+            <ProfilePrintAvatar
+              class="my-3"
+              v-if="userIsMounted"
+              :wdt="150"
+              :hgt="150"
+              :urlAvatar="this.avatarPath"
+            />
+          </v-row>
+          <v-file-input
+            class="my-5"
+            type="file"
+            name="avatar"
+            @change="onFileChange"
+          />
+          <v-btn
+            class="log"
+            width="100%"
+            :disabled="!isValidAvatar"
+            @click="editTFA"
+          >
+            submit
+          </v-btn>
+        </v-sheet>
+      </v-col>
+      <v-col cols="4">
+        <v-sheet class="sheet pa-5 mt-5">
+          <h2 class="font">Manage two-factor authentification</h2>
+          <v-row class="ma-5 justify-center">
+            <v-btn
+              :disabled="newTwoFactorEnable && !qrcode"
+              class="log"
+              @click="generate2faQrcode"
+              >Enable</v-btn
+            >
+          </v-row>
+          <v-row class="ma-5 justify-center">
+            <v-btn
+              :disabled="!newTwoFactorEnable && !qrcode"
+              class="log"
+              @click="generate2faQrcode"
+              >Disable</v-btn
+            >
+          </v-row>
+          <v-dialog v-model="dialog" persistent>
+            <v-row align="center" justify="center">
+              <v-sheet class="sheet pa-10" height="100%" width="500">
+                <v-row justify="end"
+                  ><v-btn class="close" @click="dialog = false"
+                    ><v-icon icon="mdi-close"></v-icon></v-btn
+                ></v-row>
+                <v-row class="justify-center ma-5 mb-10">
+                  Scan this QR Code with Google Authenticator
+                </v-row>
+                <v-row class="justify-center ma-5 mb-10">
+                  <img :src="qrcode" alt="qrcode" width="200" height="200" />
+                </v-row>
+                <v-form v-if="qrcode">
+                  <v-row class="justify-center ma-3">
+                    <v-text-field
+                      v-model="twoFactorCode"
+                      label="Enter the generated code"
+                      required
+                      @keydown.enter.prevent="editTFA"
+                    ></v-text-field>
+                  </v-row>
+                  <v-row class="justify-center ma-3">
+                    <v-btn v-if="qrcode" class="btn" @click="editTFA"
+                      >Validate code</v-btn
+                    >
+                  </v-row>
+                </v-form>
+              </v-sheet>
             </v-row>
-            <v-row class="justify-center ma-5 mb-10">
-              <img :src="qrcode" alt="qrcode" width="200" height="200" />
-            </v-row>
-            <v-form v-if="qrcode">
-              <v-row class="justify-center ma-3">
-                <v-text-field
-                  v-model="twoFactorCode"
-                  label="Enter the generated code"
-                  required
-                  @keydown.enter.prevent="editTFA"
-                ></v-text-field>
-              </v-row>
-              <v-row class="justify-center ma-3">
-                <v-btn v-if="qrcode" class="btn" @click="editTFA"
-                  >Validate code</v-btn
-                >
-              </v-row>
-            </v-form>
-          </v-sheet>
-        </v-row>
-      </v-dialog>
-    </v-sheet>
-		</v-col>
-		</v-row>
+          </v-dialog>
+        </v-sheet>
+      </v-col>
+    </v-row>
 
-    <v-row class="ma-5 justify-center"><v-btn class="log" width="100%" @click="alertDeleteAccount">Delete Account</v-btn></v-row>
+    <v-row class="ma-5 justify-center"
+      ><v-btn class="log" width="100%" @click="alertDeleteAccount"
+        >Delete Account</v-btn
+      ></v-row
+    >
   </v-container>
 </template>
 
@@ -176,7 +191,7 @@ export default {
           text: formatError(error.response.data.message)
         });
       }
-        this.getProfile();
+      this.getProfile();
     },
     async editNickname() {
       if (!this.isValidForm) {
@@ -203,7 +218,7 @@ export default {
           text: formatError(error.response.data.message)
         });
       }
-        this.getProfile();
+      this.getProfile();
     },
     async editTFA() {
       try {
@@ -328,10 +343,10 @@ export default {
   background: var(--dark-purple);
   border-radius: 30px;
   border: 3px solid var(--light);
-	text-align: center;
-	height: 100%
+  text-align: center;
+  height: 100%;
 }
 .disable-events {
-	pointer-events: none
+  pointer-events: none;
 }
 </style>
