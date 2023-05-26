@@ -48,7 +48,7 @@
           ></v-img></v-avatar
         ><span class="text">LeaderBoard</span></router-link
       >
-      <router-link v-if="isLog()" class="button" to="/profile"
+      <router-link v-if="isLog()" class="button" :to="'/Profile/' + user"
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
@@ -68,13 +68,20 @@ export default {
   data() {
     return {
       drawer: true,
-      is_expanded: false
+      is_expanded: false,
+			user: ''
     };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
+	beforeMount() {
+		this.getNickname();
+	},
   methods: {
+		getNickname() {
+			this.user = this.sessionStore.nickname;	
+		},
     isLog() {
       return this.sessionStore.loggedIn;
     },

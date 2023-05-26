@@ -39,7 +39,7 @@
             ><p class="font">Game played</p></v-row
           >
         </v-sheet>
-        <v-btn v-if="!otherUser" class="ma-5 log" to="/settings"
+        <v-btn class="ma-5 log" to="/settings"
           >Settings</v-btn
         >
       </v-col>
@@ -61,7 +61,7 @@ import ProfileHistoryGames from './ProfileHistoryGames.vue';
 import ProfileLastConnection from './ProfileLastConnection.vue';
 
 export default {
-  props: ['otherUser'],
+  props: ['nickname'],
   components: {
     ProfilePrintAvatar,
     ProfileLadderPoints,
@@ -72,8 +72,7 @@ export default {
   data() {
     return {
       user: {},
-      userIsMounted: false,
-      currentUser: ''
+      userIsMounted: false
     };
   },
   computed: {
@@ -84,12 +83,9 @@ export default {
   },
   methods: {
     async getProfile() {
+console.log("HERE");
       try {
-        const response = this.otherUser
-          ? await axios.get(constants.API_URL + `/users/${this.otherUser}`)
-          : await axios.get(
-              constants.API_URL + `/users/${this.sessionStore.nickname}`
-            );
+        const response = await axios.get(constants.API_URL + `/users/${this.nickname}`);
 
         this.user = response.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;

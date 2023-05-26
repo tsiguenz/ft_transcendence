@@ -28,7 +28,7 @@
                 {{ status }}
               </p>
               <v-divider class="my-3"></v-divider>
-              <router-link class="button" :to="'/otherUserProfile/' + nickname"
+              <router-link class="button" :to="'/Profile/' + nickname"
                 >Show Profile</router-link
               >
             </div>
