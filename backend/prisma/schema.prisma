@@ -24,7 +24,7 @@ model User {
   chatrooms       ChatRoomUser[]
   friends         Friend[]       @relation("user")
   blockedUsers    BlockedUser[]  @relation("user")
-  TwoFactorId     TwoFactorId?
+  twoFactorId     TwoFactorId?
   restrictions    ChatRoomRestriction[]
   refreshToken    String?
   lastConnection  DateTime       @default(now())
