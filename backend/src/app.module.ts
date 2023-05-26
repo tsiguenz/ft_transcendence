@@ -6,6 +6,7 @@ import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
 import { ChatroomModule } from './chatroom/chatroom.module';
 import { StatusModule } from './status/status.module';
+import { GameModule } from './game/game.module';
 import { TwoFaService } from './2fa/2fa.service';
 import { TwoFaModule } from './2fa/2fa.module';
 import { UsersService } from './users/users.service';
@@ -23,6 +24,7 @@ import { ChatroomUserModule } from './chatroom_user/chatroom_user.module';
     UsersModule,
     TwoFaModule,
     StatusModule,
+    GameModule,
     ChatroomUserModule,
     ServeStaticModule.forRoot({
       rootPath: '/app/public',

@@ -9,11 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum GameType {
-  LADDER
-  CUSTOM
-}
-
 model User {
   id              String         @id @default(uuid())
   fortyTwoId      Int?           @unique
@@ -24,12 +19,12 @@ model User {
   twoFactorSecret String?
   hash            String?
   gamesWin        Game[]         @relation("winner")
-  gamesLoose      Game[]         @relation("looser")
+  gamesLose       Game[]         @relation("loser")
   messages        Message[]      @relation("author")
   chatrooms       ChatRoomUser[]
   friends         Friend[]       @relation("user")
   blockedUsers    BlockedUser[]  @relation("user")
-  TwoFactorId     TwoFactorId?
+  twoFactorId     TwoFactorId?
   refreshToken    String?
   lastConnection  DateTime       @default(now())
   createdAt       DateTime       @default(now())
@@ -46,18 +41,17 @@ model TwoFactorId {
 }
 
 model Game {
-  id                   String   @id @default(uuid())
-  type                 GameType
+  id                   String  @id
+  isRanked             Boolean
   winnerId             String
-  winner               User     @relation("winner", fields: [winnerId], references: [id])
-  looserId             String
-  looser               User     @relation("looser", fields: [looserId], references: [id])
+  winner               User  @relation("winner", fields: [winnerId], references: [id])
+  loserId              String
+  loser                User  @relation("loser", fields: [loserId], references: [id])
   previousWinnerRating Int
-  previousLooserRating Int
-  winnerScore          Int      @default(0)
-  looserScore          Int      @default(0)
-  duration             DateTime
-  createdAt            DateTime @default(now())
+  previousLoserRating  Int
+  winnerScore          Int
+  loserScore           Int
+  duration             DateTime  @default(now())
 
   @@map("games")
 }
