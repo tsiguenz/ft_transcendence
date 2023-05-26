@@ -46,7 +46,6 @@ export class StatusService {
     return payload.sub;
   }
 
-
   async setLastConnection(socket: Socket) {
     const userId = await this.getUserIdFromSocket(socket);
     if (!userId) return;

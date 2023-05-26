@@ -52,6 +52,19 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
+  @ApiParam({
+    name: 'nickname',
+    type: String,
+    required: true,
+    description: "Nickname of the user you're searching"
+  })
+  @Get(':nickname/games')
+  getUserGames(@Param('nickname') nickname: string) {
+    return this.usersService.getUserGames(nickname);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();

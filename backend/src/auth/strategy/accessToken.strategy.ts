@@ -24,7 +24,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
         avatarPath: true,
         twoFactorEnable: true,
         createdAt: true,
-				lastConnection: true
+        lastConnection: true
       }
     });
     return user;
