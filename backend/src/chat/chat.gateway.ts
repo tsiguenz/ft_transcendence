@@ -198,6 +198,10 @@ export class ChatGateway
       time: number;
     }
   ) {
+    if (0 >= payload.time || payload.time > 100000000) {
+      throw new WsException('Restriction time invalid');
+    }
+
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
     if (!chatroom) {
       return;

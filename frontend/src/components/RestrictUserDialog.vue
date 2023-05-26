@@ -12,9 +12,10 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model="banTime"
-                label="Restrict time"
                 type="number"
+                v-model="banTime"
+                :rules="rules"
+                label="Restrict time (minutes)"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -25,7 +26,12 @@
         <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
           Close
         </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="restrict">
+        <v-btn
+          color="blue-darken-1"
+          variant="text"
+          :disabled="0 >= banTime || banTime > 100000000"
+          @click="restrict"
+        >
           {{ action }}
         </v-btn>
       </v-card-actions>
@@ -45,7 +51,13 @@ export default {
   data() {
     return {
       dialog: false,
-      banTime: 15
+      banTime: 15,
+      rules: [
+        (value) => !!value || 'Required',
+        (value) =>
+          !(0 >= value || value > 100000000) ||
+          "Value should be between 1 and 100'000'000"
+      ]
     };
   },
   methods: {
