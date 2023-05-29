@@ -39,7 +39,7 @@
             ><p class="font">Game played</p></v-row
           >
         </v-sheet>
-        <v-btn class="ma-5 log" to="/settings"
+        <v-btn v-if="currentNickname === sessionStore.nickname" class="ma-5 log" to="/settings"
           >Settings</v-btn
         >
       </v-col>
@@ -72,20 +72,29 @@ export default {
   data() {
     return {
       user: {},
-      userIsMounted: false
+      userIsMounted: false,
+			currentNickname: ''
     };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
+	watch: {
+		'$route' (to, from) {
+			if (to.path !== '/profile' + this.nickname)
+				this.currentNickname = this.sessionStore.nickname;
+			this.getProfile();
+		}
+	},
   async mounted() {
     await this.getProfile();
   },
   methods: {
     async getProfile() {
-console.log("HERE");
+if (!this.currentNickname)
+	this.currentNickname = this.nickname;
       try {
-        const response = await axios.get(constants.API_URL + `/users/${this.nickname}`);
+        const response = await axios.get(constants.API_URL + `/users/${this.currentNickname}`);
 
         this.user = response.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;

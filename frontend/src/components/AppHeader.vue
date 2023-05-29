@@ -68,20 +68,16 @@ export default {
   data() {
     return {
       drawer: true,
-      is_expanded: false,
-			user: ''
+      is_expanded: false
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+		user() {
+			return (this.sessionStore.nickname);
+		}
   },
-	beforeMount() {
-		this.getNickname();
-	},
   methods: {
-		getNickname() {
-			this.user = this.sessionStore.nickname;	
-		},
     isLog() {
       return this.sessionStore.loggedIn;
     },
