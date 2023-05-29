@@ -23,17 +23,17 @@ import { useChatStore } from '@/store/chat';
 import { useSessionStore } from '@/store/session';
 
 export default {
-  data () {
-    return {
-      activeRoomId: false
-    }
-  },
   components: {
     NewChatroomDialog,
     JoinChatroomDialog
   },
   props: ['id', 'showFriends'],
   emits: ['join', 'toggleChatView', 'toggleFriendsView', 'togglePublicChannelView'],
+  data () {
+    return {
+      activeRoomId: false
+    }
+  },
   computed: {
     ...mapStores(useChatStore, useSessionStore),
     chatrooms() {
