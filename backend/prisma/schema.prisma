@@ -45,14 +45,14 @@ model Game {
   id                   String  @id
   isRanked             Boolean
   winnerId             String
-  winner               User  @relation("winner", fields: [winnerId], references: [id])
+  winner               User  @relation("winner", fields: [winnerId], references: [id], onDelete: Cascade)
   loserId              String
-  loser                User  @relation("loser", fields: [loserId], references: [id])
+  loser                User  @relation("loser", fields: [loserId], references: [id], onDelete: Cascade)
   previousWinnerRating Int
   previousLoserRating  Int
   winnerScore          Int
   loserScore           Int
-  duration             DateTime  @default(now())
+  createdAt            DateTime  @default(now())
 
   @@map("games")
 }
