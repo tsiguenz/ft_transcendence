@@ -29,7 +29,7 @@
         <v-btn
           color="blue-darken-1"
           variant="text"
-          :disabled="0 >= banTime || banTime > 100000000"
+          :disabled="1 > banTime || banTime > 100000000"
           @click="restrict"
         >
           {{ action }}
@@ -40,11 +40,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants';
-import swal from 'sweetalert';
-import formatError from '@/utils/lib';
-
 export default {
   emits: ['restrict'],
   props: ['nickname', 'action', 'userId'],
@@ -55,7 +50,7 @@ export default {
       rules: [
         (value) => !!value || 'Required',
         (value) =>
-          !(0 >= value || value > 100000000) ||
+          !(1 > value || value > 100000000) ||
           "Value should be between 1 and 100'000'000"
       ]
     };
