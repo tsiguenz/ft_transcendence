@@ -15,6 +15,11 @@
         ></v-list-item>
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
+        <v-btn
+          @click="privateMessage(user.id)"
+          block
+          >Private message</v-btn
+        >
         <div v-if="currentUserIsOwner">
           <v-btn v-if="user.role === 'USER'" @click="promote(user.id)" block
             >Make admin</v-btn
@@ -234,6 +239,9 @@ export default {
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);
+    },
+    privateMessage(userId) {
+      ChatService.createOneToOne(this.currentUserId, userId);
     }
   }
 };

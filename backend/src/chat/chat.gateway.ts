@@ -16,6 +16,7 @@ import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
+import { PrivateMessageService } from '../private_message/private_message.service';
 import { UsersService } from '../users/users.service';
 import { RestrictionType, ChatRoom } from '@prisma/client';
 import * as events from './socketioEvents';
@@ -30,7 +31,8 @@ export class ChatGateway
     private users: UsersService,
     private chatroom: ChatroomService,
     private chatroomUser: ChatroomUserService,
-    private chatroomRestriction: ChatroomRestrictionService
+    private chatroomRestriction: ChatroomRestrictionService,
+    private privateMessage: PrivateMessageService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -74,7 +76,6 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    // TODO: refactor these checks
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
     if (!chatroom) {
@@ -88,6 +89,24 @@ export class ChatGateway
       ))
     ) {
       return;
+    }
+
+    try {
+      client.join(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CREATE_ROOM)
+  async handleCreateRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { name: string, roomType: string, password: string, userIds: Array<string> }
+  ) {
+    let chatroom = undefined;
+    if (payload.roomType === "ONE_TO_ONE") {
+      console.log(payload.userIds);
+      chatroom = this.privateMessage.create(payload.userIds[0], payload.userIds[1]);
     }
 
     try {

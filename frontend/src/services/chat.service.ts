@@ -100,6 +100,10 @@ class ChatService {
   kickUser(userId: string, chatroomId: string) {
     this.socketService.send(events.KICK_USER, { userId, chatroomId });
   }
+
+  createOneToOne(firstUserId: string, secondUserId: string) {
+    this.socketService.send(events.CREATE_ROOM, { roomType: "ONE_TO_ONE", userIds: [firstUserId, secondUserId] });
+  }
 }
 
 export default new ChatService();

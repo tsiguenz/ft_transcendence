@@ -14,6 +14,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ChatroomUserModule } from './chatroom_user/chatroom_user.module';
 import { ChatroomRestrictionService } from './chatroom_restriction/chatroom_restriction.service';
+import { PrivateMessageService } from './private_message/private_message.service';
+
 
 // TODO: remember when we said global is bad? Well, it's bad here too.
 @Module({
@@ -38,7 +40,8 @@ import { ChatroomRestrictionService } from './chatroom_restriction/chatroom_rest
     TwoFaService,
     UsersService,
     JwtService,
-    ChatroomRestrictionService
+    ChatroomRestrictionService,
+    PrivateMessageService
   ]
 })
 export class AppModule {}
