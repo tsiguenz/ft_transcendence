@@ -8,7 +8,7 @@ import {
   Param,
   UseGuards,
   Req,
-  ForbiddenException
+  UnauthorizedException
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -103,7 +103,7 @@ export class ChatroomController {
     @User() user: object
   ) {
     if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
-      throw new ForbiddenException('Unauthorized to edit room');
+      throw new UnauthorizedException('Unauthorized to edit room');
     }
     return this.chatroomService.update(id, updateChatroomDto);
   }
@@ -119,7 +119,7 @@ export class ChatroomController {
   @Delete(':id')
   async remove(@User() user: object, @Param('id') id: string) {
     if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
-      throw new ForbiddenException('Unauthorized to delete room');
+      throw new UnauthorizedException('Unauthorized to delete room');
     }
     return this.chatroomService.remove(id);
   }
@@ -145,7 +145,7 @@ export class ChatroomController {
     @Body('password') password: string
   ) {
     if (await this.chatroomRestrictionService.isUserBanned(user['id'], id)) {
-      throw new ForbiddenException('Unauthorized to join room');
+      throw new UnauthorizedException('Unauthorized to join room');
     }
     return await this.chatroomService.join(user['id'], id, password);
   }
