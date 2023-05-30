@@ -36,8 +36,7 @@ export default {
     ChatroomUsers
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     ...mapStores(useSessionStore, useChatStore),
@@ -56,10 +55,10 @@ export default {
       this.chatStore.activeChatroom = id;
     },
     leaveRoom(id) {
+      this.chatStore.removeRoom(id);
       if (id == this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
       }
-      this.chatStore.removeRoom(id);
     }
   }
 };
