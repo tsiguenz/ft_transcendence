@@ -82,9 +82,10 @@ export class GameService {
   ): { winner: number; loser: number } {
     const D = winnerRating - loserRating;
     const K = 40;
-    const p = Math.round((1 / (1 + Math.pow(10, -D / 400))) * 10) / 10;
-    const newWinnerScore = Math.round(winnerRating + K * (1 - p));
-    const newLoserScore = Math.round(loserRating + K * (0 - p));
+    const pWinner = Math.round((1 / (1 + Math.pow(10, -D / 400))) * 10) / 10;
+    const pLoser = Math.round((1 / (1 + Math.pow(10, D / 400))) * 10) / 10;
+    const newWinnerScore = Math.round(winnerRating + K * (1 - pWinner));
+    const newLoserScore = Math.round(loserRating + K * (0 - pLoser));
     return {
       winner: newWinnerScore,
       loser: newLoserScore
