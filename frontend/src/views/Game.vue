@@ -1,5 +1,4 @@
 <template>
-  <h1>Game</h1>
   <!--
   <p v-if="ball">ball: {{ ball }}</p>
   <p v-if="pad1">pad1: {{ pad1 }}</p>
@@ -11,13 +10,21 @@
     </v-row>
   </v-container>
 
-  <p v-if="isInQueue()">Waiting for an opponent</p>
+  <v-container v-if="isInQueue()">
+    <v-row justify="center" align="center">
+      <p>Waiting for an opponent</p>
+    </v-row>
+  </v-container>
 
-  <div v-show="isInGame()">
+  <v-container v-show="isInGame()">
     <canvas id="canvas"></canvas>
-  </div>
+  </v-container>
 
-  <p v-if="isInScoreScreen()">The winner is {{ winnerId }}</p>
+  <v-container v-if="isInScoreScreen()">
+    <v-row justify="center" align="center">
+      <p>The winner is {{ winnerId }}</p>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -185,10 +192,12 @@ export default {
 </script>
 
 <style scoped>
+/* idk how it works but it works */
 div {
   height: 50%;
   width: 50%;
   margin: 0 auto;
+  border: 3px solid var(--light);
 }
 
 canvas {
@@ -197,15 +206,5 @@ canvas {
   background-color: var(--dark-alt);
   border-radius: 30px;
   border: 3px solid var(--light);
-}
-
-p {
-  text-align: center;
-  font-size: 2em;
-}
-
-h1 {
-  text-align: center;
-  font-size: 3em;
 }
 </style>
