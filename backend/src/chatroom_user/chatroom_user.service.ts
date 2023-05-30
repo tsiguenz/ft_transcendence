@@ -117,6 +117,9 @@ export class ChatroomUserService {
   }
 
   async canUserAdministrate(userId: string, chatroomId: string) {
-    return await this.isUserAdmin(userId, chatroomId) || await this.isUserOwner(userId, chatroomId);
+    return (
+      (await this.isUserAdmin(userId, chatroomId)) ||
+      (await this.isUserOwner(userId, chatroomId))
+    );
   }
 }

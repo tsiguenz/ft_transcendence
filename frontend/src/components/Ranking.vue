@@ -1,26 +1,49 @@
 <template>
-<div class="rank">
-      <figure class="ranking-2" >
-    <v-avatar size="180px">
-            <v-img
-              class="same"
-              src="/assets/icons/laurier2.png"
-            ><ProfilePrintAvatar :wdt="60" :hgt="60" :url-avatar="avatarPath[1]"></ProfilePrintAvatar></v-img></v-avatar
-          ><figcaption>#2<br>{{ users.second.nickname }}<br><p class="points">{{ users.second.ladderPoints }}</p></figcaption></figure>
-          <figure class="ranking-1" >
-    <v-avatar size="200px">
-            <v-img
-              class="same"
-              src="/assets/icons/laurier.png"
-            ><ProfilePrintAvatar :wdt="70" :hgt="70" :url-avatar="avatarPath[0]"></ProfilePrintAvatar></v-img>
-            </v-avatar><figcaption>#1<br>{{ users.first.nickname }}<br><p class="points">{{ users.first.ladderPoints }}</p></figcaption></figure>
-            <figure class="ranking-3" >
-          <v-avatar class="ranking-3" size="160px">
-            <v-img
-              class="same"
-              src="/assets/icons/laurier3.png"
-            ><ProfilePrintAvatar :wdt="50" :hgt="50" :url-avatar="avatarPath[2]"></ProfilePrintAvatar></v-img></v-avatar>
-            <figcaption>#3<br>{{ users.third.nickname }}<br><p class="points">{{ users.third.ladderPoints }}</p></figcaption></figure></div>
+  <div class="rank">
+    <figure class="ranking-2">
+      <v-avatar size="180px">
+        <v-img class="same" src="/assets/icons/laurier2.png"
+          ><ProfilePrintAvatar
+            :wdt="60"
+            :hgt="60"
+            :url-avatar="avatarPath[1]"
+          ></ProfilePrintAvatar></v-img
+      ></v-avatar>
+      <figcaption>
+        #2<br />{{ users.second.nickname }}<br />
+        <p class="points">{{ users.second.ladderPoints }}</p>
+      </figcaption>
+    </figure>
+    <figure class="ranking-1">
+      <v-avatar size="200px">
+        <v-img class="same" src="/assets/icons/laurier.png"
+          ><ProfilePrintAvatar
+            :wdt="70"
+            :hgt="70"
+            :url-avatar="avatarPath[0]"
+          ></ProfilePrintAvatar
+        ></v-img>
+      </v-avatar>
+      <figcaption>
+        #1<br />{{ users.first.nickname }}<br />
+        <p class="points">{{ users.first.ladderPoints }}</p>
+      </figcaption>
+    </figure>
+    <figure class="ranking-3">
+      <v-avatar class="ranking-3" size="160px">
+        <v-img class="same" src="/assets/icons/laurier3.png"
+          ><ProfilePrintAvatar
+            :wdt="50"
+            :hgt="50"
+            :url-avatar="avatarPath[2]"
+          ></ProfilePrintAvatar></v-img
+      ></v-avatar>
+      <figcaption>
+        #3<br />{{ users.third.nickname }}<br />
+        <p class="points">{{ users.third.ladderPoints }}</p>
+      </figcaption>
+    </figure>
+  </div>
 </template>
 
 <script>
@@ -33,51 +56,50 @@ export default {
     ProfilePrintAvatar
   },
   props: ['users'],
-  data () {
+  data() {
     return {
-      avatarPath: [],
-    }
+      avatarPath: []
+    };
   },
   async mounted() {
     await this.getUsersAvatarPath();
   },
   methods: {
-  async getUsersAvatarPath() {
+    async getUsersAvatarPath() {
       //Put the 3 users avatar path in an array
       this.avatarPath[0] = constants.AVATARS_URL + this.users.first.avatarPath;
       this.avatarPath[1] = constants.AVATARS_URL + this.users.second.avatarPath;
       this.avatarPath[2] = constants.AVATARS_URL + this.users.third.avatarPath;
-    },
-    },
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-
-.same{
+.same {
   display: flex;
   align-items: center;
   justify-content: center;
   padding-bottom: 15%;
 }
-.ranking-1{
+.ranking-1 {
   margin-right: auto;
   margin-left: auto;
   align-self: flex-end;
 }
 
-.ranking-2{
+.ranking-2 {
   margin-left: 20%;
   margin-bottom: 0;
   align-self: flex-end;
 }
 
-.ranking-3{
+.ranking-3 {
   margin-right: 20%;
   align-self: flex-end;
 }
 
-.rank{
+.rank {
   display: flex;
   justify-content: center;
 }
@@ -91,12 +113,10 @@ figcaption {
   caption-side: users;
   font-size: 40px !important;
   text-align: center;
-  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
-.points{
-  font-size:medium;
+.points {
+  font-size: medium;
 }
-
-
 </style>

@@ -151,12 +151,12 @@ export class ChatGateway
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (!await this.canRestrictUser(payload.userId, chatroom, client)) {
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
       throw new WsException('Unauthorized to kick user');
     }
 
     try {
-      await this.kickUser(payload.userId, chatroom)
+      await this.kickUser(payload.userId, chatroom);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -179,7 +179,7 @@ export class ChatGateway
 
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (!await this.canRestrictUser(payload.userId, chatroom, client)) {
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
       throw new WsException('Unauthorized to restrict user');
     }
 
@@ -204,12 +204,11 @@ export class ChatGateway
       if (restrictionType == RestrictionType.MUTED) {
         return;
       }
-      await this.kickUser(payload.userId, chatroom)
+      await this.kickUser(payload.userId, chatroom);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
-
 
   @SubscribeMessage(events.UNRESTRICT_USER)
   async handleUnrestrict(
@@ -223,7 +222,7 @@ export class ChatGateway
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (!await this.canRestrictUser(payload.userId, chatroom, client)) {
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
       throw new WsException('Unauthorized to unrestrict user');
     }
 
@@ -328,9 +327,9 @@ export class ChatGateway
     }
     return null;
   }
-  
+
   private async kickUser(userId: string, chatroom: ChatRoom) {
-   const socket = await this.getUserSocket(userId);
+    const socket = await this.getUserSocket(userId);
     if (!socket) {
       return;
     }
@@ -340,7 +339,11 @@ export class ChatGateway
     this.chatroomUser.remove(userId, chatroom.id);
   }
 
-  private async canRestrictUser(userId: string, chatroom: ChatRoom, target: Socket) {
+  private async canRestrictUser(
+    userId: string,
+    chatroom: ChatRoom,
+    target: Socket
+  ) {
     if (!chatroom) {
       return false;
     }
