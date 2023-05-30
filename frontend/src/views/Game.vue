@@ -5,16 +5,25 @@
   <p v-if="pad1">pad1: {{ pad1 }}</p>
   <p v-if="pad2">pad2: {{ pad2 }}</p>
   -->
-  <button v-if="!inGame" @click="runGame">Run game (or reconnect)</button>
-  <div v-if="!winnerId" v-show="inGame">
+  <v-container v-if="isInMenu()">
+    <v-row justify="center" align="center">
+      <v-btn @click="queueRanked">Search ranked match</v-btn>
+    </v-row>
+  </v-container>
+
+  <p v-if="isInQueue()">Waiting for an opponent</p>
+
+  <div v-show="isInGame()">
     <canvas id="canvas"></canvas>
   </div>
-  <p v-if="winnerId">The winner is {{ winnerId }}</p>
+
+  <p v-if="isInScoreScreen()">The winner is {{ winnerId }}</p>
 </template>
 
 <script>
 import { GAME_SOCKET_URL } from '../constants';
 import SocketioService from '../services/socketio.service';
+import * as constants from '@/constants';
 export default {
   data() {
     return {
@@ -27,28 +36,33 @@ export default {
       map: null,
       score: null,
       winnerId: null,
-      inGame: false
+      gameStatus: constants.GAME_STATUS.IN_MENU
     };
   },
-  mounted() {},
+  mounted() {
+    this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
+    this.socketioGame.subscribe('alreadyInGame', () => {
+      this.gameStatus = constants.GAME_STATUS.IN_GAME;
+      this.socketioGame.send('connectToRoom');
+      this.subscribeGameLoop();
+      this.runGame();
+    });
+  },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
     this.socketioGame.disconnect();
   },
   methods: {
+    queueRanked() {
+      this.subscribeGameLoop();
+      this.subscribeStartGame();
+      this.socketioGame.send('connectToRoom');
+      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
+    },
     runGame() {
-      this.inGame = true;
-      this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
-      this.socketioGame.subscribe('gameLoop', (datas) => {
-        this.ball = datas.ball;
-        this.pad1 = datas.pad1;
-        this.pad2 = datas.pad2;
-        this.map = datas.map;
-        this.score = datas.score;
-        this.draw();
-      });
       this.socketioGame.subscribe('gameOver', (res) => {
+        this.gameStatus = constants.GAME_STATUS.IN_SCORE_SCREEN;
         document.removeEventListener('keydown', this.handleKeyDown);
         document.removeEventListener('keyup', this.handleKeyUp);
         this.canvas = null;
@@ -59,9 +73,7 @@ export default {
             ? score.player1.id
             : score.player2.id;
       });
-      this.init();
-      //this.sendGameDatas();
-      this.socketioGame.send('connectToRoom');
+      this.initCanvas();
       document.addEventListener('keydown', this.handleKeyDown);
       document.addEventListener('keyup', this.handleKeyUp);
     },
@@ -76,9 +88,30 @@ export default {
       };
       this.socketioGame.send('initGame', gameDatas);
     },
-    init() {
+    initCanvas() {
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
+    },
+    subscribeGameLoop() {
+      this.socketioGame.subscribe('gameLoop', (datas) => {
+        this.ball = datas.ball;
+        this.pad1 = datas.pad1;
+        this.pad2 = datas.pad2;
+        this.map = datas.map;
+        this.score = datas.score;
+        this.draw();
+      });
+    },
+    subscribeStartGame() {
+      this.socketioGame.subscribe('startGame', (datas) => {
+        this.gameStatus = constants.GAME_STATUS.IN_GAME;
+        this.ball = datas.ball;
+        this.pad1 = datas.pad1;
+        this.pad2 = datas.pad2;
+        this.map = datas.map;
+        this.score = datas.score;
+        this.runGame();
+      });
     },
     draw() {
       if (!this.map) return;
@@ -125,7 +158,6 @@ export default {
       this.ctx.fillText(this.score.player2.points, this.map.width / 2 + 15, 20);
     },
     handleKeyDown(e) {
-      console.log(e);
       if (e.key === 'ArrowUp') {
         this.socketioGame.send('movePad', { dy: -1 });
       } else if (e.key === 'ArrowDown') {
@@ -135,6 +167,18 @@ export default {
     handleKeyUp(e) {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
         this.socketioGame.send('movePad', { dy: 0 });
+    },
+    isInGame() {
+      return this.gameStatus === constants.GAME_STATUS.IN_GAME;
+    },
+    isInMenu() {
+      return this.gameStatus === constants.GAME_STATUS.IN_MENU;
+    },
+    isInQueue() {
+      return this.gameStatus === constants.GAME_STATUS.IN_QUEUE;
+    },
+    isInScoreScreen() {
+      return this.gameStatus === constants.GAME_STATUS.IN_SCORE_SCREEN;
     }
   }
 };

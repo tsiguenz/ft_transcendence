@@ -19,8 +19,6 @@ export class GameGateway {
     private auth: AuthService
   ) {}
   datas = {};
-  // useless
-  usersTokens = [];
   rooms = new Map();
 
   @WebSocketServer() server: Server;
@@ -28,8 +26,17 @@ export class GameGateway {
 
   @SubscribeMessage('connect')
   async handleConnection(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
     if (await this.gameService.setDecodedTokenToClient(client)) return;
+    this.logger.log(`Client connected: ${client.id}`);
+    if (
+      !this.gameService.isUserAlreadyInRoom(client['decoded'].sub, this.rooms)
+    )
+      return;
+    const roomId = this.gameService.getRoomIdByUserId(
+      client['decoded'].sub,
+      this.rooms
+    );
+    client.emit('alreadyInGame', roomId);
   }
 
   @SubscribeMessage('disconnect')
@@ -61,14 +68,15 @@ export class GameGateway {
       client.join(joinableRoom);
       this.logger.log(`Client joined room: ${joinableRoom}`);
       this.logger.log(`Start game: ${joinableRoom}`);
+      this.server.in(joinableRoom).emit('startGame', room.datas);
       room.interval = setInterval(
         async (joinableRoom) => {
           const res = await this.gameService.gameLoop(this.rooms, joinableRoom);
           const room = this.rooms.get(joinableRoom);
-          if (!res) this.server.to(joinableRoom).emit('gameLoop', room.datas);
+          if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
           else {
             this.logger.log(`Game is over: ${joinableRoom}`);
-            this.server.to(joinableRoom).emit('gameOver', { score: res });
+            this.server.in(joinableRoom).emit('gameOver', { score: res });
           }
         },
         10,

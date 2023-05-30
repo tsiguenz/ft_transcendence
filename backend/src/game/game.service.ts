@@ -57,6 +57,7 @@ export class GameService {
   }
 
   handleMovePad(userId: string, data: any, dy: number): void {
+    if (!data.score) return;
     const pad = userId === data.score.player1.id ? data.pad1 : data.pad2;
     pad.dy = dy;
   }

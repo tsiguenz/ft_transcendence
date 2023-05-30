@@ -15,3 +15,9 @@ export const UNAUTHENTICATED_ROUTES = [
 ];
 export const UNAUTHENTICATED_ROUTES_WITHOUT_HOME =
   UNAUTHENTICATED_ROUTES.filter((route) => route != '/home');
+export const GAME_STATUS = Object.freeze({
+  IN_MENU: 0,
+  IN_QUEUE: 1,
+  IN_GAME: 2,
+  IN_SCORE_SCREEN: 3
+});
