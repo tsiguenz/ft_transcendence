@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
+import { UsersService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GameService {
-  constructor(private prisma: PrismaService, private auth: AuthService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auth: AuthService,
+    private user: UsersService
+  ) {}
 
   async gameLoop(rooms: any, roomId: string) {
     const room = rooms.get(roomId);
@@ -42,18 +47,57 @@ export class GameService {
     const player2 = score.player2;
     const winner = player1.points > player2.points ? player1 : player2;
     const loser = winner.id === player1.id ? player2 : player1;
-    await this.prisma.game.create({
-      data: {
-        id: roomId,
-        isRanked: room.datas.isRanked,
-        winnerId: winner.id,
-        loserId: loser.id,
-        previousWinnerRating: 0,
-        previousLoserRating: 0,
-        winnerScore: winner.points,
-        loserScore: loser.points
-      }
-    });
+    const winnerInfos = await this.user.getUserById(winner.id);
+    const loserInfos = await this.user.getUserById(loser.id);
+    if (!winnerInfos || !loserInfos) return;
+    await this.updateUsersRating(winnerInfos, loserInfos);
+    await this.prisma.game
+      .create({
+        data: {
+          id: roomId,
+          isRanked: room.datas.isRanked,
+          winnerId: winner.id,
+          loserId: loser.id,
+          previousWinnerRating: winnerInfos.ladderPoints,
+          previousLoserRating: loserInfos.ladderPoints,
+          winnerScore: winner.points,
+          loserScore: loser.points
+        }
+      })
+      .catch((err) => console.log(err));
+  }
+
+  async updateUsersRating(winner: any, loser: any): Promise<void> {
+    const winnerRating = winner.ladderPoints;
+    const loserRating = loser.ladderPoints;
+    const newRating = this.calculateNewRating(winnerRating, loserRating);
+    await this.updateRating(winner.id, newRating.winner);
+    await this.updateRating(loser.id, newRating.loser);
+  }
+
+  // https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details
+  calculateNewRating(
+    winnerRating: number,
+    loserRating: number
+  ): { winner: number; loser: number } {
+    const D = winnerRating - loserRating;
+    const K = 40;
+    const p = Math.round((1 / (1 + Math.pow(10, -D / 400))) * 10) / 10;
+    const newWinnerScore = Math.round(winnerRating + K * (1 - p));
+    const newLoserScore = Math.round(loserRating + K * (0 - p));
+    return {
+      winner: newWinnerScore,
+      loser: newLoserScore
+    };
+  }
+
+  async updateRating(userId, newRating): Promise<void> {
+    await this.prisma.user
+      .update({
+        where: { id: userId },
+        data: { ladderPoints: newRating }
+      })
+      .catch((err) => console.log(err));
   }
 
   handleMovePad(userId: string, data: any, dy: number): void {
