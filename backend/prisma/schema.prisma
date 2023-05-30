@@ -13,7 +13,7 @@ model User {
   id              String         @id @default(uuid())
   fortyTwoId      Int?           @unique
   nickname        String         @unique
-  ladderPoints    Int            @default(0)
+  ladderPoints    Int            @default(1000)
   avatarPath      String         @default("/default.jpeg")
   twoFactorEnable Boolean        @default(false)
   twoFactorSecret String?
