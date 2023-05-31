@@ -28,7 +28,7 @@ export class GameService {
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
-    if (this.isGameEnded(score)) return await this.stopGame(rooms, roomId);
+    if (this.isGameEnded(score, 10)) return await this.stopGame(rooms, roomId);
     return null;
   }
 
@@ -160,8 +160,9 @@ export class GameService {
       this.ballIsBetweenPadX(ball, pad) &&
       this.ballIsBetweenPadY(ball, pad)
     ) {
-      this.isPlayerOne(ball, map) ? (ball.dx = -1) : (ball.dx = 1);
+      ball.dx = this.isPlayerOne(ball, map) ? -1 : 1;
       ball.dy = (ball.y - (pad.y + pad.height / 2)) / 10;
+      ball.speed *= map.acceleration;
     }
   }
 
@@ -194,10 +195,11 @@ export class GameService {
   }
 
   resetBall(ball: any, map: any): void {
+    ball.dx = this.isPlayerOne(ball, map) ? -1 : 1;
+    ball.dy = Math.random() * 2 - 1;
     ball.x = map.width / 2;
     ball.y = map.height / 2;
-    ball.dx = 1;
-    ball.dy = 1;
+    ball.speed = 1;
   }
 
   padIsOnTopBorder(pad: any): boolean {
@@ -268,8 +270,10 @@ export class GameService {
     return room.id;
   }
 
-  isGameEnded(score: any): boolean {
-    return score.player1.points === 3 || score.player2.points === 3;
+  isGameEnded(score: any, maxScore: number): boolean {
+    return (
+      score.player1.points === maxScore || score.player2.points === maxScore
+    );
   }
 
   getDatasFromRoom(rooms: any, roomId: string): any {
@@ -282,7 +286,8 @@ export class GameService {
     const map = {
       height: 150,
       width: 300,
-      padOffset: 10
+      padOffset: 10,
+      acceleration: 1.1
     };
     const padInfos = {
       height: map.height / 5,
