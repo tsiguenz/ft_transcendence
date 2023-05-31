@@ -25,6 +25,7 @@ model User {
   friends         Friend[]       @relation("user")
   blockedUsers    BlockedUser[]  @relation("user")
   twoFactorId     TwoFactorId?
+  restrictions    ChatRoomRestriction[]
   refreshToken    String?
   lastConnection  DateTime       @default(now())
   createdAt       DateTime       @default(now())
@@ -81,14 +82,15 @@ model ChatRoomUser {
 }
 
 model ChatRoom {
-  id        String      @id @default(uuid())
-  name      String      @db.VarChar(255) @unique
-  slug      String      @db.VarChar(255) @unique
-  messages  Message[]   @relation("chatRoom")
-  users     ChatRoomUser[]
-  type      RoomType    @default(PUBLIC)
-  hash      String?     
-  createdAt DateTime    @default(now())
+  id            String      @id @default(uuid())
+  name          String      @db.VarChar(255) @unique
+  slug          String      @db.VarChar(255) @unique
+  messages      Message[]   @relation("chatRoom")
+  users         ChatRoomUser[]
+  restricted    ChatRoomRestriction[]
+  type          RoomType    @default(PUBLIC)
+  hash          String?     
+  createdAt     DateTime    @default(now())
 
   @@map("chatrooms")
 }
@@ -111,6 +113,18 @@ model BlockedUser {
   @@map("blocked_users")
 }
 
+model ChatRoomRestriction {
+  id                String      @id @default(uuid())
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  chatRoom          ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId        String
+  type              RestrictionType
+  restrictedUntil   DateTime
+
+  @@map("chatrooms_restrictions")
+}
+
 enum Role {
   OWNER
   ADMIN
@@ -121,5 +135,10 @@ enum RoomType {
   PRIVATE
   PROTECTED
   PUBLIC
+}
+
+enum RestrictionType {
+  MUTED
+  BANNED
 }
 

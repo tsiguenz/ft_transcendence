@@ -6,7 +6,7 @@
           <div class="py-5">
             <ProfileLadderPoints v-if="userIsMounted" :user="user" />
           </div>
-          <ProfileAchievements />
+          <ProfileAchievements v-if="userIsMounted" />
         </v-sheet>
       </v-col>
       <v-col cols="6">
@@ -22,7 +22,9 @@
           <v-row class="justify-center">
             <h2 class="font ma-3">{{ user.nickname }}</h2>
           </v-row>
-          <ProfileHistoryGames />
+          <v-sheet max-height="80vh" class="scroll" color="transparent">
+            <ProfileHistoryGames v-if="userIsMounted" :gamesWin="gameStats.gamesWin" :gamesLose="gameStats.gamesLose" />
+          </v-sheet>
         </v-sheet>
       </v-col>
       <v-col cols="3" align="center">
@@ -30,16 +32,23 @@
           <p class="ma-5">
             <ProfileLastConnection v-if="userIsMounted" :user="user" />
           </p>
-          <v-row class="justify-center"><h2 class="font">12</h2></v-row>
+          <v-row class="justify-center"
+            ><h2 class="font">{{ gamesWin }}</h2></v-row
+          >
           <v-row class="justify-center mb-5"
             ><p class="font">Game won</p></v-row
           >
-          <v-row class="justify-center"><h2 class="font">23</h2></v-row>
+          <v-row class="justify-center"
+            ><h2 class="font">{{ gamesPlayed }}</h2></v-row
+          >
           <v-row class="justify-center mb-5"
             ><p class="font">Game played</p></v-row
           >
         </v-sheet>
-        <v-btn v-if="currentNickname === sessionStore.nickname" class="ma-5 log" to="/settings"
+        <v-btn
+          v-if="currentNickname === sessionStore.nickname"
+          class="ma-5 log"
+          to="/settings"
           >Settings</v-btn
         >
       </v-col>
@@ -73,33 +82,42 @@ export default {
     return {
       user: {},
       userIsMounted: false,
-			currentNickname: ''
+      currentNickname: '',
+      gameStats: {},
+      gamesWin: 0,
+      gamesPlayed: 0
     };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
-	watch: {
-		'$route' (to, from) {
-			if (to.path !== '/profile' + this.nickname)
-				this.currentNickname = this.sessionStore.nickname;
-			this.getProfile();
-		}
-	},
+  watch: {
+    $route(to, from) {
+      if (to.path !== '/profile' + this.nickname)
+        this.currentNickname = this.sessionStore.nickname;
+      this.getProfile();
+    }
+  },
   async mounted() {
     await this.getProfile();
   },
   methods: {
     async getProfile() {
-if (!this.currentNickname)
-	this.currentNickname = this.nickname;
+      if (!this.currentNickname) this.currentNickname = this.nickname;
       try {
-        const response = await axios.get(constants.API_URL + `/users/${this.currentNickname}`);
+        const responseUser = await axios.get(
+          constants.API_URL + `/users/${this.currentNickname}`
+        );
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.currentNickname}/games`
+        );
 
-        this.user = response.data;
+        this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
+        this.gameStats = response.data;
+        this.gamesWin = this.gameStats.gamesWin.length;
+        this.gamesPlayed = this.gamesWin + this.gameStats.gamesLose.length;
         this.userIsMounted = true;
-        this.currentUser = this.user.nickname;
       } catch (error) {
         swal({
           icon: 'error',
@@ -120,5 +138,15 @@ if (!this.currentNickname)
   background: var(--dark-purple);
   border-radius: 30px;
   border: 3px solid var(--light);
+}
+.scroll {
+  overflow-y: auto;
+  max-height: 60%;
+    -ms-overflow-style: none; /* for Internet Explorer, Edge */
+    scrollbar-width: none; /* for Firefox */
+    overflow-y: scroll; 
+}
+.scroll::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
 }
 </style>

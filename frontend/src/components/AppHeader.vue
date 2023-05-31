@@ -73,9 +73,9 @@ export default {
   },
   computed: {
     ...mapStores(useSessionStore),
-		user() {
-			return (this.sessionStore.nickname);
-		}
+    user() {
+      return this.sessionStore.nickname;
+    }
   },
   methods: {
     isLog() {
