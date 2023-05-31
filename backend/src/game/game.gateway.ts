@@ -10,6 +10,7 @@ import { Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
+import { Room } from './interfaces/game.interfaces';
 
 @WebSocketGateway({ namespace: 'game', cors: { origin: '*' } })
 export class GameGateway {
@@ -18,8 +19,7 @@ export class GameGateway {
     private jwt: JwtService,
     private auth: AuthService
   ) {}
-  datas = {};
-  rooms = new Map();
+  rooms = new Map<string, Room>();
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('GameGateway');

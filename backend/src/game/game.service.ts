@@ -4,6 +4,15 @@ import { Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  MapInfos,
+  Ball,
+  Pad,
+  GameDatas,
+  Score,
+  Room,
+  Player
+} from './interfaces/game.interfaces';
 
 @Injectable()
 export class GameService {
@@ -13,7 +22,7 @@ export class GameService {
     private user: UsersService
   ) {}
 
-  async gameLoop(rooms: any, roomId: string) {
+  async gameLoop(rooms: Map<string, Room>, roomId: string): Promise<Score> {
     const room = rooms.get(roomId);
     const datas = room.datas;
     if (!datas) return null;
@@ -32,7 +41,7 @@ export class GameService {
     return null;
   }
 
-  async stopGame(rooms: any, roomId: string): Promise<any> {
+  async stopGame(rooms: Map<string, Room>, roomId: string): Promise<Score> {
     const room = rooms.get(roomId);
     const score = room.datas.score;
     clearInterval(room.interval);
@@ -41,7 +50,7 @@ export class GameService {
     return score;
   }
 
-  async storeDataToDb(room: any, roomId: string): Promise<void> {
+  async storeDataToDb(room: Room, roomId: string): Promise<void> {
     const score = room.datas.score;
     const player1 = score.player1;
     const player2 = score.player2;
@@ -67,7 +76,7 @@ export class GameService {
       .catch((err) => console.log(err));
   }
 
-  async updateUsersRating(winner: any, loser: any): Promise<void> {
+  async updateUsersRating(winner: Player, loser: Player): Promise<void> {
     const winnerRating = winner.ladderPoints;
     const loserRating = loser.ladderPoints;
     const newRating = this.calculateNewRating(winnerRating, loserRating);
@@ -101,9 +110,9 @@ export class GameService {
       .catch((err) => console.log(err));
   }
 
-  handleMovePad(userId: string, data: any, dy: number): void {
-    if (!data.score) return;
-    const pad = userId === data.score.player1.id ? data.pad1 : data.pad2;
+  handleMovePad(userId: string, datas: GameDatas, dy: number): void {
+    if (!datas.score) return;
+    const pad = userId === datas.score.player1.id ? datas.pad1 : datas.pad2;
     pad.dy = dy;
   }
 
@@ -113,12 +122,12 @@ export class GameService {
     ball.y += ball.dy * ball.speed;
   }
 
-  movePad(pad: any): void {
+  movePad(pad: Pad): void {
     if (!pad || pad.dy === 0) return;
     pad.y += pad.dy * pad.speed;
   }
 
-  checkCollision(pad1: any, pad2: any, ball: any, map: any): void {
+  checkCollision(pad1: Pad, pad2: Pad, ball: Ball, map: MapInfos): void {
     this.checkCollisionPadToBorder(pad1, map);
     this.checkCollisionPadToBorder(pad2, map);
     this.checkCollisionBallToBorder(ball, map);
@@ -126,7 +135,7 @@ export class GameService {
     this.checkCollisionBallToPad(ball, pad2, map);
   }
 
-  checkCollisionPadToBorder(pad: any, map: any): void {
+  checkCollisionPadToBorder(pad: Pad, map: MapInfos): void {
     if (
       (this.padIsOnTopBorder(pad) && pad.dy < 0) ||
       (this.padIsOnBottomBorder(pad, map) && pad.dy > 0)
@@ -142,7 +151,7 @@ export class GameService {
     }
   }
 
-  checkCollisionBallToBorder(ball: any, map: any): void {
+  checkCollisionBallToBorder(ball: Ball, map: MapInfos): void {
     if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= map.height) {
       ball.dy *= -1;
     }
@@ -155,7 +164,7 @@ export class GameService {
     }
   }
 
-  checkCollisionBallToPad(ball: any, pad: any, map: any): void {
+  checkCollisionBallToPad(ball: Ball, pad: Pad, map: MapInfos): void {
     if (
       this.ballIsBetweenPadX(ball, pad) &&
       this.ballIsBetweenPadY(ball, pad)
@@ -166,24 +175,24 @@ export class GameService {
     }
   }
 
-  ballIsBetweenPadY(ball: any, pad: any): boolean {
+  ballIsBetweenPadY(ball: Ball, pad: Pad): boolean {
     return (
       ball.y >= this.getTopPadPosition(pad) &&
       ball.y <= this.getBottomPadPosition(pad)
     );
   }
 
-  ballIsBetweenPadX(ball: any, pad: any): boolean {
+  ballIsBetweenPadX(ball: Ball, pad: Pad): boolean {
     return (
       ball.x + ball.radius >= pad.x && ball.x - ball.radius <= pad.x + pad.width
     );
   }
 
-  isPlayerOne(ball: any, map: any): boolean {
+  isPlayerOne(ball: Ball, map: MapInfos): boolean {
     return ball.x > map.height / 2;
   }
 
-  checkGoal(ball: any, map: any, score: any): void {
+  checkGoal(ball: Ball, map: MapInfos, score: Score): void {
     if (ball.x <= 0) {
       score.player2.points += 1;
       this.resetBall(ball, map);
@@ -194,7 +203,7 @@ export class GameService {
     }
   }
 
-  resetBall(ball: any, map: any): void {
+  resetBall(ball: Ball, map: MapInfos): void {
     ball.dx = this.isPlayerOne(ball, map) ? -1 : 1;
     ball.dy = Math.random() * 2 - 1;
     ball.x = map.width / 2;
@@ -202,23 +211,23 @@ export class GameService {
     ball.speed = 1;
   }
 
-  padIsOnTopBorder(pad: any): boolean {
+  padIsOnTopBorder(pad: Pad): boolean {
     return this.getTopPadPosition(pad) <= 0;
   }
 
-  padIsOnBottomBorder(pad: any, map: any): boolean {
+  padIsOnBottomBorder(pad: Pad, map: MapInfos): boolean {
     return this.getBottomPadPosition(pad) >= map.height;
   }
 
-  getTopPadPosition(pad: any): number {
+  getTopPadPosition(pad: Pad): number {
     return pad.y;
   }
 
-  getBottomPadPosition(pad: any): number {
+  getBottomPadPosition(pad: Pad): number {
     return pad.y + pad.height;
   }
 
-  isUserAlreadyInRoom(userId: string, rooms: any): boolean {
+  isUserAlreadyInRoom(userId: string, rooms: Map<string, Room>): boolean {
     const it = rooms[Symbol.iterator]();
     for (const room of it) {
       if (room[1].players.find((player) => player === userId)) return true;
@@ -226,7 +235,7 @@ export class GameService {
     return false;
   }
 
-  getRoomIdByUserId(userId: string, rooms: any): string {
+  getRoomIdByUserId(userId: string, rooms: Map<string, Room>): string {
     const it = rooms[Symbol.iterator]();
     for (const room of it) {
       if (room[1].players.find((player) => player === userId)) return room[0];
@@ -249,14 +258,14 @@ export class GameService {
     return 0;
   }
 
-  getJoinableRoom(rooms: any): string {
+  getJoinableRoom(rooms: Map<string, Room>): string {
     const it = rooms[Symbol.iterator]();
     for (const room of it)
       if (room[1].players.length === 1 && !room[1].isStarted) return room[0];
     return null;
   }
 
-  createRoom(rooms: any, userId: string): string {
+  createRoom(rooms: Map<string, Room>, userId: string): string {
     const room = {
       id: uuidv4(),
       players: [userId]
@@ -265,23 +274,23 @@ export class GameService {
       interval: null,
       isStarted: false,
       players: room.players,
-      datas: {}
+      datas: null
     });
     return room.id;
   }
 
-  isGameEnded(score: any, maxScore: number): boolean {
+  isGameEnded(score: Score, maxScore: number): boolean {
     return (
       score.player1.points === maxScore || score.player2.points === maxScore
     );
   }
 
-  getDatasFromRoom(rooms: any, roomId: string): any {
+  getDatasFromRoom(rooms: Map<string, Room>, roomId: string): GameDatas {
     const room = rooms.get(roomId);
     return room.datas;
   }
 
-  initDatas(rooms: any, roomId: string): void {
+  initDatas(rooms: Map<string, Room>, roomId: string): void {
     const room = rooms.get(roomId);
     const map = {
       height: 150,
@@ -324,6 +333,7 @@ export class GameService {
     };
     room.datas = {
       map: map,
+      padInfos: padInfos,
       ball: ball,
       pad1: pad1,
       pad2: pad2,
