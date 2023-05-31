@@ -74,18 +74,9 @@ export class GameGateway {
       this.logger.log(`Start game: ${joinableRoom}`);
       this.server.in(joinableRoom).emit('startGame', room.datas);
       room.interval = setInterval(
-        async (joinableRoom: string) => {
-          const res = await this.gameService.gameIteration(
-            this.rooms,
-            joinableRoom
-          );
-          const room = this.rooms.get(joinableRoom);
-          if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
-          else {
-            this.logger.log(`Ranked game is over: ${joinableRoom}`);
-            this.server.in(joinableRoom).emit('gameOver', { score: res });
-          }
-        },
+        // use arrow function to keep the context of this
+        // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
+        (roomId: string) => this.gameLoop(roomId),
         10,
         joinableRoom
       );
@@ -94,6 +85,16 @@ export class GameGateway {
       this.gameService.initRankedDatas(this.rooms.get(roomId));
       client.join(roomId);
       this.logger.log(`Client created ranked room: ${roomId}`);
+    }
+  }
+
+  async gameLoop(joinableRoom: string) {
+    const res = await this.gameService.gameIteration(this.rooms, joinableRoom);
+    const room = this.rooms.get(joinableRoom);
+    if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
+    else {
+      this.logger.log(`Ranked game is over: ${joinableRoom}`);
+      this.server.in(joinableRoom).emit('gameOver', { score: res });
     }
   }
 
