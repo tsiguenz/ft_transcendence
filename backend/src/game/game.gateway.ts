@@ -36,20 +36,18 @@ export class GameGateway {
       client['decoded'].sub,
       this.rooms
     );
-    if (!this.rooms.get(roomId).isStarted) {
-      this.rooms.delete(roomId);
-      return;
-    }
+    if (!roomId) return;
     client.emit('alreadyInGame', roomId);
   }
 
   @SubscribeMessage('disconnect')
   handleDisconnect(@ConnectedSocket() client: Socket) {
     const userId = client['decoded'].sub;
-    const room = this.gameService.getRoomIdByUserId(userId, this.rooms);
-    if (!room) return;
-    client.leave(room);
-    this.logger.log(`Client leave room: ${room}`);
+    const roomId = this.gameService.getRoomIdByUserId(userId, this.rooms);
+    if (!roomId) return;
+    if (!this.rooms.get(roomId).isStarted) this.rooms.delete(roomId);
+    client.leave(roomId);
+    this.logger.log(`Client leave room: ${roomId}`);
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
@@ -82,13 +80,13 @@ export class GameGateway {
       );
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
-      this.gameService.initRankedDatas(this.rooms.get(roomId));
+      this.gameService.initDefaultDatas(this.rooms.get(roomId));
       client.join(roomId);
       this.logger.log(`Client created ranked room: ${roomId}`);
     }
   }
 
-  async gameLoop(joinableRoom: string) {
+  async gameLoop(joinableRoom: string): Promise<void> {
     const res = await this.gameService.gameIteration(this.rooms, joinableRoom);
     const room = this.rooms.get(joinableRoom);
     if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
@@ -101,7 +99,7 @@ export class GameGateway {
   @SubscribeMessage('createCustomRoom')
   handleCreateCustomRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: GameDatas
+    @MessageBody() data: any
   ) {
     const userId = client['decoded'].sub;
     if (
@@ -111,6 +109,7 @@ export class GameGateway {
     }
     const roomId = this.gameService.createRoom(this.rooms, userId);
     const room = this.rooms.get(roomId);
+    this.gameService.initDefaultDatas(room);
     this.gameService.initDatasCustomGame(room, data, userId);
     client.join(roomId);
     this.logger.log(`Client created room for custom game: ${roomId}`);
@@ -136,15 +135,9 @@ export class GameGateway {
     this.logger.log(`Client joined room for custom game: ${roomId}`);
     this.server.in(roomId).emit('startGame', room.datas);
     room.interval = setInterval(
-      async (roomId: string) => {
-        const res = await this.gameService.gameIteration(this.rooms, roomId);
-        const room = this.rooms.get(roomId);
-        if (!res) this.server.in(roomId).emit('gameLoop', room.datas);
-        else {
-          this.logger.log(`Custom game is over: ${roomId}`);
-          this.server.in(roomId).emit('gameOver', { score: res });
-        }
-      },
+      // use arrow function to keep the context of this
+      // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
+      (roomId: string) => this.gameLoop(roomId),
       10,
       roomId
     );

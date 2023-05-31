@@ -295,7 +295,7 @@ export class GameService {
     return room.datas;
   }
 
-  initRankedDatas(room: Room): void {
+  initDefaultDatas(room: Room): void {
     const map = {
       height: 150,
       width: 300,
@@ -346,9 +346,24 @@ export class GameService {
     };
   }
 
-  initDatasCustomGame(room: Room, data: GameDatas, userId: string): void {
-    room.datas = data;
-    room.datas.isRanked = false;
-    room.datas.score.player1.id = userId;
+  initDatasCustomGame(room: Room, customDatas: any, userId: string): void {
+    const roomDatas = room.datas;
+    roomDatas.ball.radius = customDatas.ballRadius;
+    roomDatas.ball.speed = customDatas.ballSpeed;
+    roomDatas.padInfos.height = customDatas.padHeight;
+    roomDatas.padInfos.width = customDatas.padWidth;
+    roomDatas.padInfos.speed = customDatas.padSpeed;
+    this.setCustomDatasToPad(roomDatas, customDatas);
+    roomDatas.isRanked = false;
+    roomDatas.score.player1.id = userId;
+  }
+
+  setCustomDatasToPad(datas: GameDatas, customDatas: any): void {
+    datas.pad1.height = customDatas.padHeight;
+    datas.pad1.width = customDatas.padWidth;
+    datas.pad1.speed = customDatas.padSpeed;
+    datas.pad2.height = customDatas.padHeight;
+    datas.pad2.width = customDatas.padWidth;
+    datas.pad2.speed = customDatas.padSpeed;
   }
 }

@@ -3,13 +3,19 @@
     <v-row justify="center" align="center">
       <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
       <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
+      <input class="pa-2 ma-2" v-model="gameId" type="text" />
+      <v-btn class="pa-2 ma-2" @click="joinCustomGame">Join custom game</v-btn>
     </v-row>
   </v-container>
 
   <v-container v-if="isInMenu()">
     <v-row justify="center" align="center">
+      <!--
       <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
-      <v-btn class="pa-2 ma-2" @click="runCustomGame">Run custom game</v-btn>
+      -->
+      <v-btn class="pa-2 ma-2" @click="createCustomRoom"
+        >Create custom game</v-btn
+      >
     </v-row>
   </v-container>
 
@@ -46,9 +52,7 @@ export default {
       map: null,
       score: null,
       winnerId: null,
-      custom: {
-        ballSpeed: 1
-      },
+      gameId: null,
       gameStatus: constants.GAME_STATUS.IN_CHOOSE_MODE
     };
   },
@@ -73,12 +77,17 @@ export default {
       this.socketioGame.send('connectToRoom');
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
-    runCustomGame() {
+    createCustomRoom() {
       this.subscribeGameLoop();
       this.subscribeStartGame();
-      this.sendGameDatas();
-      this.socketioGame.send('connectToRoom');
-      this.gameStatus = constants.GAME_STATUS.IN_GAME;
+      this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());
+      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
+    },
+    joinCustomGame() {
+      this.subscribeGameLoop();
+      this.subscribeStartGame();
+      this.socketioGame.send('joinCustomRoom', this.gameId);
+      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
     runGame() {
       this.socketioGame.subscribe('gameOver', (res) => {
@@ -97,16 +106,15 @@ export default {
       document.addEventListener('keydown', this.handleKeyDown);
       document.addEventListener('keyup', this.handleKeyUp);
     },
-    // function for custom games
-    sendGameDatas() {
-      const gameDatas = {
-        map: this.map,
-        ball: this.ball,
-        pad1: this.pad1,
-        pad2: this.pad2,
-        score: this.score
+    getCustomGameDatas() {
+      return {
+        ballAcceleration: 2,
+        padHeight: 150 / 2,
+        padWidth: 300 / 100,
+        padSpeed: 2,
+        ballRadius: 1,
+        ballSpeed: 2
       };
-      this.socketioGame.send('initGame', gameDatas);
     },
     initCanvas() {
       this.canvas = document.getElementById('canvas');
