@@ -287,12 +287,12 @@ export class GameService {
       height: 150,
       width: 300,
       padOffset: 10,
-      acceleration: 1.1
+      acceleration: 1.01
     };
     const padInfos = {
-      height: map.height / 5,
+      height: map.height / 7,
       width: map.width / 100,
-      speed: 1
+      speed: 1.5
     };
     const ball = {
       x: map.width / 2,

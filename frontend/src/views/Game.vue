@@ -1,9 +1,4 @@
 <template>
-  <!--
-  <p v-if="ball">ball: {{ ball }}</p>
-  <p v-if="pad1">pad1: {{ pad1 }}</p>
-  <p v-if="pad2">pad2: {{ pad2 }}</p>
-  -->
   <v-container v-if="isInMenu()">
     <v-row justify="center" align="center">
       <v-btn @click="queueRanked">Search ranked match</v-btn>
@@ -166,14 +161,14 @@ export default {
     },
     handleKeyDown(e) {
       if (e.key === 'ArrowUp') {
-        this.socketioGame.send('movePad', { dy: -1 });
+        this.socketioGame.send('movePad', { dy: constants.PAD_UP });
       } else if (e.key === 'ArrowDown') {
-        this.socketioGame.send('movePad', { dy: 1 });
+        this.socketioGame.send('movePad', { dy: constants.PAD_DOWN });
       }
     },
     handleKeyUp(e) {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
-        this.socketioGame.send('movePad', { dy: 0 });
+        this.socketioGame.send('movePad', { dy: constants.PAD_STOP });
     },
     isInGame() {
       return this.gameStatus === constants.GAME_STATUS.IN_GAME;
