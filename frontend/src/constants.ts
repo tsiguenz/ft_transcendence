@@ -19,8 +19,9 @@ export const PAD_UP = -1;
 export const PAD_DOWN = 1;
 export const PAD_STOP = 0;
 export const GAME_STATUS = Object.freeze({
-  IN_MENU: 0,
-  IN_QUEUE: 1,
-  IN_GAME: 2,
-  IN_SCORE_SCREEN: 3
+  IN_CHOOSE_MODE: 0,
+  IN_MENU: 1,
+  IN_QUEUE: 2,
+  IN_GAME: 3,
+  IN_SCORE_SCREEN: 4
 });

@@ -1,7 +1,15 @@
 <template>
+  <v-container v-if="isInChooseMode()">
+    <v-row justify="center" align="center">
+      <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
+      <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
+    </v-row>
+  </v-container>
+
   <v-container v-if="isInMenu()">
     <v-row justify="center" align="center">
-      <v-btn @click="queueRanked">Search ranked match</v-btn>
+      <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
+      <v-btn class="pa-2 ma-2" @click="runCustomGame">Run custom game</v-btn>
     </v-row>
   </v-container>
 
@@ -12,7 +20,7 @@
   </v-container>
 
   <v-container v-show="isInGame()">
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas" height="150" width="300"></canvas>
   </v-container>
 
   <v-container v-if="isInScoreScreen()">
@@ -38,7 +46,10 @@ export default {
       map: null,
       score: null,
       winnerId: null,
-      gameStatus: constants.GAME_STATUS.IN_MENU
+      custom: {
+        ballSpeed: 1
+      },
+      gameStatus: constants.GAME_STATUS.IN_CHOOSE_MODE
     };
   },
   mounted() {
@@ -61,6 +72,13 @@ export default {
       this.subscribeStartGame();
       this.socketioGame.send('connectToRoom');
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
+    },
+    runCustomGame() {
+      this.subscribeGameLoop();
+      this.subscribeStartGame();
+      this.sendGameDatas();
+      this.socketioGame.send('connectToRoom');
+      this.gameStatus = constants.GAME_STATUS.IN_GAME;
     },
     runGame() {
       this.socketioGame.subscribe('gameOver', (res) => {
@@ -181,6 +199,9 @@ export default {
     },
     isInScoreScreen() {
       return this.gameStatus === constants.GAME_STATUS.IN_SCORE_SCREEN;
+    },
+    isInChooseMode() {
+      return this.gameStatus === constants.GAME_STATUS.IN_CHOOSE_MODE;
     }
   }
 };
@@ -189,7 +210,7 @@ export default {
 <style scoped>
 /* idk how it works but it works */
 div {
-  height: 50%;
+  height: 70%;
   width: 50%;
   margin: 0 auto;
   border: 3px solid var(--light);

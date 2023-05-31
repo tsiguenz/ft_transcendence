@@ -22,7 +22,10 @@ export class GameService {
     private user: UsersService
   ) {}
 
-  async gameLoop(rooms: Map<string, Room>, roomId: string): Promise<Score> {
+  async gameIteration(
+    rooms: Map<string, Room>,
+    roomId: string
+  ): Promise<Score> {
     const room = rooms.get(roomId);
     const datas = room.datas;
     if (!datas) return null;
@@ -37,7 +40,7 @@ export class GameService {
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
-    if (this.isGameEnded(score, 10)) return await this.stopGame(rooms, roomId);
+    if (this.isGameEnded(score, 3)) return await this.stopGame(rooms, roomId);
     return null;
   }
 
@@ -59,7 +62,8 @@ export class GameService {
     const winnerInfos = await this.user.getUserById(winner.id);
     const loserInfos = await this.user.getUserById(loser.id);
     if (!winnerInfos || !loserInfos) return;
-    await this.updateUsersRating(winnerInfos, loserInfos);
+    if (room.datas.isRanked)
+      await this.updateUsersRating(winnerInfos, loserInfos);
     await this.prisma.game
       .create({
         data: {
@@ -84,7 +88,7 @@ export class GameService {
     await this.updateRating(loser.id, newRating.loser);
   }
 
-  // https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details
+  // https://en.wikipedia.org/wiki/Elo_rating_system
   calculateNewRating(
     winnerRating: number,
     loserRating: number
@@ -259,6 +263,7 @@ export class GameService {
   }
 
   getJoinableRoom(rooms: Map<string, Room>): string {
+    // test if the game is ranked
     const it = rooms[Symbol.iterator]();
     for (const room of it)
       if (room[1].players.length === 1 && !room[1].isStarted) return room[0];
@@ -290,8 +295,7 @@ export class GameService {
     return room.datas;
   }
 
-  initDatas(rooms: Map<string, Room>, roomId: string): void {
-    const room = rooms.get(roomId);
+  initRankedDatas(room: Room): void {
     const map = {
       height: 150,
       width: 300,
@@ -329,7 +333,7 @@ export class GameService {
     };
     const score = {
       player1: { id: room.players[0], points: 0 },
-      player2: { id: room.players[1], points: 0 }
+      player2: { id: undefined, points: 0 }
     };
     room.datas = {
       map: map,
@@ -340,5 +344,11 @@ export class GameService {
       score: score,
       isRanked: true
     };
+  }
+
+  initDatasCustomGame(room: Room, data: GameDatas, userId: string): void {
+    room.datas = data;
+    room.datas.isRanked = false;
+    room.datas.score.player1.id = userId;
   }
 }
