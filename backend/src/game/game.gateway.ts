@@ -69,6 +69,7 @@ export class GameGateway {
       room.datas.score.player2.id = userId;
       client.join(joinableRoom);
       this.logger.log(`Client joined room: ${joinableRoom}`);
+      room.isStarted = true;
       this.logger.log(`Start game: ${joinableRoom}`);
       this.server.in(joinableRoom).emit('startGame', room.datas);
       room.interval = setInterval(
@@ -133,6 +134,7 @@ export class GameGateway {
     room.datas.score.player2.id = userId;
     client.join(roomId);
     this.logger.log(`Client joined room for custom game: ${roomId}`);
+    room.isStarted = true;
     this.server.in(roomId).emit('startGame', room.datas);
     room.interval = setInterval(
       // use arrow function to keep the context of this

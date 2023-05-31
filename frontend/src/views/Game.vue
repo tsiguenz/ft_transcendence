@@ -1,11 +1,14 @@
 <template>
   <v-container v-if="isInChooseMode()">
-    <v-row justify="center" align="center">
-      <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
-      <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
-      <input class="pa-2 ma-2" v-model="gameId" type="text" />
-      <v-btn class="pa-2 ma-2" @click="joinCustomGame">Join custom game</v-btn>
-    </v-row>
+    <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
+    <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
+    <input
+      v-model="gameId"
+      style="border: 2px solid black"
+      class="pa-2 ma-2"
+      type="text"
+    />
+    <v-btn class="pa-2 ma-2" @click="joinCustomGame">Join custom game</v-btn>
   </v-container>
 
   <v-container v-if="isInMenu()">
@@ -13,6 +16,7 @@
       <!--
       <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
       -->
+      <p>Some options</p>
       <v-btn class="pa-2 ma-2" @click="createCustomRoom"
         >Create custom game</v-btn
       >
