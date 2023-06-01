@@ -2,10 +2,10 @@
             <v-table  v-if="friends.length === 0" class="friends" density="compact">
               <h2>Friends</h2>
               <v-col col="10">
-                <v-list-item-content class="noroom">
+                <v-list class="noroom">
                   <h3> :( </h3>
                   <h3> Oops nothing here </h3>
-                </v-list-item-content>
+                </v-list>
               </v-col>
             </v-table>
   <v-table v-else class="friends" density="compact">
@@ -165,6 +165,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.noroom{
+  background-color: var(--dark-purple);
+}
 .friends{
   padding-top: 12px;
   text-align: center;

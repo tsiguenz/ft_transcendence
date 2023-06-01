@@ -31,7 +31,6 @@
           <p>{{ user.nickname }}</p>
         </td>
         <td class="hgt-td">{{ user.ladderPoints }}</td>
-        <td class="hgt-td">{{ userStatus(user) }}</td>
         <td class="hgt-td">
           <IsFriend :friendname="user.nickname"></IsFriend>
         </td>

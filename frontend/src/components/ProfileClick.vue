@@ -11,6 +11,7 @@
                 :url-avatar="urlAvatar"
               ></ProfilePrintAvatar>
             </v-avatar>
+            <v-icon :class="status ? 'co' : 'unco'" class="statusUser" size="15px" icon="mdi-circle"></v-icon>
           </v-btn>
         </template>
         <v-card>
