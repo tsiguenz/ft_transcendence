@@ -9,6 +9,7 @@ export interface Ball {
   x: number;
   y: number;
   radius: number;
+  defaultBallSpeed: number;
   speed: number;
   dx: number;
   dy: number;

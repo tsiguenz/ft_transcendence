@@ -44,6 +44,16 @@ export class GameService {
     return null;
   }
 
+  async gameLoop(joinableRoom: string, that: any): Promise<void> {
+    const res = await this.gameIteration(that.rooms, joinableRoom);
+    const room = that.rooms.get(joinableRoom);
+    if (!res) that.server.in(joinableRoom).emit('gameLoop', room.datas);
+    else {
+      that.logger.log(`Game is over: ${joinableRoom}`);
+      that.server.in(joinableRoom).emit('gameOver', { score: res });
+    }
+  }
+
   async stopGame(rooms: Map<string, Room>, roomId: string): Promise<Score> {
     const room = rooms.get(roomId);
     const score = room.datas.score;
@@ -174,7 +184,7 @@ export class GameService {
       this.ballIsBetweenPadY(ball, pad)
     ) {
       ball.dx = this.isPlayerOne(ball, map) ? -1 : 1;
-      ball.dy = (ball.y - (pad.y + pad.height / 2)) / 10;
+      ball.dy = (ball.y - (pad.y + pad.height / 2)) / (map.width / 30);
       ball.speed *= map.acceleration;
     }
   }
@@ -212,7 +222,7 @@ export class GameService {
     ball.dy = Math.random() * 2 - 1;
     ball.x = map.width / 2;
     ball.y = map.height / 2;
-    ball.speed = 1;
+    ball.speed = ball.defaultBallSpeed;
   }
 
   padIsOnTopBorder(pad: Pad): boolean {
@@ -297,21 +307,22 @@ export class GameService {
 
   initDefaultDatas(room: Room): void {
     const map = {
-      height: 150,
-      width: 300,
-      padOffset: 10,
-      acceleration: 1.01
+      height: 525,
+      width: 858,
+      padOffset: 30,
+      acceleration: 1.02
     };
     const padInfos = {
       height: map.height / 7,
       width: map.width / 100,
-      speed: 1.5
+      speed: map.height / 100
     };
     const ball = {
       x: map.width / 2,
       y: map.height / 2,
-      radius: 3,
-      speed: 1,
+      radius: map.width / 100,
+      defaultBallSpeed: map.width / 300,
+      speed: map.width / 300,
       dx: 1,
       dy: 1
     };

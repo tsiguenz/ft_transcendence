@@ -1,42 +1,29 @@
 <template>
-  <v-container v-if="isInChooseMode()">
+  <v-container v-if="isInChooseMode()" class="v-container">
     <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
     <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
-    <input
-      v-model="gameId"
-      style="border: 2px solid black"
-      class="pa-2 ma-2"
-      type="text"
-    />
-    <v-btn class="pa-2 ma-2" @click="joinCustomGame">Join custom game</v-btn>
   </v-container>
 
-  <v-container v-if="isInMenu()">
-    <v-row justify="center" align="center">
-      <!--
+  <v-container v-if="isInMenu()" class="v-container">
+    <!--
       <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
       -->
-      <p>Some options</p>
-      <v-btn class="pa-2 ma-2" @click="createCustomRoom"
-        >Create custom game</v-btn
-      >
-    </v-row>
+    <p>Some options</p>
+    <v-btn class="pa-2 ma-2" @click="createCustomRoom"
+      >Create custom game</v-btn
+    >
   </v-container>
 
-  <v-container v-if="isInQueue()">
-    <v-row justify="center" align="center">
-      <p>Waiting for an opponent</p>
-    </v-row>
+  <v-container v-if="isInQueue()" class="game-container">
+    <p>Waiting for an opponent</p>
   </v-container>
 
   <v-container v-show="isInGame()">
-    <canvas id="canvas" height="150" width="300"></canvas>
+    <canvas id="canvas" height="525" width="858"></canvas>
   </v-container>
 
-  <v-container v-if="isInScoreScreen()">
-    <v-row justify="center" align="center">
-      <p>The winner is {{ winnerId }}</p>
-    </v-row>
+  <v-container v-if="isInScoreScreen()" class="v-container">
+    <p>The winner is {{ winnerId }}</p>
   </v-container>
 </template>
 
@@ -127,6 +114,7 @@ export default {
     initCanvas() {
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
+      console.log(this.ctx);
     },
     subscribeGameLoop() {
       this.socketioGame.subscribe('gameLoop', (datas) => {
@@ -194,10 +182,14 @@ export default {
       this.ctx.fill();
     },
     writeScore() {
-      this.ctx.font = '20px Poppins';
+      this.ctx.font = '50px Poppins';
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(this.score.player1.points, this.map.width / 2 - 25, 20);
-      this.ctx.fillText(this.score.player2.points, this.map.width / 2 + 15, 20);
+      this.ctx.fillText(
+        this.score.player1.points,
+        this.map.width / 2 - 120,
+        50
+      );
+      this.ctx.fillText(this.score.player2.points, this.map.width / 2 + 80, 50);
     },
     handleKeyDown(e) {
       if (e.key === 'ArrowUp') {
@@ -230,18 +222,27 @@ export default {
 </script>
 
 <style scoped>
-div {
-  height: 50%;
-  width: 50%;
-  margin: 0 auto;
-  border: 3px solid var(--light);
-}
-
-canvas {
+#canvas {
   height: 100%;
   width: 100%;
   background-color: var(--dark-alt);
   border-radius: 30px;
   border: 3px solid var(--light);
+}
+
+.v-container {
+  height: 50%;
+  width: 50%;
+  margin: 0 auto;
+  border: 3px solid var(--light);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-container {
+  height: 525px;
+  width: 858px;
 }
 </style>

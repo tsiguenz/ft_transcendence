@@ -75,25 +75,17 @@ export class GameGateway {
       room.interval = setInterval(
         // use arrow function to keep the context of this
         // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
-        (roomId: string) => this.gameLoop(roomId),
+        //(roomId: string) => this.gameLoop(roomId),
+        (roomId: string, that: any) => this.gameService.gameLoop(roomId, that),
         10,
-        joinableRoom
+        joinableRoom,
+        this
       );
     } else {
       const roomId = this.gameService.createRoom(this.rooms, userId);
       this.gameService.initDefaultDatas(this.rooms.get(roomId));
       client.join(roomId);
       this.logger.log(`Client created ranked room: ${roomId}`);
-    }
-  }
-
-  async gameLoop(joinableRoom: string): Promise<void> {
-    const res = await this.gameService.gameIteration(this.rooms, joinableRoom);
-    const room = this.rooms.get(joinableRoom);
-    if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
-    else {
-      this.logger.log(`Game is over: ${joinableRoom}`);
-      this.server.in(joinableRoom).emit('gameOver', { score: res });
     }
   }
 
@@ -129,6 +121,7 @@ export class GameGateway {
     }
     const room = this.rooms.get(roomId);
     if (!room || room.isStarted || room.datas.isRanked) {
+      this.logger.log(`Room not found: ${roomId}`);
       client.emit('roomNotFound');
       return;
     }
@@ -141,9 +134,10 @@ export class GameGateway {
     room.interval = setInterval(
       // use arrow function to keep the context of this
       // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
-      (roomId: string) => this.gameLoop(roomId),
+      (roomId: string, that: any) => this.gameService.gameLoop(roomId, that),
       10,
-      roomId
+      roomId,
+      this
     );
   }
 
