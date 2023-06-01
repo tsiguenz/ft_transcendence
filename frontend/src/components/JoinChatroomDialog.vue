@@ -1,8 +1,11 @@
 <template>
-    <v-card>
+    <v-card class="roomsjoin">
       <v-card-title>
         <span class="text-h5">Join a public room</span>
       </v-card-title>
+      <v-divider
+                  class="my-0 divider"
+                />
       <v-container
           class="fill-height pa-0 "
         >
@@ -15,14 +18,12 @@
                 height="500"
               >
               <template v-if="chatrooms.length === 0">
-            <v-row no-gutters>
               <v-col col="10">
                 <v-list class="noroom">
                   <h3> :( </h3>
                   <h3> No chatrooms available </h3>
                 </v-list>
               </v-col>
-            </v-row>
             </template>
             <template v-else>
           <v-list subheader>
@@ -71,9 +72,7 @@
       </v-col>
     </v-row>
   </v-list-item>
-          <v-divider
-                  class="my-0 divider"
-                />
+         
           </v-list>
         </template>
           </v-responsive>
@@ -105,6 +104,7 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
+
     async joinRoom(chatroom) {
       try {
         const response = await axios.post(
@@ -113,9 +113,12 @@ export default {
             ...chatroom
           }
         );
-        this.chatrooms = response.data;
+
+        
+        this.reply = response.data;
         this.$emit('join', chatroom);
-        this.closeDialog();
+        let i = this.chatrooms.map(item => item.id).indexOf(chatroom.id);
+        this.chatrooms.splice(i, 1);
       } catch (error) {
         swal({
           icon: 'error',
@@ -147,11 +150,18 @@ export default {
   margin-bottom: 0;
 }
 
-.v-card{
-  background: var(--dark-purple);
+.roomsjoin{
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--light-purple);
+  border-color: var(--light-purple) !important;
 }
+
 .v-list{
   background: var(--dark-purple) !important;
+  border-radius: 5px !important;
+  
 }
 
 .joinbtn{

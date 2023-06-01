@@ -1,4 +1,5 @@
 <template>
+  <v-list class="window">
   <v-card class="borderR">
     <v-btn :class="`${showFriends === true ? 'activebtn' : 'inactivebtn'}`"  @click="$emit('toggleFriendsView')"><v-avatar rounded="0" size="25px">
           <v-img
@@ -29,14 +30,15 @@
       ></v-list-item>
     </v-list>
   </v-card>
-  <!-- <v-row no-gutters>
-    <v-col cols="8" class="pa-0">
+ <v-row no-gutters>
+    <!-- <v-col cols="8" class="pa-0">
       <JoinChatroomDialog @join="pushChatroom" />
-    </v-col>
+    </v-col> -->
     <v-col cols="4" class="pa-0">
       <NewChatroomDialog @create="pushChatroom" />
     </v-col>
-  </v-row> -->
+  </v-row>
+</v-list>
 </template>
 
 <script>
@@ -112,6 +114,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
 
 .v-btn{
   width: 100%;

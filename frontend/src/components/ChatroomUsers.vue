@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-list class="window">
     <v-btn block>Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">

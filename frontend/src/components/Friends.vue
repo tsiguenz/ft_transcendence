@@ -169,10 +169,8 @@ export default {
   padding-top: 12px;
   text-align: center;
   background-color: var(--dark-purple);
-  border-style: solid;
-  border-radius: 5px;
+  border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple);
-  border-color: var(--light-purple);
 }
 
 .cust-th{

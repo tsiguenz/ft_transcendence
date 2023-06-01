@@ -118,4 +118,6 @@ export default {
 
 <style scoped>
 /* Your component styles here */
+
+
 </style>

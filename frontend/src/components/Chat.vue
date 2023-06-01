@@ -1,7 +1,7 @@
 <template>
-  <v-list ref="chat"  class="overflow-y-auto">
-    <v-toolbar color="">
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
+  <v-list ref="chat"  class="overflow-y-auto window">
+    <v-toolbar class="roomName">
+      <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <EditChatroomDialog
         v-if="currentUserIsOwner"
@@ -50,7 +50,8 @@ export default {
   emits: ['leave', 'delete'],
   data() {
     return {
-      newMessage: ''
+      newMessage: '',
+      chatroom: []
     };
   },
   computed: {
@@ -66,7 +67,8 @@ export default {
         return false;
       }
       return true;
-    }
+    },
+    
   },
   watch: {
     messages: {
@@ -125,7 +127,26 @@ export default {
       }
       return new Date(this.messages.at(-1).sentAt);
     },
-   
+    currentChatroomName() {
+      if (!this.id) {
+        return '';
+      }
+      const chatroom = this.chatStore.chatrooms.find((x) => x.id === this.id);
+      if (!chatroom) {
+        return '';
+      }
+      return chatroom.name;
+    },
   }
 };
 </script>
+
+<style scoped>
+
+
+.roomName{
+  background-color: var(--medium-purple);
+
+}
+
+</style>
