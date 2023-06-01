@@ -118,7 +118,7 @@
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
@@ -168,7 +168,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
         this.$router.push('/logout');
       }
@@ -188,7 +188,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
       this.getProfile();
@@ -215,7 +215,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
       this.getProfile();
@@ -236,7 +236,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
       this.getProfile();
@@ -259,7 +259,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
     },
@@ -275,7 +275,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
     },

@@ -55,7 +55,7 @@
 import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 
 export default {
   emits: ['create'],
@@ -82,7 +82,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
       }
     }

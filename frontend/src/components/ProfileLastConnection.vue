@@ -15,8 +15,7 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 export default {
@@ -42,8 +41,7 @@ export default {
         return;
       }
       this.isLog = false;
-      const lastCoUTC = new Date(this.user.lastConnection).getTime();
-      this.disconnectSince = new Date(lastCoUTC).toLocaleString();
+      this.disconnectSince = lib.convertDate(this.user.lastConnection);
     }
   }
 };

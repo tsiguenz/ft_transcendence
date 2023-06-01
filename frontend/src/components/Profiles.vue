@@ -1,6 +1,6 @@
 <template>
   <v-container flex>
-    <v-row align="center">
+    <v-row class="align-center">
       <v-col cols="3">
         <v-sheet class="sheet pa-3">
           <div class="py-5">
@@ -22,14 +22,14 @@
           <v-row class="justify-center">
             <h2 class="font ma-3">{{ user.nickname }}</h2>
           </v-row>
-          <v-sheet max-height="80vh" class="scroll" color="transparent">
-            <ProfileHistoryGames v-if="userIsMounted" :gamesWin="gameStats.gamesWin" :gamesLose="gameStats.gamesLose" />
-          </v-sheet>
+<v-sheet max-height="80vh" class="scroll" color="transparent">
+            <ProfileHistoryGames v-if="userIsMounted" :gamesWin="gameStats.gamesWin" :gamesLose="gameStats.gamesLose" :users="users" />
+</v-sheet>
         </v-sheet>
       </v-col>
       <v-col cols="3" align="center">
         <v-sheet class="sheet pa-3">
-          <p class="ma-5">
+          <p class="ma-10">
             <ProfileLastConnection v-if="userIsMounted" :user="user" />
           </p>
           <v-row class="justify-center"
@@ -60,7 +60,7 @@
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from './ProfilePrintAvatar.vue';
@@ -81,6 +81,7 @@ export default {
   data() {
     return {
       user: {},
+			users: [],
       userIsMounted: false,
       currentNickname: '',
       gameStats: {},
@@ -95,6 +96,7 @@ export default {
     $route(to, from) {
       if (to.path !== '/profile' + this.nickname)
         this.currentNickname = this.sessionStore.nickname;
+this.isMounted = false;
       this.getProfile();
     }
   },
@@ -108,20 +110,27 @@ export default {
         const responseUser = await axios.get(
           constants.API_URL + `/users/${this.currentNickname}`
         );
-        const response = await axios.get(
+        const responseGame = await axios.get(
           constants.API_URL + `/users/${this.currentNickname}/games`
         );
 
+        const jwt = this.$cookie.getCookie('jwt');
+        const responseUsers = await axios.get(constants.API_URL + '/users', {
+          headers: {
+            Authorization: 'Bearer ' + jwt
+          }
+        });
+        this.users = responseUsers.data;
         this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
-        this.gameStats = response.data;
+        this.gameStats = responseGame.data;
         this.gamesWin = this.gameStats.gamesWin.length;
         this.gamesPlayed = this.gamesWin + this.gameStats.gamesLose.length;
         this.userIsMounted = true;
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
         this.$router.push('/logout');
       }
@@ -145,8 +154,12 @@ export default {
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
     overflow-y: scroll; 
+      -webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 110%);
+    mask-image: linear-gradient(to bottom,black 10%,transparent 50%);
 }
 .scroll::-webkit-scrollbar {
     display: none; /* for Chrome, Safari, and Opera */
+      -webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
+    mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
 }
 </style>

@@ -20,7 +20,7 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
@@ -79,7 +79,7 @@ export default {
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
-        swal({ icon: 'error', text: formatError(error.response.data.message) });
+        swal({ icon: 'error', text: lib.formatError(error.response.data.message) });
       }
     }
   }

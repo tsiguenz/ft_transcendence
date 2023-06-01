@@ -17,7 +17,6 @@
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 

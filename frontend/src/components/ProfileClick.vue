@@ -43,7 +43,7 @@
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
@@ -82,7 +82,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });

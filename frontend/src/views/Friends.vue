@@ -49,7 +49,7 @@ import { useSessionStore } from '@/store/session';
 import * as constants from '@/constants.ts';
 import axios from 'axios';
 import swall from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 
 export default {
   data() {
@@ -89,7 +89,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -112,7 +112,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -135,7 +135,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
