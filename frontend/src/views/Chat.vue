@@ -96,6 +96,10 @@ export default {
       }
       this.chatStore.removeRoom(id);
       this.chatStore.hasJoinedRoom = false;
+      this.chatStore.removeRoom(id);
+      if (id == this.currentChatroomId) {
+        this.chatStore.switchToDefaultChatroom();
+      }
     },
     toggleFriendsView() {
       this.showFriends = true;

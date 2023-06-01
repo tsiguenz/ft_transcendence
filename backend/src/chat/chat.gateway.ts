@@ -15,7 +15,9 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { UsersService } from '../users/users.service';
+import { RestrictionType, ChatRoom } from '@prisma/client';
 import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -27,7 +29,8 @@ export class ChatGateway
     private chat: ChatService,
     private users: UsersService,
     private chatroom: ChatroomService,
-    private chatroomUser: ChatroomUserService
+    private chatroomUser: ChatroomUserService,
+    private chatroomRestriction: ChatroomRestrictionService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -41,6 +44,12 @@ export class ChatGateway
     try {
       const chatroom = await this.chatroom.findOne(payload.chatroomId);
       const user = await this.users.getUserById(client['decoded'].sub);
+
+      if (
+        await this.chatroomRestriction.isUserRestricted(user.id, chatroom.id)
+      ) {
+        return;
+      }
 
       const message = await this.chat.saveMessage(
         client['decoded'].sub,
@@ -135,6 +144,107 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.KICK_USER)
+  async handleKick(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { userId: string; chatroomId: string }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
+      throw new WsException('Unauthorized to kick user');
+    }
+
+    try {
+      await this.kickUser(payload.userId, chatroom);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.RESTRICT_USER)
+  async handleRestrict(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      userId: string;
+      chatroomId: string;
+      restrictionType: string;
+      time: number;
+    }
+  ) {
+    if (1 > payload.time || payload.time > 100000000) {
+      throw new WsException('Restriction time invalid');
+    }
+
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
+      throw new WsException('Unauthorized to restrict user');
+    }
+
+    const date = new Date();
+    const until = new Date(date.getTime() + payload.time * 1000 * 60);
+    const restrictionType = this.chatroomRestriction.stringToRestrictionType(
+      payload.restrictionType
+    );
+
+    if (!restrictionType) {
+      throw new WsException('Unknown restriction type');
+    }
+
+    try {
+      this.chatroomRestriction.create(
+        payload.userId,
+        chatroom.id,
+        restrictionType,
+        until
+      );
+
+      if (restrictionType == RestrictionType.MUTED) {
+        return;
+      }
+      await this.kickUser(payload.userId, chatroom);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.UNRESTRICT_USER)
+  async handleUnrestrict(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      userId: string;
+      chatroomId: string;
+      restrictionType: string;
+    }
+  ) {
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
+      throw new WsException('Unauthorized to unrestrict user');
+    }
+
+    const restrictionType = this.chatroomRestriction.stringToRestrictionType(
+      payload.restrictionType
+    );
+
+    if (!restrictionType) {
+      throw new WsException('Unknown restriction type');
+    }
+
+    try {
+      this.chatroomRestriction.remove(
+        payload.userId,
+        chatroom.id,
+        restrictionType
+      );
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   @SubscribeMessage(events.GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
@@ -206,5 +316,51 @@ export class ChatGateway
     if (!user) {
       client.disconnect();
     }
+  }
+
+  async getUserSocket(userId: string) {
+    const sockets = await this.server.fetchSockets();
+    for (const socket of sockets) {
+      if (socket['decoded'].sub == userId) {
+        return socket;
+      }
+    }
+    return null;
+  }
+
+  private async kickUser(userId: string, chatroom: ChatRoom) {
+    const socket = await this.getUserSocket(userId);
+    if (!socket) {
+      return;
+    }
+
+    socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+    socket.leave(chatroom.slug);
+    this.chatroomUser.remove(userId, chatroom.id);
+  }
+
+  private async canRestrictUser(
+    userId: string,
+    chatroom: ChatRoom,
+    target: Socket
+  ) {
+    if (!chatroom) {
+      return false;
+    }
+
+    if (!(await this.users.getUserById(userId))) {
+      return false;
+    }
+
+    if (
+      (await this.chatroomUser.isUserOwner(userId, chatroom.id)) ||
+      !(await this.chatroomUser.canUserAdministrate(
+        target['decoded'].sub,
+        chatroom.id
+      ))
+    ) {
+      return false;
+    }
+    return true;
   }
 }

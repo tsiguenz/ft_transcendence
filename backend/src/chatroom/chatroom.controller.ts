@@ -8,7 +8,7 @@ import {
   Param,
   UseGuards,
   Req,
-  ForbiddenException
+  UnauthorizedException
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { User } from '../decorator/user.decorator';
 
@@ -29,7 +30,8 @@ import { User } from '../decorator/user.decorator';
 export class ChatroomController {
   constructor(
     private readonly chatroomService: ChatroomService,
-    private readonly chatroomUserService: ChatroomUserService
+    private readonly chatroomUserService: ChatroomUserService,
+    private readonly chatroomRestrictionService: ChatroomRestrictionService
   ) {}
 
   @UseGuards(AccessTokenGuard)
@@ -101,7 +103,7 @@ export class ChatroomController {
     @User() user: object
   ) {
     if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
-      throw new ForbiddenException('Unauthorized to edit room');
+      throw new UnauthorizedException('Unauthorized to edit room');
     }
     return this.chatroomService.update(id, updateChatroomDto);
   }
@@ -117,7 +119,7 @@ export class ChatroomController {
   @Delete(':id')
   async remove(@User() user: object, @Param('id') id: string) {
     if (!(await this.chatroomUserService.isUserOwner(user['id'], id))) {
-      throw new ForbiddenException('Unauthorized to delete room');
+      throw new UnauthorizedException('Unauthorized to delete room');
     }
     return this.chatroomService.remove(id);
   }
@@ -142,6 +144,9 @@ export class ChatroomController {
     @Param('id') id: string,
     @Body('password') password: string
   ) {
+    if (await this.chatroomRestrictionService.isUserBanned(user['id'], id)) {
+      throw new UnauthorizedException('Unauthorized to join room');
+    }
     return await this.chatroomService.join(user['id'], id, password);
   }
 }

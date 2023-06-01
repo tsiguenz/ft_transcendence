@@ -32,6 +32,18 @@ export class ChatroomUserService {
           where: {
             chatRoomId: chatroomId
           }
+        },
+        restrictions: {
+          select: {
+            type: true,
+            restrictedUntil: true
+          },
+          where: {
+            chatRoomId: chatroomId,
+            restrictedUntil: {
+              gte: new Date()
+            }
+          }
         }
       }
     });
@@ -102,5 +114,12 @@ export class ChatroomUserService {
 
   async isUserAdmin(userId: string, chatroomId: string) {
     return await this.userHasRole(userId, chatroomId, Role.ADMIN);
+  }
+
+  async canUserAdministrate(userId: string, chatroomId: string) {
+    return (
+      (await this.isUserAdmin(userId, chatroomId)) ||
+      (await this.isUserOwner(userId, chatroomId))
+    );
   }
 }

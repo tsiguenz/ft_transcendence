@@ -40,6 +40,8 @@ import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
+import swal from 'sweetalert';
+import formatError from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 
 export default {
@@ -85,14 +87,14 @@ export default {
         if (!this.id) {
           return;
         }
-        
+
         ChatService.joinRoom(this.id);
         ChatService.getRoomMessages(this.id, this.lastMessageTime());
       }
     }
   },
   created() {
-    ChatService.setup(this.$cookie.getCookie('jwt'));
+    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
   },
   mounted() {
     ChatService.subscribeToMessages((message) => {
@@ -137,6 +139,12 @@ export default {
       }
       return chatroom.name;
     },
+    displayError(payload) {
+      swal({
+        icon: 'error',
+        text: formatError(payload.message)
+      });
+    }
   }
 };
 </script>

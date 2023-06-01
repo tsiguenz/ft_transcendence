@@ -2,7 +2,7 @@
   <h1 class="title">Leaderboard</h1>
   <br />
   <div v-if="leaders">
-    <Ranking :users="leaders"/>
+    <Ranking :users="leaders" />
   </div>
   <v-table density="compact">
     <thead>
@@ -14,11 +14,25 @@
       </tr>
     </thead>
     <tbody>
-      <tr  v-for="(user, index) in users" :key="user.id" :class="{'isprofile': isMyProfile(user.nickname)}">
-        <td class="indexRank"> {{ index + 1 }} </td>
-        <td class="cust-td hgt-td"> <ProfileClick :nickname="user.nickname" :status="userStatus(user)" :width="40" :height="40" :url-avatar="getAvatarPath(user)"></ProfileClick><p>{{ user.nickname }}</p></td>
-        <td class=" hgt-td">{{ user.ladderPoints }}</td>
-        <td class=" hgt-td">
+      <tr
+        v-for="(user, index) in users"
+        :key="user.id"
+        :class="{ isprofile: isMyProfile(user.nickname) }"
+      >
+        <td class="indexRank">{{ index + 1 }}</td>
+        <td class="cust-td hgt-td">
+          <ProfileClick
+            :nickname="user.nickname"
+            :status="userStatus(user)"
+            :width="40"
+            :height="40"
+            :url-avatar="getAvatarPath(user)"
+          ></ProfileClick>
+          <p>{{ user.nickname }}</p>
+        </td>
+        <td class="hgt-td">{{ user.ladderPoints }}</td>
+        <td class="hgt-td">{{ userStatus(user) }}</td>
+        <td class="hgt-td">
           <IsFriend :friendname="user.nickname"></IsFriend>
         </td>
       </tr>
@@ -48,9 +62,14 @@ export default {
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
   },
-  computed: { leaders() {
+  computed: {
+    leaders() {
       if (this.users.length > 0) {
-        return { first: this.users[0], second: this.users[1], third: this.users[2] };
+        return {
+          first: this.users[0],
+          second: this.users[1],
+          third: this.users[2]
+        };
       }
       return 0;
     }
@@ -66,7 +85,7 @@ export default {
   async mounted() {
     await this.getUsers();
   },
-  methods: { 
+  methods: {
     async getUsers() {
       try {
         const jwt = this.$cookie.getCookie('jwt');
@@ -115,22 +134,24 @@ export default {
       return false;
     },
     getLeaders() {
-      return { first: this.users[0], second: this.users[1], third: this.users[2] };
+      return {
+        first: this.users[0],
+        second: this.users[1],
+        third: this.users[2]
+      };
     },
     getAvatarPath(user) {
-    return constants.AVATARS_URL + user.avatarPath;
-  },
-  isMyProfile(name) {
-    return name === this.sessionStore.nickname;
+      return constants.AVATARS_URL + user.avatarPath;
+    },
+    isMyProfile(name) {
+      return name === this.sessionStore.nickname;
+    }
   }
-  },
 };
 </script>
 
-
 <style lang="scss" scoped>
-
-.v-table{
+.v-table {
   background: var(--medium-purple);
   width: 95%;
   margin-right: auto;
@@ -145,43 +166,41 @@ tr:not(.isprofile) {
   background-color: var(--dark-purple);
 }
 
-.cust-th{
+.cust-th {
   color: #ffff !important;
   text-transform: uppercase;
 }
 
-.hgt-td{
+.hgt-td {
   height: 60px !important;
 }
 
-.cust-td{
+.cust-td {
   display: flex !important;
   padding: 1rem;
-  p{
+  p {
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 10px;
   }
 }
 
-.cont{
+.cont {
   margin-top: auto;
   margin-bottom: auto;
-  
 }
 
-.title{
+.title {
   color: #ffff;
   text-align: center;
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-.indexRank{
+.indexRank {
   color: #ffff;
   font-size: 1.5rem;
   font-weight: bold;
   width: 5%;
 }
-
 </style>
