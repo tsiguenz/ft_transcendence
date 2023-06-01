@@ -1,6 +1,6 @@
 <template>
   <v-card class="borderR">
-    <v-btn :class="`${showFriends == true ? 'activebtn' : 'inactivebtn'}`"  @click="$emit('toggleFriendsView')"><v-avatar rounded="0" size="25px">
+    <v-btn :class="`${showFriends === true ? 'activebtn' : 'inactivebtn'}`"  @click="$emit('toggleFriendsView')"><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
             src="/assets/icons/friends.png"
@@ -8,7 +8,7 @@
         >My friends</v-btn>
   </v-card>
   <v-card class="borderR">
-    <v-btn  @click="$emit('togglePublicChannelView')"><v-avatar rounded="0" size="25px">
+    <v-btn  :class="`${showPublicChannel === true ? 'activebtn' : 'inactivebtn'}`" @click="$emit('togglePublicChannelView')"><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
             src="/assets/icons/friends.png"
@@ -19,7 +19,7 @@
     <v-list class="soc">
       <p class="titleMessages">MESSAGES</p>
       <v-list-item
-      :class="{'activeR': chatroom.id === activeRoomId && !showFriends, 'inactiveR': chatroom.id !== activeRoomId && !showFriends}"
+      :class="{'activeR': chatroom.id === activeRoomId && !showFriends && !showPublicChannel, 'inactiveR': chatroom.id !== activeRoomId && !showFriends}"
         v-for="chatroom in chatrooms"
         :key="chatroom.id"
         :title="chatroom.name"
@@ -61,7 +61,7 @@ export default {
     NewChatroomDialog,
     JoinChatroomDialog
   },
-  props: ['id', 'showFriends'],
+  props: ['id', 'showFriends', 'showPublicChannel'],
   emits: ['join', 'toggleChatView', 'toggleFriendsView', 'togglePublicChannelView'],
   computed: {
     ...mapStores(useChatStore, useSessionStore),

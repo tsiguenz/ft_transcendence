@@ -5,6 +5,8 @@
         <Chatrooms
           :id="currentChatroomId"
           :showFriends="showFriends"
+          :showPublicChannel="showPublicChannel"
+          :showPrivateChannel="showPrivateChannel"
           @join="joinChatroom"
           @toggleFriendsView="toggleFriendsView"
           @toggleChatView="toggleChatView"

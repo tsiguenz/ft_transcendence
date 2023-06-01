@@ -1,5 +1,14 @@
 <template>
-  <v-table class="friends" density="compact">
+            <v-table  v-if="friends.length === 0" class="friends" density="compact">
+              <h2>Friends</h2>
+              <v-col col="10">
+                <v-list-item-content class="noroom">
+                  <h3> :( </h3>
+                  <h3> Oops nothing here </h3>
+                </v-list-item-content>
+              </v-col>
+            </v-table>
+  <v-table v-else class="friends" density="compact">
     <thead>
       <tr class="cust-tr">
         <th class="cust-th">Nickname</th>

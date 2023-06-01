@@ -14,12 +14,22 @@
                 class="overflow-y-auto fill-height"
                 height="500"
               >
+              <template v-if="chatrooms.length === 0">
+            <v-row no-gutters>
+              <v-col col="10">
+                <v-list-item-content class="noroom">
+                  <h3> :( </h3>
+                  <h3> No chatrooms available </h3>
+                </v-list-item-content>
+              </v-col>
+            </v-row>
+            </template>
+            <template v-else>
           <v-list subheader>
             <v-list-item-group v-model="activeChat">
             <template
               v-for="chatroom in chatrooms"
               :key="chatroom.id"
-              
             >
             <v-list-item class="rooms"  :value="chatroom.name">
             <v-row no-gutters>
@@ -67,13 +77,15 @@
       </v-col>
     </v-row>
   </v-list-item>
+            </template>
           <v-divider
                   class="my-0 divider"
                 />
 
-            </template>
+            
           </v-list-item-group>
           </v-list>
+        </template>
           </v-responsive>
           </v-col>
           </v-row>
@@ -154,7 +166,14 @@ export default {
 
 .joinbtn{
   background: var(--light-purple) !important;
+}
 
+.noroom{
+  height: 500px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 </style>
