@@ -1,18 +1,21 @@
 <template>
-  <v-container v-if="isInChooseMode()" class="v-container">
-    <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
-    <v-btn class="pa-2 ma-2" @click="gameStatus = 1">Custom game</v-btn>
-  </v-container>
+  <ChooseGameMode
+    v-if="isInChooseMode()"
+    @queue-ranked="queueRanked"
+    @change-status-to-in-menu="gameStatus = 1"
+  />
 
+  <CustomGameMenu v-if="isInMenu()" @create-custom-room="createCustomRoom" />
+
+  <!--
   <v-container v-if="isInMenu()" class="v-container">
-    <!--
       <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
-      -->
     <p>Some options</p>
     <v-btn class="pa-2 ma-2" @click="createCustomRoom"
       >Create custom game</v-btn
     >
   </v-container>
+      -->
 
   <v-container v-if="isInQueue()" class="game-container">
     <p>Waiting for an opponent</p>
@@ -30,8 +33,15 @@
 <script>
 import { GAME_SOCKET_URL } from '../constants';
 import SocketioService from '../services/socketio.service';
+import ChooseGameMode from '../components/ChooseGameMode.vue';
+import CustomGameMenu from '../components/CustomGameMenu.vue';
 import * as constants from '@/constants';
+
 export default {
+  components: {
+    ChooseGameMode,
+    CustomGameMenu
+  },
   data() {
     return {
       socketioGame: new SocketioService(GAME_SOCKET_URL),
@@ -43,7 +53,6 @@ export default {
       map: null,
       score: null,
       winnerId: null,
-      gameId: null,
       gameStatus: null
     };
   },
@@ -114,7 +123,6 @@ export default {
     initCanvas() {
       this.canvas = document.getElementById('canvas');
       this.ctx = this.canvas.getContext('2d');
-      console.log(this.ctx);
     },
     subscribeGameLoop() {
       this.socketioGame.subscribe('gameLoop', (datas) => {

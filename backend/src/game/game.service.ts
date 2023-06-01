@@ -40,7 +40,7 @@ export class GameService {
     this.moveBall(ball);
     this.movePad(pad1);
     this.movePad(pad2);
-    if (this.isGameEnded(score, 3)) return await this.stopGame(rooms, roomId);
+    if (this.isGameEnded(score)) return await this.stopGame(rooms, roomId);
     return null;
   }
 
@@ -294,9 +294,10 @@ export class GameService {
     return room.id;
   }
 
-  isGameEnded(score: Score, maxScore: number): boolean {
+  isGameEnded(score: Score): boolean {
     return (
-      score.player1.points === maxScore || score.player2.points === maxScore
+      score.player1.points === score.scoreLimit ||
+      score.player2.points === score.scoreLimit
     );
   }
 
@@ -318,13 +319,13 @@ export class GameService {
       speed: map.height / 100
     };
     const ball = {
-      x: map.width / 2,
-      y: map.height / 2,
+      x: null,
+      y: null,
       radius: map.width / 100,
       defaultBallSpeed: map.width / 300,
-      speed: map.width / 300,
-      dx: 1,
-      dy: 1
+      speed: null,
+      dx: null,
+      dy: null
     };
     const pad1 = {
       x: map.padOffset,
@@ -343,9 +344,11 @@ export class GameService {
       dy: 0
     };
     const score = {
+      scoreLimit: 3,
       player1: { id: room.players[0], points: 0 },
       player2: { id: undefined, points: 0 }
     };
+    this.resetBall(ball, map);
     room.datas = {
       map: map,
       padInfos: padInfos,

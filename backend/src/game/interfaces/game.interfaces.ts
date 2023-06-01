@@ -31,6 +31,7 @@ export interface PadInfos {
 }
 
 export interface Score {
+  scoreLimit: number;
   player1: { id: string; points: number };
   player2: { id: string; points: number };
 }
