@@ -57,7 +57,7 @@ export default {
       score: null,
       winnerId: null,
       gameId: null,
-      gameStatus: constants.GAME_STATUS.IN_CHOOSE_MODE
+      gameStatus: null
     };
   },
   mounted() {
@@ -68,6 +68,10 @@ export default {
       this.subscribeGameLoop();
       this.runGame();
     });
+    if (this.$route.params.id) {
+      const gameId = this.$route.params.id;
+      this.joinCustomGame(gameId);
+    } else this.gameStatus = constants.GAME_STATUS.IN_CHOOSE_MODE;
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
@@ -87,11 +91,11 @@ export default {
       this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
-    joinCustomGame() {
+    joinCustomGame(gameId) {
+      this.subscribeRoomNotFound();
       this.subscribeGameLoop();
       this.subscribeStartGame();
-      this.socketioGame.send('joinCustomRoom', this.gameId);
-      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
+      this.socketioGame.send('joinCustomRoom', gameId);
     },
     runGame() {
       this.socketioGame.subscribe('gameOver', (res) => {
@@ -143,6 +147,12 @@ export default {
         this.map = datas.map;
         this.score = datas.score;
         this.runGame();
+      });
+    },
+    subscribeRoomNotFound() {
+      this.socketioGame.subscribe('roomNotFound', () => {
+        this.gameStatus = constants.GAME_STATUS.IN_CHOOSE_MODE;
+        this.$router.push({ name: 'Game' });
       });
     },
     draw() {
@@ -220,9 +230,8 @@ export default {
 </script>
 
 <style scoped>
-/* idk how it works but it works */
 div {
-  height: 70%;
+  height: 50%;
   width: 50%;
   margin: 0 auto;
   border: 3px solid var(--light);

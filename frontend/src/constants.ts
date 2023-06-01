@@ -6,6 +6,7 @@ export const AVATARS_URL = `${BACKEND_URL}/avatars`;
 export const CHAT_SOCKET_URL = `${BACKEND_URL}/chat`;
 export const STATUS_SOCKET_URL = `${BACKEND_URL}/status`;
 export const GAME_SOCKET_URL = `${BACKEND_URL}/game`;
+export const FRONTEND_GAME_URL = `${FRONTEND_URL}/game`;
 export const UNAUTHENTICATED_ROUTES = [
   '/signin',
   '/signup',

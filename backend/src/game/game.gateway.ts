@@ -10,7 +10,7 @@ import { Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
-import { Room, GameDatas } from './interfaces/game.interfaces';
+import { Room } from './interfaces/game.interfaces';
 
 @WebSocketGateway({ namespace: 'game', cors: { origin: '*' } })
 export class GameGateway {
@@ -92,7 +92,7 @@ export class GameGateway {
     const room = this.rooms.get(joinableRoom);
     if (!res) this.server.in(joinableRoom).emit('gameLoop', room.datas);
     else {
-      this.logger.log(`Ranked game is over: ${joinableRoom}`);
+      this.logger.log(`Game is over: ${joinableRoom}`);
       this.server.in(joinableRoom).emit('gameOver', { score: res });
     }
   }
@@ -128,8 +128,10 @@ export class GameGateway {
       return;
     }
     const room = this.rooms.get(roomId);
-    if (!room) return;
-    if (room.players.length === 2) return;
+    if (!room || room.isStarted || room.datas.isRanked) {
+      client.emit('roomNotFound');
+      return;
+    }
     room.players.push(userId);
     room.datas.score.player2.id = userId;
     client.join(roomId);
