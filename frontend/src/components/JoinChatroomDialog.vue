@@ -17,32 +17,26 @@
               <template v-if="chatrooms.length === 0">
             <v-row no-gutters>
               <v-col col="10">
-                <v-list-item-content class="noroom">
+                <v-list class="noroom">
                   <h3> :( </h3>
                   <h3> No chatrooms available </h3>
-                </v-list-item-content>
+                </v-list>
               </v-col>
             </v-row>
             </template>
             <template v-else>
           <v-list subheader>
-            <v-list-item-group v-model="activeChat">
-            <template
+            <v-list-item
               v-for="chatroom in chatrooms"
-              :key="chatroom.id"
-            >
-            <v-list-item class="rooms"  :value="chatroom.name">
+              
+              :key="chatroom.id" class="rooms"  :value="chatroom.name">
             <v-row no-gutters>
               <v-col cols="1">
-                <v-list-item-avatar>
                   <v-icon>{{ chatroom.type === 'PROTECTED' ? 'mdi-lock' : 'mdi-earth' }}</v-icon>
-                </v-list-item-avatar>
               </v-col>
 
               <v-col cols="7">
-                <v-list-item-content>
                   <v-list-item-title> {{ chatroom.name }} </v-list-item-title>
-                </v-list-item-content>
               </v-col>
 
               <v-col cols="3">
@@ -77,13 +71,9 @@
       </v-col>
     </v-row>
   </v-list-item>
-            </template>
           <v-divider
                   class="my-0 divider"
                 />
-
-            
-          </v-list-item-group>
           </v-list>
         </template>
           </v-responsive>
