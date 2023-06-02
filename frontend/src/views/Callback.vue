@@ -1,4 +1,6 @@
 <template>
+        <v-sheet class="sheet pa-5 mt-5">
+          <h4 class="font">Choose your nickname</h4>
   <v-form v-if="printForm">
     <v-text-field
       v-model="nickname"
@@ -9,8 +11,9 @@
       required
       @keydown.enter.prevent="signin42"
     ></v-text-field>
-    <v-btn @click="signin42">Create account</v-btn>
+    <v-btn @click="signin42" class="log">Create account</v-btn>
   </v-form>
+        </v-sheet>
 </template>
 
 <script>
@@ -85,3 +88,18 @@ export default {
   }
 };
 </script>
+<style>
+.font {
+  font-family: 'Poppins', serif;
+}
+.close {
+  background: var(--dark-purple);
+}
+.sheet {
+background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
+}
+</style>
