@@ -7,16 +7,6 @@
 
   <CustomGameMenu v-if="isInMenu()" @create-custom-room="createCustomRoom" />
 
-  <!--
-  <v-container v-if="isInMenu()" class="v-container">
-      <v-text-field type="text" v-model="custom.ballSpeed"> </v-text-field>
-    <p>Some options</p>
-    <v-btn class="pa-2 ma-2" @click="createCustomRoom"
-      >Create custom game</v-btn
-    >
-  </v-container>
-      -->
-
   <v-container v-if="isInQueue()" class="game-container">
     <p>Waiting for an opponent</p>
   </v-container>
@@ -36,6 +26,7 @@ import SocketioService from '../services/socketio.service';
 import ChooseGameMode from '../components/ChooseGameMode.vue';
 import CustomGameMenu from '../components/CustomGameMenu.vue';
 import * as constants from '@/constants';
+import swal from 'sweetalert';
 
 export default {
   components: {
@@ -147,6 +138,7 @@ export default {
     },
     subscribeRoomNotFound() {
       this.socketioGame.subscribe('roomNotFound', () => {
+        swal('Room not found', 'This room does not exist', 'error');
         this.gameStatus = constants.GAME_STATUS.IN_CHOOSE_MODE;
         this.$router.push({ name: 'Game' });
       });
@@ -231,8 +223,12 @@ export default {
 
 <style scoped>
 #canvas {
-  height: 100%;
-  width: 100%;
+  /*
+  original size of the canvas
+  but it's not responsive
+  */
+  height: 525px;
+  width: 858px;
   background-color: var(--dark-alt);
   border-radius: 30px;
   border: 3px solid var(--light);

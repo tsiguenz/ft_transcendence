@@ -1,23 +1,30 @@
 <template>
-  <v-container>
+  <v-container v-if="!isInQueue">
     <p>Some options</p>
     <v-btn class="pa-2 ma-2" @click="createCustomRoom"
       >Create custom game</v-btn
     >
   </v-container>
+  <WaitingGame v-if="isInQueue" :is-ranked="false" />
 </template>
 
 <script>
 import { GAME_SOCKET_URL } from '../constants';
 import SocketioService from '../services/socketio.service';
 import swal from 'sweetalert';
+import WaitingGame from '../components/WaitingGame.vue';
 
 export default {
+  components: {
+    WaitingGame
+  },
   emits: ['create-custom-room'],
   data() {
     return {
       socketioGame: null,
-      inGameView: false
+      inGameView: false,
+      alreadyInGame: false,
+      isInQueue: false
     };
   },
   mounted() {
@@ -28,7 +35,7 @@ export default {
       this.socketioGame = new SocketioService(GAME_SOCKET_URL);
       this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
       this.socketioGame.subscribe('alreadyInGame', () => {
-        swal('You are already in game');
+        this.alreadyInGame = true;
       });
     }
   },
@@ -39,9 +46,11 @@ export default {
   },
   methods: {
     createCustomRoom() {
+      if (this.alreadyInGame) return swal('You are already in game!');
       if (!this.inGameView) {
+        this.isInQueue = true;
+        this.subscribeStartGame();
         this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());
-        this.$router.push({ name: 'Game' });
       } else {
         this.$emit('create-custom-room');
       }
@@ -55,6 +64,11 @@ export default {
         ballRadius: 1,
         ballSpeed: 2
       };
+    },
+    subscribeStartGame() {
+      this.socketioGame.subscribe('startGame', () => {
+        this.$router.push('/game');
+      });
     }
   }
 };
