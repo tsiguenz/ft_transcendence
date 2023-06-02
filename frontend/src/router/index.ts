@@ -16,16 +16,6 @@ const router = createRouter({
       component: () => import('../views/Chat.vue')
     },
     {
-      path: '/signin',
-      name: 'Signin',
-      component: () => import('../views/Signin.vue')
-    },
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: () => import('../views/Signup.vue')
-    },
-    {
       path: '/game',
       name: 'Game',
       component: () => import('../views/Game.vue')
@@ -35,11 +25,6 @@ const router = createRouter({
       name: 'Leaderboard',
       component: () => import('../views/Leaderboard.vue')
     },
-    // {
-    //   path: '/friends',
-    //   name: 'Friends',
-    //   component: () => import('../views/Friends.vue')
-    // },
     {
       path: '/profile',
       name: 'Profile',

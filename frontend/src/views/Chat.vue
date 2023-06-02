@@ -14,7 +14,7 @@
         />
       </v-col>
       <v-col cols="6">
-        <template v-if="showPrivateChannel">
+        <template v-if="showPrivateChannel && currentChatroomId">
           <Chat
             :id="currentChatroomId"
             title="Chat"
