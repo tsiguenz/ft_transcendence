@@ -13,21 +13,21 @@ export default {
   },
   data() {
     return {
-			nickname: '',
-			isMounted: false
-		};
+      nickname: '',
+      isMounted: false
+    };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
-	async mounted() {
-		await this.getNickname();
-	},
-	methods: {
-		async getNickname() {
-		this.nickname = await this.sessionStore.nickname;
-		this.isMounted = true;
-		}
-	}
+  async mounted() {
+    await this.getNickname();
+  },
+  methods: {
+    async getNickname() {
+      this.nickname = await this.sessionStore.nickname;
+      this.isMounted = true;
+    }
+  }
 };
 </script>

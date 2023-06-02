@@ -1,7 +1,7 @@
 <template>
   <v-container flex>
     <v-row class="align-center">
-						<v-col>
+      <v-col>
         <v-sheet class="mt-5" color="transparent">
           <v-row justify="center">
             <ProfilePrintAvatar
@@ -14,9 +14,9 @@
           <v-row class="justify-center">
             <h2 class="font ma-3">{{ user.nickname }}</h2>
           </v-row>
-				</v-sheet>
-			</v-col>
-		</v-row>
+        </v-sheet>
+      </v-col>
+    </v-row>
     <v-row class="align-top">
       <v-col cols="3">
         <v-sheet class="position sheet pa-3">
@@ -28,40 +28,47 @@
       </v-col>
       <v-col cols="6">
         <v-sheet color="transparent">
-            <ProfileHistoryGames v-if="userIsMounted" :gamesWin="gameStats.gamesWin" :gamesLose="gameStats.gamesLose" :users="users" />
+          <ProfileHistoryGames
+            v-if="userIsMounted"
+            :gamesWin="gameStats.gamesWin"
+            :gamesLose="gameStats.gamesLose"
+            :users="users"
+          />
         </v-sheet>
       </v-col>
       <v-col cols="3" align="center">
-				<div class="position">
-        <v-sheet class="sheet pa-3">
-          <p class="ma-10">
-            <ProfileLastConnection v-if="userIsMounted && nickname !== sessionStore.nickname" :user="user" />
-          </p>
-          <v-row class="justify-center"
-            ><h2 class="font">{{ gamesWin }}</h2></v-row
+        <div class="position">
+          <v-sheet class="sheet pa-3">
+            <p class="ma-10">
+              <ProfileLastConnection
+                v-if="userIsMounted && nickname !== sessionStore.nickname"
+                :user="user"
+              />
+            </p>
+            <v-row class="justify-center"
+              ><h2 class="font">{{ gamesWin }}</h2></v-row
+            >
+            <v-row class="justify-center mb-5"
+              ><p class="font">Game won</p></v-row
+            >
+            <v-row class="justify-center"
+              ><h2 class="font">{{ gamesPlayed }}</h2></v-row
+            >
+            <v-row class="justify-center mb-5"
+              ><p class="font">Game played</p></v-row
+            >
+          </v-sheet>
+          <v-btn
+            v-if="nickname === sessionStore.nickname"
+            class="ma-5 log"
+            to="/settings"
+            >Settings</v-btn
           >
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game won</p></v-row
-          >
-          <v-row class="justify-center"
-            ><h2 class="font">{{ gamesPlayed }}</h2></v-row
-          >
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game played</p></v-row
-          >
-        </v-sheet>
-        <v-btn
-          v-if="nickname === sessionStore.nickname"
-          class="ma-5 log"
-          to="/settings"
-          >Settings</v-btn
-        >
-				</div>
+        </div>
       </v-col>
     </v-row>
   </v-container>
-				<v-sheet v-if="isPageLongerThanWindow" height="10vh" class="blur">
-				</v-sheet>
+  <v-sheet v-if="isPageLongerThanWindow" height="10vh" class="blur"> </v-sheet>
 </template>
 
 <script>
@@ -89,12 +96,12 @@ export default {
   data() {
     return {
       user: {},
-			users: [],
+      users: [],
       userIsMounted: false,
       gameStats: {},
       gamesWin: 0,
       gamesPlayed: 0,
-			isPageLongerThanWindow: false
+      isPageLongerThanWindow: false
     };
   },
   computed: {
@@ -102,10 +109,10 @@ export default {
   },
   async mounted() {
     await this.getProfile();
-		this.checkIfPageIsLongerThanWindow();
+    this.checkIfPageIsLongerThanWindow();
     window.addEventListener('resize', this.checkIfPageIsLongerThanWindow);
   },
-beforeDestroy() {
+  beforeDestroy() {
     window.removeEventListener('resize', this.checkIfPageIsLongerThanWindow);
   },
   methods: {
@@ -153,23 +160,23 @@ beforeDestroy() {
   font-family: 'Poppins', serif;
 }
 .sheet {
-background-color: var(--dark-purple);
+  background-color: var(--dark-purple);
   border-style: solid;
   border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple) !important;
   border-color: var(--light-purple) !important;
 }
 .position {
-	position: sticky;
-	top:1vh;
+  position: sticky;
+  top: 1vh;
 }
 .blur {
-background: -webkit-linear-gradient(
-rgba(96, 15, 223, 0) 0%,
-       rgba(96, 15, 223, 1) 100%
-    ); 
-	position: -webkit-sticky;
-	position: sticky;
-	bottom: 0;
+  background: -webkit-linear-gradient(
+    rgba(96, 15, 223, 0) 0%,
+    rgba(96, 15, 223, 1) 100%
+  );
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
 }
 </style>

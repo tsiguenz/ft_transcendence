@@ -340,7 +340,7 @@ export default {
   background: var(--dark-purple);
 }
 .sheet {
-background-color: var(--dark-purple);
+  background-color: var(--dark-purple);
   border-style: solid;
   border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple) !important;

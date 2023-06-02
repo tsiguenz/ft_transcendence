@@ -4,10 +4,13 @@
     <v-container flex>
       <div v-if="isMounted" v-for="index in games">
         <v-divider />
-        <v-row height="500px" class="justify-space-between" align="center">
+        <v-row class="justify-space-between" align="center">
           <v-sheet class="ma-4" color="transparent">
-            <p>Score: {{ index.winnerScore }} - {{ index.loserScore }} </p>
-            <p>Opponent {{ users[index.winnerId].nickname }} - {{ users[index.loserId].nickname }}</p>
+            <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+            <p>
+              Opponent {{ users[index.winnerId].nickname }} -
+              {{ users[index.loserId].nickname }}
+            </p>
           </v-sheet>
           <v-sheet color="transparent">
             <p>{{ setDuration(index.duration) }}</p>
@@ -24,26 +27,26 @@ import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 
 export default {
-props: ["gamesWin", "gamesLose", "users"],
+  props: ['gamesWin', 'gamesLose', 'users'],
   data() {
     return {
       historyGames: [],
       games: [],
-			isMounted: false
+      isMounted: false
     };
   },
   async mounted() {
-		await this.getGames();
+    await this.getGames();
   },
-  methods: {	
-	getGames() {
-		this.games.push(...this.gamesWin);
-		this.games.push(...this.gamesLose);
-this.isMounted = true;
-	},
-		setDuration(dateToConvert) {
-return lib.convertDate(dateToConvert);
-		}
+  methods: {
+    getGames() {
+      this.games.push(...this.gamesWin);
+      this.games.push(...this.gamesLose);
+      this.isMounted = true;
+    },
+    setDuration(dateToConvert) {
+      return lib.convertDate(dateToConvert);
+    }
   }
 };
 </script>

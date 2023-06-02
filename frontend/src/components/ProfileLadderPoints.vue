@@ -1,7 +1,7 @@
 <template>
   <v-container flex class="font">
     <v-row justify="center">
-      <h1>{{ ladderPoints }}</h1>
+      <h1>{{ user.ladderPoints }}</h1>
     </v-row>
     <v-row justify="center">
       <h3>Ladder Points</h3>
@@ -14,11 +14,6 @@ export default {
   props: ['user'],
   data() {
     return {};
-  },
-  computed: {
-    ladderPoints() {
-      return this.user.ladderPoints;
-    }
   }
 };
 </script>

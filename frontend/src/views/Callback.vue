@@ -1,19 +1,19 @@
 <template>
-        <v-sheet class="sheet pa-5 mt-5">
-          <h4 class="font">Choose your nickname</h4>
-  <v-form v-if="printForm">
-    <v-text-field
-      v-model="nickname"
-      class="mb-5"
-      label="Nickname"
-      variant="outlined"
-      autocomplete="username"
-      required
-      @keydown.enter.prevent="signin42"
-    ></v-text-field>
-    <v-btn @click="signin42" class="log">Create account</v-btn>
-  </v-form>
-        </v-sheet>
+  <v-sheet class="sheet pa-5 mt-5">
+    <h4 class="font">Choose your nickname</h4>
+    <v-form v-if="printForm">
+      <v-text-field
+        v-model="nickname"
+        class="mb-5"
+        label="Nickname"
+        variant="outlined"
+        autocomplete="username"
+        required
+        @keydown.enter.prevent="signin42"
+      ></v-text-field>
+      <v-btn @click="signin42" class="log">Create account</v-btn>
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
@@ -82,7 +82,10 @@ export default {
         this.$root.connectAndSubscribeStatusSocket();
         this.$router.push('/home');
       } catch (error) {
-        swal({ icon: 'error', text: lib.formatError(error.response.data.message) });
+        swal({
+          icon: 'error',
+          text: lib.formatError(error.response.data.message)
+        });
       }
     }
   }
@@ -96,7 +99,7 @@ export default {
   background: var(--dark-purple);
 }
 .sheet {
-background-color: var(--dark-purple);
+  background-color: var(--dark-purple);
   border-style: solid;
   border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple) !important;
