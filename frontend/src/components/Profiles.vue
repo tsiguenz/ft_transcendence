@@ -35,7 +35,7 @@
 				<div class="position">
         <v-sheet class="sheet pa-3">
           <p class="ma-10">
-            <ProfileLastConnection v-if="userIsMounted && currentNickname !== sessionStore.nickname" :user="user" />
+            <ProfileLastConnection v-if="userIsMounted && nickname !== sessionStore.nickname" :user="user" />
           </p>
           <v-row class="justify-center"
             ><h2 class="font">{{ gamesWin }}</h2></v-row
@@ -51,7 +51,7 @@
           >
         </v-sheet>
         <v-btn
-          v-if="currentNickname === sessionStore.nickname"
+          v-if="nickname === sessionStore.nickname"
           class="ma-5 log"
           to="/settings"
           >Settings</v-btn
@@ -60,7 +60,7 @@
       </v-col>
     </v-row>
   </v-container>
-				<v-sheet height="100px" class="blur">
+				<v-sheet v-if="isPageLongerThanWindow" height="10vh" class="blur">
 				</v-sheet>
 </template>
 
@@ -91,35 +91,31 @@ export default {
       user: {},
 			users: [],
       userIsMounted: false,
-      currentNickname: '',
       gameStats: {},
       gamesWin: 0,
-      gamesPlayed: 0
+      gamesPlayed: 0,
+			isPageLongerThanWindow: false
     };
   },
   computed: {
     ...mapStores(useSessionStore)
   },
-  watch: {
-    $route(to, from) {
-      if (to.path !== '/profile' + this.nickname)
-        this.currentNickname = this.sessionStore.nickname;
-this.isMounted = false;
-      this.getProfile();
-    }
-  },
   async mounted() {
     await this.getProfile();
+		this.checkIfPageIsLongerThanWindow();
+    window.addEventListener('resize', this.checkIfPageIsLongerThanWindow);
+  },
+beforeDestroy() {
+    window.removeEventListener('resize', this.checkIfPageIsLongerThanWindow);
   },
   methods: {
     async getProfile() {
-      if (!this.currentNickname) this.currentNickname = this.nickname;
       try {
         const responseUser = await axios.get(
-          constants.API_URL + `/users/${this.currentNickname}`
+          constants.API_URL + `/users/${this.nickname}`
         );
         const responseGame = await axios.get(
-          constants.API_URL + `/users/${this.currentNickname}/games`
+          constants.API_URL + `/users/${this.nickname}/games`
         );
 
         const jwt = this.$cookie.getCookie('jwt');
@@ -142,6 +138,11 @@ this.isMounted = false;
         });
         this.$router.push('/logout');
       }
+    },
+    checkIfPageIsLongerThanWindow() {
+      const pageHeight = document.documentElement.scrollHeight;
+      const windowHeight = window.innerHeight;
+      this.isPageLongerThanWindow = pageHeight > windowHeight;
     }
   }
 };
@@ -150,11 +151,6 @@ this.isMounted = false;
 <style>
 .font {
   font-family: 'Poppins', serif;
-}
-.oldsheet {
-  background: var(--dark-purple);
-  border-radius: 30px;
-  border: 3px solid var(--light);
 }
 .sheet {
 background-color: var(--dark-purple);

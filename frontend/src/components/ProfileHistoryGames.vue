@@ -32,13 +32,6 @@ props: ["gamesWin", "gamesLose", "users"],
 			isMounted: false
     };
   },
-  watch: {
-		gamesWin: function() {
-			this.games = [];
-			this.isMounted = false;
-			this.getGames();
-		}
-  },
   async mounted() {
 		await this.getGames();
   },

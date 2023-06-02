@@ -48,7 +48,7 @@
           ></v-img></v-avatar
         ><span class="text">LeaderBoard</span></router-link
       >
-      <router-link v-if="isLog()" class="button" :to="'/Profile/' + user"
+      <router-link v-if="isLog()" class="button" to="/profile/me"
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
