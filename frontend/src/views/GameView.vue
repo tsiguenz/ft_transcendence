@@ -7,17 +7,13 @@
 
   <CustomGameMenu v-if="isInMenu()" @create-custom-room="createCustomRoom" />
 
-  <v-container v-if="isInQueue()" class="game-container">
-    <p>Waiting for an opponent</p>
-  </v-container>
+  <WaitingGame v-if="isInQueue()" :is-ranked="isRanked" />
 
   <v-container v-show="isInGame()">
     <canvas id="canvas" height="525" width="858"></canvas>
   </v-container>
 
-  <v-container v-if="isInScoreScreen()" class="v-container">
-    <p>The winner is {{ winnerId }}</p>
-  </v-container>
+  <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId" />
 </template>
 
 <script>
@@ -25,14 +21,19 @@ import { GAME_SOCKET_URL } from '../constants';
 import SocketioService from '../services/socketio.service';
 import ChooseGameMode from '../components/ChooseGameMode.vue';
 import CustomGameMenu from '../components/CustomGameMenu.vue';
+import WaitingGame from '../components/WaitingGame.vue';
+import ScoreScreen from '../components/ScoreScreen.vue';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
 
 export default {
   components: {
     ChooseGameMode,
-    CustomGameMenu
+    CustomGameMenu,
+    WaitingGame,
+    ScoreScreen
   },
+  inject: ['sessionStore'],
   data() {
     return {
       socketioGame: new SocketioService(GAME_SOCKET_URL),
@@ -44,7 +45,8 @@ export default {
       map: null,
       score: null,
       winnerId: null,
-      gameStatus: null
+      gameStatus: null,
+      isRanked: false
     };
   },
   mounted() {
@@ -67,12 +69,14 @@ export default {
   },
   methods: {
     queueRanked() {
+      this.isRanked = true;
       this.subscribeGameLoop();
       this.subscribeStartGame();
       this.socketioGame.send('connectToRoom');
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
     createCustomRoom() {
+      this.isRanked = false;
       this.subscribeGameLoop();
       this.subscribeStartGame();
       this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());

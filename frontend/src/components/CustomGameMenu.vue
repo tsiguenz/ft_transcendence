@@ -5,7 +5,7 @@
       >Create custom game</v-btn
     >
   </v-container>
-  <WaitingGame v-if="isInQueue" :is-ranked="false" />
+  <WaitingGame v-if="isInQueue" />
 </template>
 
 <script>

@@ -44,10 +44,11 @@ export class GameGateway {
   handleDisconnect(@ConnectedSocket() client: Socket) {
     const userId = client['decoded'].sub;
     const roomId = this.gameService.getRoomIdByUserId(userId, this.rooms);
-    if (!roomId) return;
-    if (!this.rooms.get(roomId).isStarted) this.rooms.delete(roomId);
-    client.leave(roomId);
-    this.logger.log(`Client leave room: ${roomId}`);
+    if (roomId) {
+      if (!this.rooms.get(roomId).isStarted) this.rooms.delete(roomId);
+      this.logger.log(`Client leave room: ${roomId}`);
+      client.leave(roomId);
+    }
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
