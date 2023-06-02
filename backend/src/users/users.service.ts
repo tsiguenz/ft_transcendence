@@ -134,6 +134,7 @@ export class UsersService {
         friendId: true
       }
     });
+    console.log(friendsId);
     const friends = await this.prisma.user.findMany({
       where: {
         id: {

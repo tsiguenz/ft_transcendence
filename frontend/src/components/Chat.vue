@@ -1,6 +1,5 @@
 <template>
-  <v-list ref="chat"  class="overflow-y-auto window">
-    <v-toolbar class="roomName">
+  <v-toolbar class="roomName">
       <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <EditChatroomDialog
@@ -10,6 +9,8 @@
       />
       <v-btn v-if="id && chatStore.hasJoinedRoom" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
     </v-toolbar>
+  <v-list ref="chat"  class="overflow-y-auto window chating">
+    
     <div v-for="item in messages" :key="item.sentAt">
       <p class="text-right ma-2">
         <a
@@ -28,7 +29,6 @@
     </div>
   </v-list>
   <v-text-field
-  v-if="id && chatStore.hasJoinedRoom"
     v-model="newMessage"
     label="Message"
     @keyup.enter="sendMessage"
@@ -157,4 +157,8 @@ export default {
 
 }
 
+.chating{
+  height:900px;
+  overflow-y:auto;
+}
 </style>

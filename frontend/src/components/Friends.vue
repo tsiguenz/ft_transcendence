@@ -29,8 +29,6 @@
 </template>
 
 <script>
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
 import * as constants from '@/constants.ts';
 import axios from 'axios';
 import swall from 'sweetalert';
@@ -54,9 +52,7 @@ export default {
 
     };
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
+  
   watch: {
     async renderPage() {
       await this.getFriends();
@@ -88,6 +84,7 @@ export default {
         this.friends.forEach((friend) => {
           friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
         });
+        console.log(this.friends);
       } catch (error) {
         swall({
           title: 'Error',

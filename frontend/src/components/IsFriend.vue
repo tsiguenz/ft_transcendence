@@ -95,6 +95,7 @@ export default {
     },
     async addFriend(friendname) {
       try {
+        console.log(friendname)
         const jwt = this.$cookie.getCookie('jwt');
         await axios.post(
           constants.API_URL +

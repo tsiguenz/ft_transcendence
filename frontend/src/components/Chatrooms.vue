@@ -34,9 +34,7 @@
     <!-- <v-col cols="8" class="pa-0">
       <JoinChatroomDialog @join="pushChatroom" />
     </v-col> -->
-    <v-col cols="4" class="pa-0">
-      <NewChatroomDialog @create="pushChatroom" />
-    </v-col>
+     <NewChatroomDialog @create="pushChatroom" />
   </v-row>
 </v-list>
 </template>
@@ -157,4 +155,6 @@ export default {
 .v-list-item.activeR{
   background-color: var(--light-purple)  !important;
 }
+
+
 </style>
