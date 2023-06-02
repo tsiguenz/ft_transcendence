@@ -4,7 +4,7 @@
     <v-container flex>
       <div v-if="isMounted" v-for="index in games">
         <v-divider />
-        <v-row class="justify-space-between" align="center">
+        <v-row height="500px" class="justify-space-between" align="center">
           <v-sheet class="ma-4" color="transparent">
             <p>Score: {{ index.winnerScore }} - {{ index.loserScore }} </p>
             <p>Opponent {{ users[index.winnerId].nickname }} - {{ users[index.loserId].nickname }}</p>

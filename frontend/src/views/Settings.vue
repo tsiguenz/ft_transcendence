@@ -340,11 +340,11 @@ export default {
   background: var(--dark-purple);
 }
 .sheet {
-  background: var(--dark-purple);
-  border-radius: 30px;
-  border: 3px solid var(--light);
-  text-align: center;
-  height: 100%;
+background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
 }
 .disable-events {
   pointer-events: none;
