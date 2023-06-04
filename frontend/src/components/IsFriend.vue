@@ -1,6 +1,6 @@
 <template>
   <v-btn
-    v-if="getStatusFriend(friendname) && !hover && !isMyProfile(friendname)"
+    v-if="isMyFriend && !hover && !isMyProfile()"
     color="#600FDF"
     size="x-small"
     icon
@@ -8,7 +8,7 @@
     ><img src="/assets/icons/add-friend.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)"
+    v-if="hover && isMyFriend && !isMyProfile()"
     color="#0F0124"
     size="x-small"
     icon
@@ -17,108 +17,82 @@
     ><img src="/assets/icons/trash.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="!getStatusFriend(friendname) && !isMyProfile(friendname)"
+    v-if="!isMyFriend && !isMyProfile()"
     color="#0F0124"
     size="x-small"
     icon
-    @click="addFriend(friendname)"
+    @click="addFriend()"
     ><img src="/assets/icons/add-user.png" :width="20" :height="20"
   /></v-btn>
 </template>
 
 <script>
-import { mapStores } from 'pinia';
 import axios from 'axios';
-import { useSessionStore } from '@/store/session';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
-  props: ['friendname'],
+  inject: ['sessionStore'],
+  props: {
+    friendname: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
-      users: [],
-      friends: [],
+      isMyFriend: false,
       hover: false
     };
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
-  watch: {
-    friends() {
-      this.getFriends();
-    }
-  },
-  async mounted() {
-    await this.getFriends();
+  mounted() {
+    this.setStatusFriend();
   },
   methods: {
-    async getFriends() {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
-        );
-        this.friends = response.data.map((friend) => friend.nickname);
-      } catch (error) {
-        console.log('error');
-      }
-    },
-    async deleteFriend(nickname) {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        await axios.delete(
-          constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
+    async setStatusFriend() {
+      const response = await axios
+        .get(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`)
+        .catch((error) => {
+          console.log(error);
         });
-      }
+      const friends = response.data.map((friend) => friend.nickname);
+      this.isMyFriend = !!friends.includes(this.friendname);
     },
-    async addFriend(friendname) {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        await axios.post(
+    async deleteFriend() {
+      await axios
+        .delete(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${friendname}`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
+            `/users/${this.sessionStore.nickname}/friends/${this.friendname}`
+        )
+        .catch((error) => {
+          swall({
+            title: 'Error',
+            text: formatError(error.response.data.message),
+            icon: 'error',
+            button: 'OK'
+          });
         });
-      }
+      this.isMyFriend = false;
     },
-    getStatusFriend(friendname) {
-      return this.friends.includes(friendname);
+    async addFriend() {
+      await axios
+        .post(
+          constants.API_URL +
+            `/users/${this.sessionStore.nickname}/friends/${this.friendname}`
+        )
+        .catch((error) => {
+          swall({
+            title: 'Error',
+            text: formatError(error.response.data.message),
+            icon: 'error',
+            button: 'OK'
+          });
+        });
+      this.isMyFriend = true;
     },
-    isMyProfile(friendname) {
-      return friendname == this.sessionStore.nickname;
+    isMyProfile() {
+      return this.friendname == this.sessionStore.nickname;
     }
   }
 };
