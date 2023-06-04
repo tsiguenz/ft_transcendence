@@ -125,10 +125,10 @@ export class UsersService {
     return { message: 'Friend deleted' };
   }
 
-  async getFriends(user: object) {
+  async getFriends(userId: string) {
     const friendsId = await this.prisma.friend.findMany({
       where: {
-        userId: user['id']
+        userId: userId
       },
       select: {
         friendId: true
