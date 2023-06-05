@@ -1,6 +1,6 @@
 <template>
   <v-btn
-    v-if="isMyFriend && !hover && !isMyProfile()"
+    v-if="newFriendStatus && !hover"
     color="#600FDF"
     size="x-small"
     icon
@@ -8,7 +8,7 @@
     ><img src="/assets/icons/add-friend.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="hover && isMyFriend && !isMyProfile()"
+    v-if="hover && newFriendStatus"
     color="#0F0124"
     size="x-small"
     icon
@@ -17,7 +17,7 @@
     ><img src="/assets/icons/trash.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="!isMyFriend && !isMyProfile()"
+    v-if="!newFriendStatus"
     color="#0F0124"
     size="x-small"
     icon
@@ -38,27 +38,22 @@ export default {
     friendname: {
       type: String,
       required: true
+    },
+    isFriendAtBegining: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
     return {
-      isMyFriend: false,
+      newFriendStatus: false,
       hover: false
     };
   },
   mounted() {
-    this.setStatusFriend();
+    this.newFriendStatus = this.isFriendAtBegining;
   },
   methods: {
-    async setStatusFriend() {
-      const response = await axios
-        .get(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`)
-        .catch((error) => {
-          console.log(error);
-        });
-      const friends = response.data.map((friend) => friend.nickname);
-      this.isMyFriend = !!friends.includes(this.friendname);
-    },
     async deleteFriend() {
       await axios
         .delete(
@@ -73,7 +68,7 @@ export default {
             button: 'OK'
           });
         });
-      this.isMyFriend = false;
+      this.newFriendStatus = false;
     },
     async addFriend() {
       await axios
@@ -89,10 +84,7 @@ export default {
             button: 'OK'
           });
         });
-      this.isMyFriend = true;
-    },
-    isMyProfile() {
-      return this.friendname == this.sessionStore.nickname;
+      this.newFriendStatus = true;
     }
   }
 };

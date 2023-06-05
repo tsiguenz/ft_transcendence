@@ -34,7 +34,11 @@
         <td class="hgt-td">{{ user.ladderPoints }}</td>
         <td class="hgt-td">{{ userStatus(user) }}</td>
         <td class="hgt-td">
-          <IsFriend :friendname="user.nickname"></IsFriend>
+          <IsFriend
+            v-if="!isMyProfile(user.nickname)"
+            :friendname="user.nickname"
+            :is-friend-at-begining="isFriend(user.nickname)"
+          ></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -59,6 +63,7 @@ export default {
   inject: ['connectedUsersStore', 'sessionStore'],
   data() {
     return {
+      friends: [],
       users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
@@ -83,8 +88,9 @@ export default {
       deep: true
     }
   },
-  async mounted() {
-    await this.getUsers();
+  mounted() {
+    this.getUsers();
+    this.getFriends();
   },
   methods: {
     async getUsers() {
@@ -106,27 +112,19 @@ export default {
         this.$router.push('/logout');
       }
     },
-    async addFriend(friend) {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        await axios.post(
-          constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${friend}`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
+    async getFriends() {
+      const response = await axios
+        .get(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`)
+        .catch((error) => {
+          swall({
+            title: 'Error',
+            text: formatError(error.response.data.message),
+            icon: 'error',
+            button: 'OK'
+          });
+          this.$router.push('/logout');
         });
-      }
+      this.friends = response.data.map((friend) => friend.nickname);
     },
     userStatus(user) {
       return this.connectedUsers.includes(user.id)
@@ -142,6 +140,9 @@ export default {
     },
     getAvatarPath(user) {
       return constants.AVATARS_URL + user.avatarPath;
+    },
+    isFriend(nickname) {
+      return this.friends.includes(nickname);
     },
     isMyProfile(name) {
       return name === this.sessionStore.nickname;
