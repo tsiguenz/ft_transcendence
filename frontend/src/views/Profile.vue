@@ -98,7 +98,6 @@ export default {
     },
     async editProfile() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.put(
           constants.API_URL + `/users/${this.sessionStore.nickname}/profile`,
           {
@@ -108,7 +107,7 @@ export default {
           }
         );
         this.sessionStore.nickname = this.newNickname;
-        if (this.newAvatar) await this.uploadAvatar(jwt);
+        if (this.newAvatar) await this.uploadAvatar();
         swal({
           icon: 'https://cdn3.emoji.gg/emojis/5573-okcat.png',
           text: formatError(response.data.message)
@@ -149,13 +148,8 @@ export default {
       }
     },
     async deleteAccount() {
-      const jwt = this.$cookie.getCookie('jwt');
       try {
-        await axios.delete(constants.API_URL + '/users/' + this.user.nickname, {
-          headers: {
-            Authorization: 'Bearer ' + jwt
-          }
-        });
+        await axios.delete(constants.API_URL + '/users/' + this.user.nickname);
         this.$router.push('/logout');
       } catch (error) {
         swal({
@@ -192,18 +186,12 @@ export default {
       }
       this.newAvatar = avatar;
     },
-    async uploadAvatar(jwt) {
+    async uploadAvatar() {
       const formData = new FormData();
       formData.append('file', this.newAvatar);
       await axios.post(
         constants.API_URL + `/users/${this.sessionStore.nickname}/avatar`,
-        formData,
-        {
-          headers: {
-            Authorization: 'Bearer ' + jwt,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        formData
       );
     }
   }
