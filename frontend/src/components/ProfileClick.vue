@@ -70,12 +70,7 @@ export default {
   methods: {
     async getUsers() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + '/users', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
-          }
-        });
+        const response = await axios.get(constants.API_URL + '/users');
         this.users = response.data;
       } catch (error) {
         swall({
