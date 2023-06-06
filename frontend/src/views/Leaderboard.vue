@@ -88,19 +88,14 @@ export default {
       deep: true
     }
   },
-  mounted() {
-    this.getUsers();
-    this.getFriends();
+  async created() {
+    await this.getUsers();
+    await this.getFriends();
   },
   methods: {
     async getUsers() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + '/users', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
-          }
-        });
+        const response = await axios.get(constants.API_URL + '/users');
         this.users = response.data;
       } catch (error) {
         swall({
@@ -113,18 +108,20 @@ export default {
       }
     },
     async getFriends() {
-      const response = await axios
-        .get(constants.API_URL + `/users/${this.sessionStore.nickname}/friends`)
-        .catch((error) => {
-          swall({
-            title: 'Error',
-            text: formatError(error.response.data.message),
-            icon: 'error',
-            button: 'OK'
-          });
-          this.$router.push('/logout');
+      try {
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
+        );
+        this.friends = response.data.map((friend) => friend.nickname);
+      } catch (error) {
+        swall({
+          title: 'Error',
+          text: formatError(error.response.data.message),
+          icon: 'error',
+          button: 'OK'
         });
-      this.friends = response.data.map((friend) => friend.nickname);
+        this.$router.push('/logout');
+      }
     },
     userStatus(user) {
       return this.connectedUsers.includes(user.id)

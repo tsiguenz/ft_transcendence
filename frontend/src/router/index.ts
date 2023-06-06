@@ -16,16 +16,6 @@ const router = createRouter({
       component: () => import('../views/Chat.vue')
     },
     {
-      path: '/signin',
-      name: 'Signin',
-      component: () => import('../views/Signin.vue')
-    },
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: () => import('../views/Signup.vue')
-    },
-    {
       path: '/game',
       name: 'Game',
       component: () => import('../views/Game.vue')
@@ -59,11 +49,16 @@ const router = createRouter({
       path: '/2fa/verify',
       name: '2fa',
       component: () => import('../views/TwoFactorVerify.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFound.vue')
     }
   ]
 });
 
-router.beforeEach(async (to) => {
+router.beforeEach((to) => {
   const sessionStore = useSessionStore();
   if (to.path == '/') {
     router.push('/home');

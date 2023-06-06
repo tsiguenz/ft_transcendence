@@ -50,8 +50,12 @@ export default {
       hover: false
     };
   },
-  mounted() {
-    this.newFriendStatus = this.isFriendAtBegining;
+  watch: {
+    isFriendAtBegining: {
+      handler() {
+        this.newFriendStatus = this.isFriendAtBegining;
+      }
+    }
   },
   methods: {
     async deleteFriend() {
@@ -67,8 +71,10 @@ export default {
             icon: 'error',
             button: 'OK'
           });
+        })
+        .then(() => {
+          this.newFriendStatus = false;
         });
-      this.newFriendStatus = false;
     },
     async addFriend() {
       await axios
@@ -83,8 +89,10 @@ export default {
             icon: 'error',
             button: 'OK'
           });
+        })
+        .then(() => {
+          this.newFriendStatus = true;
         });
-      this.newFriendStatus = true;
     }
   }
 };
