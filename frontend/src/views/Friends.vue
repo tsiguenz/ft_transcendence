@@ -73,14 +73,8 @@ export default {
   methods: {
     async getFriends() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
         );
         this.friends = response.data;
         this.friends.forEach((friend) => {
@@ -98,15 +92,9 @@ export default {
     },
     async deleteFriend(nickname) {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         await axios.delete(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`
         );
         this.renderPage++;
       } catch (error) {
@@ -120,16 +108,9 @@ export default {
     },
     async addFriend(nickname) {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         await axios.post(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`
         );
         this.renderPage++;
       } catch (error) {

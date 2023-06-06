@@ -161,10 +161,10 @@ export class UsersService {
     return { message: 'Friend deleted' };
   }
 
-  async getFriends(user: object) {
+  async getFriends(userId: string) {
     const friendsId = await this.prisma.friend.findMany({
       where: {
-        userId: user['id']
+        userId: userId
       },
       select: {
         friendId: true
@@ -239,9 +239,6 @@ export class UsersService {
     @UploadedFile() file: Express.Multer.File
   ) {
     if (!file) throw new ForbiddenException('File required');
-    const allowedTypes = ['.png', '.jpg', '.jpeg'];
-    const fileSizeMb = file.size / 1024 ** 2;
-    const extension = extname(file.originalname);
     const oldAvatar = await this.prisma.user.findUnique({
       where: {
         id: userId
@@ -250,10 +247,6 @@ export class UsersService {
         avatarPath: true
       }
     });
-    if (!allowedTypes.includes(extension))
-      throw new ForbiddenException('Invalid file type');
-    if (fileSizeMb > 2)
-      throw new ForbiddenException('File size limit exceeded (2MB)');
     file.path = file.path.replace('public/avatars', '');
     await this.prisma.user.update({
       where: {

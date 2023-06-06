@@ -7,6 +7,7 @@ import {
   Post,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
   Put,
   Body,
   UploadedFile,
@@ -195,6 +196,20 @@ export class UsersController {
   })
   @UseInterceptors(
     FileInterceptor('file', {
+      limits: {
+        fileSize: 2 * 1024 ** 2
+      },
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype.match(/\/(png|jpeg|jpg)$/)) {
+          cb(null, true);
+        } else
+          cb(
+            new BadRequestException(
+              'Unsupported file type (allowed: png / jpeg / jpg)'
+            ),
+            false
+          );
+      },
       storage: diskStorage({
         destination: './public/avatars',
         filename: (req, file, cb) => {
