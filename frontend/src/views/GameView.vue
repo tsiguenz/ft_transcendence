@@ -231,6 +231,7 @@ export default {
   original size of the canvas
   but it's not responsive
   */
+  margin-top: 200px;
   height: 525px;
   width: 858px;
   background-color: var(--dark-alt);
@@ -247,10 +248,5 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-.game-container {
-  height: 525px;
-  width: 858px;
 }
 </style>
