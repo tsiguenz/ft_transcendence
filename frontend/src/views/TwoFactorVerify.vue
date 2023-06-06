@@ -42,7 +42,7 @@ export default {
             icon: 'error',
             text: 'Invalid two factor code'
           });
-          this.$router.push('/signin');
+          this.$router.push('/home');
           return;
         }
         const data = response.data;
@@ -59,7 +59,7 @@ export default {
           icon: 'error',
           text: formatError(error.response.data.message)
         });
-        this.$router.push('/signin');
+        this.$router.push('/home');
       }
     }
   }
