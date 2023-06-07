@@ -96,6 +96,18 @@ export class ChatroomController {
     required: true,
     description: 'Chatroom id'
   })
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        password: {
+          type: 'string',
+          description: 'Chatroom password'
+        }
+      }
+    }
+  })
   @Patch(':id')
   async update(
     @Param('id') id: string,

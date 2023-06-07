@@ -44,11 +44,16 @@ const router = createRouter({
       path: '/2fa/verify',
       name: '2fa',
       component: () => import('../views/TwoFactorVerify.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFound.vue')
     }
   ]
 });
 
-router.beforeEach(async (to) => {
+router.beforeEach((to) => {
   const sessionStore = useSessionStore();
   if (to.path == '/') {
     router.push('/home');

@@ -32,7 +32,11 @@
         </td>
         <td class="hgt-td">{{ user.ladderPoints }}</td>
         <td class="hgt-td">
-          <IsFriend :friendname="user.nickname"></IsFriend>
+          <IsFriend
+            v-if="!isMyProfile(user.nickname)"
+            :friendname="user.nickname"
+            :is-friend-at-begining="isFriend(user.nickname)"
+          ></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -57,6 +61,7 @@ export default {
   inject: ['connectedUsersStore', 'sessionStore'],
   data() {
     return {
+      friends: [],
       users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
@@ -81,18 +86,14 @@ export default {
       deep: true
     }
   },
-  async mounted() {
+  async created() {
     await this.getUsers();
+    await this.getFriends();
   },
   methods: {
     async getUsers() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
-        const response = await axios.get(constants.API_URL + '/users', {
-          headers: {
-            Authorization: 'Bearer ' + jwt
-          }
-        });
+        const response = await axios.get(constants.API_URL + '/users');
         this.users = response.data;
       } catch (error) {
         swall({
@@ -104,19 +105,12 @@ export default {
         this.$router.push('/logout');
       }
     },
-    async addFriend(friend) {
+    async getFriends() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
-        await axios.post(
-          constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${friend}`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
         );
+        this.friends = response.data.map((friend) => friend.nickname);
       } catch (error) {
         swall({
           title: 'Error',
@@ -124,6 +118,7 @@ export default {
           icon: 'error',
           button: 'OK'
         });
+        this.$router.push('/logout');
       }
     },
     userStatus(user) {
@@ -141,6 +136,9 @@ export default {
     },
     getAvatarPath(user) {
       return constants.AVATARS_URL + user.avatarPath;
+    },
+    isFriend(nickname) {
+      return this.friends.includes(nickname);
     },
     isMyProfile(name) {
       return name === this.sessionStore.nickname;
