@@ -2,7 +2,7 @@
   <v-container flex class="font">
     <v-sheet color="transparent">
       <h2 class="mb-5">History Games</h2>
-      <v-sheet class="overflow-y-auto" color="transparent" height="60vh">
+	      <v-sheet class="overflow-y-auto" ref="myElement" color="transparent">
         <div v-if="isMounted" class="pr-5" v-for="index in games">
           <v-divider />
           <v-row class="justify-space-between" align="center">
@@ -40,6 +40,7 @@ export default {
   },
   async mounted() {
     await this.getGames();
+    this.test();
   },
   methods: {
     getGames() {
@@ -49,6 +50,17 @@ export default {
     },
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
+    },
+    test() {
+      const element = this.$refs.myElement.$el; // Obtenir l'élément DOM à partir de la référence
+
+      const rect = element.getBoundingClientRect(); // Obtenir le rectangle de position de l'élément
+
+      const height = rect.top + window.pageYOffset; // Calculer la hauteur relative à la page
+
+      console.log('Hauteur de l\'élément :', height);
+element.style.height = `calc(100vh - ${height}px)`;
+//element.style.height = `calc(100vh - 500px)`;
     }
   }
 };
