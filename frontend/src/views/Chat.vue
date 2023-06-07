@@ -14,7 +14,7 @@
         />
       </v-col>
       <v-col cols="6">
-        <template v-if="showPrivateChannel && currentChatroomId">
+        <template v-if="showPrivateChannel">
           <Chat
             :id="currentChatroomId"
             title="Chat"
@@ -67,7 +67,7 @@ export default {
     return {
       showFriends: false,
       showPublicChannel: false,
-      showPrivateChannel: true
+      showPrivateChannel: true,
     };
   },
   computed: {
@@ -115,7 +115,7 @@ export default {
       this.showPublicChannel = true;
       this.showFriends = false;
       this.showPrivateChannel = false;
-    }
+    },
   }
 };
 </script>

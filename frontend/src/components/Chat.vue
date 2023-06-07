@@ -158,7 +158,8 @@ export default {
 }
 
 .chating{
-  height:900px;
-  overflow-y:auto;
+  /* height:900px; */
+  /* overflow-y:auto; */
+  max-height: 300px;
 }
 </style>
