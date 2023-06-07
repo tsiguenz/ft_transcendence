@@ -76,10 +76,9 @@ export default {
           this.newFriendStatus = false;
         });
     },
-    async addFriend(friendname) {
-      try {
-        const jwt = this.$cookie.getCookie('jwt');
-        await axios.post(
+    async addFriend() {
+      await axios
+        .post(
           constants.API_URL +
             `/users/${this.sessionStore.nickname}/friends/${this.friendname}`
         )
@@ -95,7 +94,6 @@ export default {
           this.newFriendStatus = true;
         });
     }
-  }
   }
 };
 </script>
