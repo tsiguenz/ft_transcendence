@@ -96,5 +96,6 @@ export default {
         });
     }
   }
+  }
 };
 </script>
