@@ -104,7 +104,7 @@ aside {
     }
   }
   .button:hover {
-    background-color: red;
+    background-color: var(--light);
   }
   .menu-toggle-wrap {
     display: flex;
