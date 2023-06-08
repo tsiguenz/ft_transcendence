@@ -56,9 +56,7 @@
       max="10"
       :step="1"
     />
-    <v-btn class="pa-2 ma-2" @click="createCustomRoom()"
-      >Create custom game</v-btn
-    >
+    <v-btn class="log" @click="createCustomRoom()">Create custom game</v-btn>
   </v-container>
   <WaitingGame v-if="isInQueue" />
 </template>

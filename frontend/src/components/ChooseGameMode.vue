@@ -1,7 +1,11 @@
 <template>
   <v-container>
-    <v-btn class="pa-2 ma-2" @click="queueRanked">Search ranked match</v-btn>
-    <v-btn class="pa-2 ma-2" @click="changeStatusToInMenu">Custom game</v-btn>
+    <v-btn class="pa-2 ma-2 log" @click="queueRanked"
+      >Search ranked match</v-btn
+    >
+    <v-btn class="pa-2 ma-2 log" @click="changeStatusToInMenu"
+      >Create custom game</v-btn
+    >
   </v-container>
 </template>
 
