@@ -42,11 +42,11 @@ export default {
             icon: 'error',
             text: 'Invalid two factor code'
           });
-          this.$router.push('/signin');
+          this.$router.push('/home');
           return;
         }
         const data = response.data;
-        this.sessionStore.signin(
+        this.sessionStore.home(
           VueJwtDecode.decode(data.access_token).sub,
           response.data.nickname
         );
@@ -59,7 +59,7 @@ export default {
           icon: 'error',
           text: lib.formatError(error.response.data.message)
         });
-        this.$router.push('/signin');
+        this.$router.push('/home');
       }
     }
   }

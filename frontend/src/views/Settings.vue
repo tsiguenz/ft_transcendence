@@ -75,7 +75,13 @@
             <v-row align="center" justify="center">
               <v-sheet class="sheet pa-10" height="100%" width="500">
                 <v-row justify="end"
-                  ><v-btn class="close" @click="dialog = false"
+                  ><v-btn
+                    class="close"
+                    @click="
+                      dialog = false;
+                      newTwoFactorEnable = false;
+                      qrcode = '';
+                    "
                     ><v-icon icon="mdi-close"></v-icon></v-btn
                 ></v-row>
                 <v-row class="justify-center ma-5 mb-10">

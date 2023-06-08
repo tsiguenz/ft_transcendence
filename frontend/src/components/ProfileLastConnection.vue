@@ -1,14 +1,10 @@
 <template>
   <div v-if="!isLog">
-    <v-row class="justify-center"
-      ><h4 class="font">Disconnect since :</h4></v-row
-    >
-    <v-row class="justify-center"
-      ><p class="font">{{ disconnectSince }}</p></v-row
-    >
+    <h4 class="font">Disconnect since :</h4>
+    <p class="font">{{ disconnectSince }}</p>
   </div>
   <div v-else>
-    <v-row class="justify-center"><h4 class="font">Online</h4></v-row>
+    <h4 class="font">Online</h4>
   </div>
 </template>
 
