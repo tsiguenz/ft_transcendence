@@ -16,9 +16,20 @@ class ChatService {
     this.socketService.subscribe(events.EXCEPTION, callback);
     this.socketService.subscribe(events.CHATROOM_NEW, (payload: any) => {
       this.chatStore.addRoom(payload.chatroom);
-      this.chatStore.activeChatroom = payload.chatroom.id;
+      this.chatStore.joinRoom(payload.chatroom.id);
     });
-    // this.socketService.subscribe(events.EXCEPTION, callback);
+    this.socketService.subscribe(
+      events.CHATROOM_USER_CONNECT,
+      (payload: any) => {
+        this.chatStore.addUserToRoom(payload.chatroomId, payload.chatroomUser);
+      }
+    );
+    this.socketService.subscribe(
+      events.CHATROOM_USER_DISCONNECT,
+      (payload: any) => {
+        this.chatStore.removeUserFromRoom(payload.chatroomId, payload.userId);
+      }
+    );
     // this.socketService.subscribe(events.EXCEPTION, callback);
     // this.socketService.subscribe(events.EXCEPTION, callback);
   }

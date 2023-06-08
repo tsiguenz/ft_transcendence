@@ -165,15 +165,12 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
-    if (!chatroom) {
-      return;
-    }
-
     try {
-      await this.chatroom.leave(client['decoded'].sub, chatroom.id);
-      client.leave(chatroom.slug);
+      await this.chatroomSocketService.leaveChatroom(
+        client,
+        this.server,
+        payload
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }

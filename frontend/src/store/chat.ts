@@ -52,14 +52,26 @@ export const useChatStore = defineStore('chat', {
       this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
     },
-    // joinChatroom(chatroomId: number) {},
+    joinRoom(chatroomId) {
+      this.activeChatroom = chatroomId;
+    },
     storeMessage(message) {
-      const chatroomId: number = message.chatroomId;
+      const chatroomId: string = message.chatroomId;
 
       if (!this.messages.hasOwnProperty(chatroomId)) {
         this.messages[chatroomId] = [];
       }
       this.messages[chatroomId].push(message);
+    },
+    addUserToRoom(chatroomId: string, user: string) {
+      if (this.activeChatroom === chatroomId) {
+        this.users.push(user);
+      }
+    },
+    removeUserFromRoom(chatroomId: string, userId: string) {
+      if (this.activeChatroom === chatroomId) {
+        this.users = this.users.filter((user) => user.id !== userId);
+      }
     },
 
     // storeUser(chatroomId, users) {

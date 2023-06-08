@@ -62,7 +62,40 @@ export class ChatroomSocketService {
       throw new WsException('Unauthorized to join room');
     }
     await this.chatroom.join(userId, payload.chatroomId, payload.password);
+
+    const chatroomUser = await this.chatroomUser.findOneWithRestrictions(
+      userId,
+      chatroom.id
+    );
+
+    const formattedUser = {
+      id: chatroomUser.id,
+      nickname: chatroomUser.nickname,
+      role: chatroomUser.chatrooms[0].role,
+      restrictions: chatroomUser.restrictions
+    };
+
+    client.emit(events.CHATROOM_NEW, {
+      chatroom: chatroom
+    });
     server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
+      chatroomId: chatroom.id,
+      chatroomUser: formattedUser
+    });
+  }
+
+  async leaveChatroom(
+    client: Socket,
+    server: Server,
+    payload: { chatroomId: string }
+  ) {
+    const userId = client['decoded'].sub;
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    await this.chatroom.leave(userId, payload.chatroomId);
+
+    client.leave(chatroom.slug);
+    server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId
     });
