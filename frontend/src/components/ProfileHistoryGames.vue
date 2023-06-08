@@ -1,27 +1,25 @@
 <template>
-  <v-container flex class="font">
-    <v-sheet color="transparent">
-      <h2 class="mb-5">History Games</h2>
-	      <v-sheet class="overflow-y-auto" ref="myElement" color="transparent">
-        <div v-if="isMounted" class="pr-5" v-for="index in games">
-          <v-divider />
-          <v-row class="justify-space-between" align="center">
-            <v-sheet class="ma-4" color="transparent">
-              <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-              <p>
-                Opponent {{ users[index.winnerId].nickname }} -
-                {{ users[index.loserId].nickname }}
-              </p>
-            </v-sheet>
-            <v-sheet color="transparent">
-              <p>{{ setDuration(index.duration) }}</p>
-            </v-sheet>
-          </v-row>
-        </div>
-        <v-sheet height="10vh" class="blur"> </v-sheet>
-      </v-sheet>
+  <v-sheet class="font" color="transparent">
+    <h2 class="mb-5">History Games</h2>
+    <v-sheet class="overflow-y-auto" ref="myElement" color="transparent">
+      <div v-if="isMounted" class="pr-5" v-for="index in games">
+        <v-divider />
+        <v-row class="justify-space-between" align="center">
+          <v-sheet class="ma-4" color="transparent">
+            <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+            <p>
+              Opponent {{ users[index.winnerId].nickname }} -
+              {{ users[index.loserId].nickname }}
+            </p>
+          </v-sheet>
+          <v-sheet color="transparent">
+            <p>{{ setDuration(index.duration) }}</p>
+          </v-sheet>
+        </v-row>
+      </div>
+      <v-sheet height="10vh" class="blur"> </v-sheet>
     </v-sheet>
-  </v-container>
+  </v-sheet>
 </template>
 
 <script>
@@ -40,7 +38,7 @@ export default {
   },
   async mounted() {
     await this.getGames();
-    this.test();
+    this.findBottom();
   },
   methods: {
     getGames() {
@@ -51,16 +49,11 @@ export default {
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
-    test() {
-      const element = this.$refs.myElement.$el; // Obtenir l'élément DOM à partir de la référence
-
-      const rect = element.getBoundingClientRect(); // Obtenir le rectangle de position de l'élément
-
-      const height = rect.top + window.pageYOffset; // Calculer la hauteur relative à la page
-
-      console.log('Hauteur de l\'élément :', height);
-element.style.height = `calc(100vh - ${height}px)`;
-//element.style.height = `calc(100vh - 500px)`;
+    findBottom() {
+      const element = this.$refs.myElement.$el;
+      const rect = element.getBoundingClientRect();
+      const height = rect.top + window.pageYOffset;
+      element.style.height = `calc(100vh - ${height}px)`;
     }
   }
 };
