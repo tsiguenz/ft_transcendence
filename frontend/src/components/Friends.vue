@@ -42,6 +42,7 @@ export default {
     ProfileClick
   },
   inject: ['connectedUsersStore', 'sessionStore'],
+  
   data() {
     return {
       friends: [],

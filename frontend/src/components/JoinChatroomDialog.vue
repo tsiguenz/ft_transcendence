@@ -46,9 +46,9 @@
             <template #activator="{ props }">
               <v-btn class="joinbtn" size="small" v-bind="props">Join</v-btn>
             </template>
-          <v-card>
+          <v-card class="window">
             <v-card-title>
-              <span class="text-h5">Please enter password</span>
+              <span class="text-h6">Please enter password</span>
                <v-text-field
                    
                     v-model="chatroom.password"

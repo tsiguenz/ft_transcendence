@@ -3,7 +3,7 @@
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" icon="mdi-cog"></v-btn>
     </template>
-    <v-card>
+    <v-card class="window">
       <v-card-title>
         <span class="text-h5">Edit chatroom</span>
       </v-card-title>
