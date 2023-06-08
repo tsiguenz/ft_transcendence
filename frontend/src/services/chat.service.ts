@@ -14,6 +14,13 @@ class ChatService {
   setup(jwt: string, callback: Function) {
     this.socketService.setupSocketConnection(jwt);
     this.socketService.subscribe(events.EXCEPTION, callback);
+    this.socketService.subscribe(events.CHATROOM_NEW, (payload: any) => {
+      this.chatStore.addRoom(payload.chatroom);
+      this.chatStore.activeChatroom = payload.chatroom.id;
+    });
+    // this.socketService.subscribe(events.EXCEPTION, callback);
+    // this.socketService.subscribe(events.EXCEPTION, callback);
+    // this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
   disconnect() {

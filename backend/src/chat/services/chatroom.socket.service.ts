@@ -20,16 +20,13 @@ export class ChatroomSocketService {
 
   async createChatroom(client: Socket, payload: any) {
     const userId = client['decoded'].sub;
-
     const parsedPayload = this.parsePayload(payload);
 
-    try {
-      this.validatePayload(parsedPayload);
-      const chatroom = await this.chatroom.createWS(userId, parsedPayload);
-      client.emit('chatroomCreated', chatroom);
-    } catch (e) {
-      throw new WsException((e as Error).message);
-    }
+    this.validatePayload(parsedPayload);
+    const chatroom = await this.chatroom.create(userId, parsedPayload);
+    client.emit(events.CHATROOM_NEW, {
+      chatroom: chatroom
+    });
   }
 
   async deleteChatroom(
@@ -44,6 +41,7 @@ export class ChatroomSocketService {
       throw new WsException('Unauthorized to delete room');
     }
     this.chatroom.remove(chatroom.id);
+
     server
       .to(chatroom.slug)
       .emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
@@ -52,9 +50,11 @@ export class ChatroomSocketService {
 
   async joinChatroom(
     client: Socket,
+    server: Server,
     payload: { chatroomId: string; password: string }
   ) {
     const userId = client['decoded'].sub;
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
     if (
       await this.chatroomRestriction.isUserBanned(userId, payload.chatroomId)
@@ -62,6 +62,10 @@ export class ChatroomSocketService {
       throw new WsException('Unauthorized to join room');
     }
     await this.chatroom.join(userId, payload.chatroomId, payload.password);
+    server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
+      chatroomId: chatroom.id,
+      userId
+    });
   }
 
   // ---- [ Private ] ----

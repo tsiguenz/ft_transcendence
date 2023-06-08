@@ -3,6 +3,7 @@ export const CHATROOM_CONNECT = 'chatroom.connect';
 export const CHATROOM_LEAVE = 'chatroom.leave';
 export const CHATROOM_DELETE = 'chatroom.delete';
 export const CHATROOM_CREATE = 'chatroom.create';
+export const CHATROOM_NEW = 'chatroom.new';
 export const CHATROOM_KICKED = 'chatroom.kicked';
 export const CHATROOM_GET_MESSAGES = 'chatroom.get_messages';
 export const CHATROOM_USER_CONNECT = 'chatroom.user_connect';

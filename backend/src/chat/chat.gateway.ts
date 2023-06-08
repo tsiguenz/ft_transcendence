@@ -107,24 +107,28 @@ export class ChatGateway
     @MessageBody() payload: { chatroomId: string; password: string }
   ) {
     try {
-      await this.chatroomSocketService.joinChatroom(client, payload);
-    } catch (e) {
-      throw new WsException((e as Error).message);
-    }
-  }
-
-  @SubscribeMessage(events.CHATROOM_JOINABLE_ROOMS)
-  async handleGetRooms(@ConnectedSocket() client: Socket) {
-    try {
-      const rooms = await this.chatroom.findJoinableChatroomsForUser(
-        client['decoded'].sub
+      await this.chatroomSocketService.joinChatroom(
+        client,
+        this.server,
+        payload
       );
-
-      client.emit(events.CHATROOM_JOINABLE_ROOMS, rooms);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
+
+  // @SubscribeMessage(events.CHATROOM_JOINABLE_ROOMS)
+  // async handleGetRooms(@ConnectedSocket() client: Socket) {
+  //   try {
+  //     const rooms = await this.chatroom.findJoinableChatroomsForUser(
+  //       client['decoded'].sub
+  //     );
+
+  //     client.emit(events.CHATROOM_JOINABLE_ROOMS, rooms);
+  //   } catch (e) {
+  //     throw new WsException((e as Error).message);
+  //   }
+  // }
 
   @SubscribeMessage(events.CHATROOM_CREATE)
   async handleCreateRoom(
@@ -141,11 +145,11 @@ export class ChatGateway
 
     try {
       if (payload.roomType !== RoomType.ONE_TO_ONE) {
-        return this.chatroomSocketService.createChatroom(client, payload);
+        return await this.chatroomSocketService.createChatroom(client, payload);
       }
 
       if (payload.roomType === RoomType.ONE_TO_ONE) {
-        chatroom = this.privateMessage.create(
+        chatroom = await this.privateMessage.create(
           payload.userIds[0],
           payload.userIds[1]
         );
