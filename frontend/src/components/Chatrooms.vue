@@ -20,9 +20,9 @@
     <v-list class="soc">
       <p class="titleMessages">MESSAGES</p>
       <v-list-item
-      :class="{'activeR': chatroom.id === activeRoomId && !showFriends && !showPublicChannel, 'inactiveR': chatroom.id !== activeRoomId && !showFriends}"
-        v-for="chatroom in chatrooms"
+      v-for="chatroom in chatrooms"
         :key="chatroom.id"
+        :class="{'activeR': chatroom.id === activeRoomId && !showFriends && !showPublicChannel, 'inactiveR': chatroom.id !== activeRoomId && !showFriends}"
         :title="chatroom.name"
         :value="chatroom.name"
         :active="chatroom.id == id"
@@ -52,17 +52,17 @@ import { useChatStore } from '@/store/chat';
 import { useSessionStore } from '@/store/session';
 
 export default {
-  data () {
-    return {
-      activeRoomId: false
-    }
-  },
   components: {
     NewChatroomDialog,
     JoinChatroomDialog
   },
   props: ['id', 'showFriends', 'showPublicChannel'],
   emits: ['join', 'toggleChatView', 'toggleFriendsView', 'togglePublicChannelView'],
+  data () {
+    return {
+      activeRoomId: false
+    }
+  },
   computed: {
     ...mapStores(useChatStore, useSessionStore),
     chatrooms() {

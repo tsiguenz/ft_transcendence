@@ -17,7 +17,11 @@
           v-if="item.authorId === currentUserId"
           class="rounded-pill pa-1 bg-blue"
           >{{ item.data }}</a
-        >
+        ><ProfilePrintAvatar
+                  :wdt="25"
+                  :hgt="25"
+                  :url-avatar="getAvatarUrl(item.authorNickname)"
+                ></ProfilePrintAvatar>
       </p>
       <p class="text-left ma-2">
         <a
@@ -41,12 +45,16 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
+import axios from 'axios';
+import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
+import ProfilePrintAvatar from  '../components/ProfilePrintAvatar.vue';
 
 export default {
   components: {
-    EditChatroomDialog
+    EditChatroomDialog,
+    ProfilePrintAvatar
   },
   props: ['id', 'title', 'messages'],
   emits: ['leave', 'delete'],
@@ -87,7 +95,6 @@ export default {
         if (!this.id) {
           return;
         }
-
         ChatService.joinRoom(this.id);
         ChatService.getRoomMessages(this.id, this.lastMessageTime());
       }
@@ -144,6 +151,10 @@ export default {
         icon: 'error',
         text: formatError(payload.message)
       });
+    },
+    async getAvatarUrl(user){
+      console.log( constants.AVATARS_URL + user.avatarPath);
+      return constants.AVATARS_URL + user.avatarPath;
     }
   }
 };

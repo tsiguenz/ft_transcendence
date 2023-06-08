@@ -45,6 +45,7 @@ class ChatService {
   }
 
   getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {
+    console.log("here");
     this.socketService.send(events.GET_MESSAGES, {
       chatroomId: chatroomId,
       newerThan: newerThan
