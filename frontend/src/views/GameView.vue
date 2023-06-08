@@ -2,16 +2,14 @@
   <ChooseGameMode
     v-if="isInChooseMode()"
     @queue-ranked="queueRanked"
-    @change-status-to-in-menu="gameStatus = 1"
+    @change-status-to-in-menu="setStatusToInMenu()"
   />
 
-  <CustomGameMenu v-if="isInMenu()" @create-custom-room="createCustomRoom" />
+  <CustomGameMenu v-if="isInMenu()" />
 
   <WaitingGame v-if="isInQueue()" :is-ranked="isRanked" />
 
-  <v-container v-show="isInGame()">
-    <canvas id="canvas" height="525" width="858"></canvas>
-  </v-container>
+  <canvas v-show="isInGame()" id="canvas" height="525" width="858"></canvas>
 
   <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId" />
 </template>
@@ -79,7 +77,6 @@ export default {
       this.isRanked = false;
       this.subscribeGameLoop();
       this.subscribeStartGame();
-      this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
     joinCustomGame(gameId) {
@@ -104,16 +101,6 @@ export default {
       this.initCanvas();
       document.addEventListener('keydown', this.handleKeyDown);
       document.addEventListener('keyup', this.handleKeyUp);
-    },
-    getCustomGameDatas() {
-      return {
-        ballAcceleration: 2,
-        padHeight: 150 / 2,
-        padWidth: 300 / 100,
-        padSpeed: 2,
-        ballRadius: 1,
-        ballSpeed: 2
-      };
     },
     initCanvas() {
       this.canvas = document.getElementById('canvas');
@@ -220,6 +207,18 @@ export default {
     },
     isInChooseMode() {
       return this.gameStatus === constants.GAME_STATUS.IN_CHOOSE_MODE;
+    },
+    setStatusToInMenu() {
+      this.gameStatus = constants.GAME_STATUS.IN_MENU;
+    },
+    setStatusToInChooseMode() {
+      this.gameStatus = constants.GAME_STATUS.IN_CHOOSE_MODE;
+    },
+    setStatusToInQueue() {
+      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
+    },
+    setStatusToInGame() {
+      this.gameStatus = constants.GAME_STATUS.IN_GAME;
     }
   }
 };
@@ -231,11 +230,10 @@ export default {
   original size of the canvas
   but it's not responsive
   */
-  margin-top: 200px;
+  margin-left: 20%;
   height: 525px;
   width: 858px;
   background-color: var(--dark-alt);
-  border-radius: 30px;
   border: 3px solid var(--light);
 }
 
@@ -243,7 +241,6 @@ export default {
   height: 50%;
   width: 50%;
   margin: 0 auto;
-  border: 3px solid var(--light);
   display: flex;
   flex-direction: row;
   justify-content: center;

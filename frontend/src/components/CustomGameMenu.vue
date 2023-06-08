@@ -1,7 +1,62 @@
 <template>
-  <v-container v-if="!isInQueue">
-    <p>Some options</p>
-    <v-btn class="pa-2 ma-2" @click="createCustomRoom"
+  <v-container v-if="!isInQueue" class="d-flex flex-column">
+    <v-slider
+      v-model="customGameDatas.ballSpeed"
+      class="slider-label"
+      :label="`Ball speed: ${customGameDatas.ballSpeed}`"
+      min="0.5"
+      max="10"
+      :step="0.1"
+    />
+    <v-slider
+      v-model="customGameDatas.ballAcceleration"
+      class="slider-label"
+      :label="`Ball acceleration: ${customGameDatas.ballAcceleration}`"
+      min="1"
+      max="1.5"
+      :step="0.05"
+    />
+    <v-slider
+      v-model="customGameDatas.ballRadius"
+      class="slider-label"
+      :label="`Ball radius: ${customGameDatas.ballRadius}`"
+      min="1"
+      max="20"
+      :step="1"
+    />
+    <v-slider
+      v-model="customGameDatas.padHeight"
+      class="slider-label"
+      :label="`Pad height: ${customGameDatas.padHeight}`"
+      min="30"
+      max="200"
+      :step="5"
+    />
+    <v-slider
+      v-model="customGameDatas.padWidth"
+      class="slider-label"
+      :label="`Pad width: ${customGameDatas.padWidth}`"
+      min="1"
+      max="20"
+      :step="1"
+    />
+    <v-slider
+      v-model="customGameDatas.padSpeed"
+      class="slider-label"
+      :label="`Pad speed: ${customGameDatas.padSpeed}`"
+      min="1"
+      max="10"
+      :step="1"
+    />
+    <v-slider
+      v-model="customGameDatas.maxScore"
+      class="slider-label"
+      :label="`Max score: ${customGameDatas.maxScore}`"
+      min="1"
+      max="10"
+      :step="1"
+    />
+    <v-btn class="pa-2 ma-2" @click="createCustomRoom()"
       >Create custom game</v-btn
     >
   </v-container>
@@ -18,13 +73,22 @@ export default {
   components: {
     WaitingGame
   },
-  emits: ['create-custom-room'],
+  emits: ['custom-room-created'],
   data() {
     return {
       socketioGame: null,
       inGameView: false,
       alreadyInGame: false,
-      isInQueue: false
+      isInQueue: false,
+      customGameDatas: {
+        ballSpeed: 3,
+        ballAcceleration: 1.05,
+        ballRadius: 8,
+        padHeight: 70,
+        padWidth: 8,
+        padSpeed: 5,
+        maxScore: 5
+      }
     };
   },
   mounted() {
@@ -47,29 +111,22 @@ export default {
   methods: {
     createCustomRoom() {
       if (this.alreadyInGame) return swal('You are already in game!');
-      if (!this.inGameView) {
-        this.isInQueue = true;
-        this.subscribeStartGame();
-        this.socketioGame.send('createCustomRoom', this.getCustomGameDatas());
-      } else {
-        this.$emit('create-custom-room');
-      }
-    },
-    getCustomGameDatas() {
-      return {
-        ballAcceleration: 2,
-        padHeight: 150 / 2,
-        padWidth: 300 / 100,
-        padSpeed: 2,
-        ballRadius: 1,
-        ballSpeed: 2
-      };
+      this.isInQueue = true;
+      this.subscribeStartGame();
+      this.socketioGame.send('createCustomRoom', this.customGameDatas);
     },
     subscribeStartGame() {
-      this.socketioGame.subscribe('startGame', () => {
-        this.$router.push('/game');
+      this.socketioGame.subscribe('startGame', (payload) => {
+        this.$router.push('/game/' + payload.gameId);
       });
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.slider-label {
+  font-family: 'Poppins';
+  font-weight: bold;
+}
+</style>

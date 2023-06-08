@@ -11,7 +11,8 @@ import {
   GameDatas,
   Score,
   Room,
-  Player
+  Player,
+  CustomDatas
 } from './interfaces/game.interfaces';
 
 @Injectable()
@@ -185,7 +186,7 @@ export class GameService {
     ) {
       ball.dx = this.isPlayerOne(ball, map) ? -1 : 1;
       ball.dy = (ball.y - (pad.y + pad.height / 2)) / (map.width / 30);
-      ball.speed *= map.acceleration;
+      ball.speed *= ball.acceleration;
     }
   }
 
@@ -222,7 +223,7 @@ export class GameService {
     ball.dy = Math.random() * 2 - 1;
     ball.x = map.width / 2;
     ball.y = map.height / 2;
-    ball.speed = ball.defaultBallSpeed;
+    ball.speed = ball.defaultSpeed;
   }
 
   padIsOnTopBorder(pad: Pad): boolean {
@@ -310,8 +311,7 @@ export class GameService {
     const map = {
       height: 525,
       width: 858,
-      padOffset: 30,
-      acceleration: 1.02
+      padOffset: 30
     };
     const padInfos = {
       height: map.height / 7,
@@ -322,8 +322,9 @@ export class GameService {
       x: null,
       y: null,
       radius: map.width / 100,
-      defaultBallSpeed: map.width / 300,
+      defaultSpeed: map.width / 300,
       speed: null,
+      acceleration: 1.05,
       dx: null,
       dy: null
     };
@@ -360,24 +361,47 @@ export class GameService {
     };
   }
 
-  initDatasCustomGame(room: Room, customDatas: any, userId: string): void {
+  initDatasCustomGame(
+    room: Room,
+    customDatas: CustomDatas,
+    userId: string
+  ): void {
+    if (this.checkCustomDatas(customDatas)) return;
     const roomDatas = room.datas;
+    roomDatas.ball.defaultSpeed = customDatas.ballSpeed;
+    roomDatas.ball.acceleration = customDatas.ballAcceleration;
     roomDatas.ball.radius = customDatas.ballRadius;
-    roomDatas.ball.speed = customDatas.ballSpeed;
     roomDatas.padInfos.height = customDatas.padHeight;
     roomDatas.padInfos.width = customDatas.padWidth;
     roomDatas.padInfos.speed = customDatas.padSpeed;
+    roomDatas.score.scoreLimit = customDatas.maxScore;
     this.setCustomDatasToPad(roomDatas, customDatas);
     roomDatas.isRanked = false;
     roomDatas.score.player1.id = userId;
   }
 
-  setCustomDatasToPad(datas: GameDatas, customDatas: any): void {
+  setCustomDatasToPad(datas: GameDatas, customDatas: CustomDatas): void {
     datas.pad1.height = customDatas.padHeight;
     datas.pad1.width = customDatas.padWidth;
     datas.pad1.speed = customDatas.padSpeed;
     datas.pad2.height = customDatas.padHeight;
     datas.pad2.width = customDatas.padWidth;
     datas.pad2.speed = customDatas.padSpeed;
+  }
+
+  checkCustomDatas(customDatas: CustomDatas): boolean {
+    return !(
+      this.valueIsBetween(customDatas.ballSpeed, 0.5, 10) &&
+      this.valueIsBetween(customDatas.ballAcceleration, 1, 1.5) &&
+      this.valueIsBetween(customDatas.ballRadius, 1, 20) &&
+      this.valueIsBetween(customDatas.padHeight, 30, 200) &&
+      this.valueIsBetween(customDatas.padWidth, 1, 20) &&
+      this.valueIsBetween(customDatas.padSpeed, 1, 10) &&
+      this.valueIsBetween(customDatas.maxScore, 1, 10)
+    );
+  }
+
+  valueIsBetween(value: number, min: number, max: number): boolean {
+    return value >= min && value <= max;
   }
 }

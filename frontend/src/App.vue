@@ -1,11 +1,13 @@
 <template>
-  <div class="app">
-    <AppHeader></AppHeader>
-    <div class="content-wrapper">
-      <Navbar />
-      <router-view />
+  <v-app>
+    <div class="app">
+      <AppHeader></AppHeader>
+      <div class="content-wrapper">
+        <Navbar />
+        <router-view />
+      </div>
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -82,9 +84,6 @@ export default {
   box-sizing: border-box;
 }
 
-body {
-  background: linear-gradient(var(--medium-purple), var(--light));
-}
 button {
   cursor: pointer;
   appearance: none;
@@ -100,6 +99,7 @@ button {
 }
 
 .app {
+  background: linear-gradient(var(--medium-purple), var(--light));
   display: flex;
   width: 100%;
   main {

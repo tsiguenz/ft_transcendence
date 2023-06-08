@@ -10,7 +10,7 @@ import { Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
-import { Room } from './interfaces/game.interfaces';
+import { Room, CustomDatas } from './interfaces/game.interfaces';
 
 @WebSocketGateway({ namespace: 'game', cors: { origin: '*' } })
 export class GameGateway {
@@ -72,7 +72,9 @@ export class GameGateway {
       this.logger.log(`Client joined room: ${joinableRoom}`);
       room.isStarted = true;
       this.logger.log(`Start game: ${joinableRoom}`);
-      this.server.in(joinableRoom).emit('startGame', room.datas);
+      this.server
+        .in(joinableRoom)
+        .emit('startGame', { gameId: joinableRoom, datas: room.datas });
       room.interval = setInterval(
         // use arrow function to keep the context of this
         // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
@@ -93,7 +95,7 @@ export class GameGateway {
   @SubscribeMessage('createCustomRoom')
   handleCreateCustomRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any
+    @MessageBody() data: CustomDatas
   ) {
     const userId = client['decoded'].sub;
     if (
@@ -131,7 +133,9 @@ export class GameGateway {
     client.join(roomId);
     this.logger.log(`Client joined room for custom game: ${roomId}`);
     room.isStarted = true;
-    this.server.in(roomId).emit('startGame', room.datas);
+    this.server
+      .in(roomId)
+      .emit('startGame', { gameId: roomId, datas: room.datas });
     room.interval = setInterval(
       // use arrow function to keep the context of this
       // https://developer.mozilla.org/en-US/docs/Web/API/setInterval

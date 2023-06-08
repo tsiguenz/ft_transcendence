@@ -67,7 +67,6 @@ import { useSessionStore } from '@/store/session';
 export default {
   data() {
     return {
-      drawer: true,
       is_expanded: false
     };
   },
@@ -105,7 +104,7 @@ aside {
     }
   }
   .button:hover {
-    background-color: var(--light);
+    background-color: red;
   }
   .menu-toggle-wrap {
     display: flex;

@@ -2,15 +2,15 @@ export interface MapInfos {
   height: number;
   width: number;
   padOffset: number;
-  acceleration: number;
 }
 
 export interface Ball {
   x: number;
   y: number;
   radius: number;
-  defaultBallSpeed: number;
+  defaultSpeed: number;
   speed: number;
+  acceleration: number;
   dx: number;
   dy: number;
 }
@@ -56,4 +56,14 @@ export interface Room {
   interval?: NodeJS.Timeout;
   players: Array<string>;
   datas?: GameDatas;
+}
+
+export interface CustomDatas {
+  ballSpeed: number;
+  ballAcceleration: number;
+  ballRadius: number;
+  padHeight: number;
+  padWidth: number;
+  padSpeed: number;
+  maxScore: number;
 }

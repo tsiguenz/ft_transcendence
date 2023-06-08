@@ -47,7 +47,7 @@ export default {
           icon: 'error',
           text: 'You need to be connected to 42 to access this page'
         });
-        this.$router.push('/home');
+        this.$router.replace('/home');
         return;
       }
       if (this.nickname === '' && this.printForm === true) {
@@ -61,7 +61,7 @@ export default {
           access_token42: this.accessToken42
         });
         if (response.data.message === 'Two factor code required') {
-          this.$router.push(`/2fa/verify?id=${response.data.id}`);
+          this.$router.replace(`/2fa/verify?id=${response.data.id}`);
           return;
         }
         if (response.data.message == 'Nickname required') {
@@ -77,7 +77,7 @@ export default {
           response.data.nickname
         );
         this.$root.connectAndSubscribeStatusSocket();
-        this.$router.push('/home');
+        this.$router.replace('/home');
       } catch (error) {
         swal({ icon: 'error', text: formatError(error.response.data.message) });
       }
