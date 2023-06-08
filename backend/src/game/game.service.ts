@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import { PrismaService } from '../prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
