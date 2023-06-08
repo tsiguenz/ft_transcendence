@@ -14,11 +14,11 @@
     <div v-for="item in messages" :key="item.sentAt">
       <div  v-if="item.authorId === currentUserId" class="author">
       <p class="name">{{ item.authorNickname }}</p>
-      <p  class="text-right ma-2 msg">
+      <p  class="text-right ma-2 msg ">
         
-        <a
-          class="bubble pa-1 bg-blue"
-          >{{ item.data }}</a
+        <p
+          class="bubble pa-1 bg-blue msg-content"
+          >{{ item.data }}</p
         >
         <ProfilePrintAvatar
                   :wdt="40"
@@ -29,13 +29,13 @@
     </div>
     <div  v-if="item.authorId !== currentUserId" class="other">
       <p class="nameOther">{{ item.authorNickname }}</p>
-      <p  class="text-left ma-2 msgOther">
+      <p  class="text-left ma-2 msgOther ">
         <ProfilePrintAvatar
                   :wdt="40"
                   :hgt="40"
                   :url-avatar="getAvatarUrlComputed(item.authorNickname)"
                 ></ProfilePrintAvatar>
-        <a class="bubble pa-1 bg-green">{{ item.data }}</a>
+        <p class="bubble pa-1 bg-green msg-content">{{ item.data }}</p>
       </p>
     </div>
     </div>
@@ -224,5 +224,11 @@ export default {
 .nameOther{
   padding-left: 10px;
   font-size: 10px;
+}
+
+.msg-content {
+  max-width: 300px;
+  word-wrap: break-word;
+  text-align: left;
 }
 </style>
