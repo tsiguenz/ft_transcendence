@@ -18,6 +18,6 @@ export default {
 </script>
 <style>
 .img {
-  border: 3px solid var(--light);
+  border: 2px solid var(--light);
 }
 </style>

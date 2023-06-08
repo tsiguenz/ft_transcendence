@@ -12,24 +12,32 @@
   <v-list ref="chat"  class="overflow-y-auto window chating">
     
     <div v-for="item in messages" :key="item.sentAt">
-      <p class="text-right ma-2">
+      <div  v-if="item.authorId === currentUserId" class="author">
+      <p class="name">{{ item.authorNickname }}</p>
+      <p  class="text-right ma-2 msg">
+        
         <a
-          v-if="item.authorId === currentUserId"
-          class="rounded-pill pa-1 bg-blue"
+          class="bubble pa-1 bg-blue"
           >{{ item.data }}</a
-        ><ProfilePrintAvatar
-                  :wdt="25"
-                  :hgt="25"
-                  :url-avatar="getAvatarUrl(item.authorNickname)"
+        >
+        <ProfilePrintAvatar
+                  :wdt="40"
+                  :hgt="40"
+                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
                 ></ProfilePrintAvatar>
       </p>
-      <p class="text-left ma-2">
-        <a
-          v-if="item.authorId !== currentUserId"
-          class="rounded-pill pa-1 bg-green"
-          >{{ item.authorNickname }}: {{ item.data }}</a
-        >
+    </div>
+    <div  v-if="item.authorId !== currentUserId" class="other">
+      <p class="nameOther">{{ item.authorNickname }}</p>
+      <p  class="text-left ma-2 msgOther">
+        <ProfilePrintAvatar
+                  :wdt="40"
+                  :hgt="40"
+                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
+                ></ProfilePrintAvatar>
+        <a class="bubble pa-1 bg-green">{{ item.data }}</a>
       </p>
+    </div>
     </div>
   </v-list>
   <v-text-field
@@ -61,7 +69,8 @@ export default {
   data() {
     return {
       newMessage: '',
-      chatroom: []
+      chatroom: [],
+      avatarUrls: {},
     };
   },
   computed: {
@@ -78,20 +87,31 @@ export default {
       }
       return true;
     },
+    getAvatarUrlComputed() {
+      return (authorNickname) => {
+        return this.avatarUrls[authorNickname];
+      };
+    }
     
   },
   watch: {
     messages: {
-      handler() {
-        this.$nextTick(() => {
-          this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
-        });
-      },
-      deep: true
+        handler(newMessages) {
+            this.$nextTick(() => {
+                this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
+            });
+            const authorNicknames = Array.from(new Set(newMessages.map(message => message.authorNickname)));
+            authorNicknames.forEach(nickname => {
+                if (!this.avatarUrls[nickname]) {
+                    this.fetchAvatarUrl(nickname);
+                }
+            });
+        },
+        deep: true,
+        immediate: true
     },
     id: {
       handler() {
-        console.log(this.id);
         if (!this.id) {
           return;
         }
@@ -110,6 +130,8 @@ export default {
     ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
+    const authorNicknames = Array.from(new Set(this.messages.map(message => message.authorNickname)));
+    authorNicknames.forEach(nickname => this.fetchAvatarUrl(nickname));
   },
   beforeUnmount() {
     ChatService.disconnect();
@@ -152,10 +174,12 @@ export default {
         text: formatError(payload.message)
       });
     },
-    async getAvatarUrl(user){
-      console.log( constants.AVATARS_URL + user.avatarPath);
-      return constants.AVATARS_URL + user.avatarPath;
-    }
+    async fetchAvatarUrl(userName) {
+        const response = await axios.get(constants.API_URL + '/users/');
+        const user = response.data.find((user) => user.nickname === userName);
+        const avatarPath = constants.AVATARS_URL + user.avatarPath;
+        this.avatarUrls[userName] = avatarPath;
+  },
   }
 };
 </script>
@@ -172,5 +196,33 @@ export default {
   /* height:900px; */
   /* overflow-y:auto; */
   max-height: 300px;
+}
+
+.msg{
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+
+}
+
+.msgOther{
+  display: flex;
+  gap: 10px;
+}
+
+
+.bubble{
+  border-radius: 5px;
+}
+
+.name{
+  text-align: end;
+  padding-right: 10px;
+  font-size: 10px;
+}
+
+.nameOther{
+  padding-left: 10px;
+  font-size: 10px;
 }
 </style>
