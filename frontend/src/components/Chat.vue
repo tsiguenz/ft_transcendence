@@ -84,7 +84,7 @@ export default {
           return;
         }
 
-        ChatService.joinRoom(this.id);
+        ChatService.connectRoom(this.id);
         ChatService.getRoomMessages(this.id, this.lastMessageTime());
       }
     }

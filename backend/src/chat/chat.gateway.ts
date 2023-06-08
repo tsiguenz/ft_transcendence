@@ -18,7 +18,9 @@ import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 import { PrivateMessageService } from '../private_message/private_message.service';
 import { UsersService } from '../users/users.service';
-import { RestrictionType, ChatRoom } from '@prisma/client';
+import { RestrictionType, ChatRoom, RoomType } from '@prisma/client';
+import { ChatroomSocketService } from './services/chatroom.socket.service';
+import { CreateChatroomPayload } from '../chat/interfaces/createChatroom.interface';
 import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -32,7 +34,8 @@ export class ChatGateway
     private chatroom: ChatroomService,
     private chatroomUser: ChatroomUserService,
     private chatroomRestriction: ChatroomRestrictionService,
-    private privateMessage: PrivateMessageService
+    private privateMessage: PrivateMessageService,
+    private chatroomSocketService: ChatroomSocketService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -71,8 +74,8 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.JOIN_ROOM)
-  async handleJoin(
+  @SubscribeMessage(events.CHATROOM_CONNECT)
+  async handleConnect(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
@@ -98,25 +101,62 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.CREATE_ROOM)
-  async handleCreateRoom(
+  @SubscribeMessage(events.CHATROOM_JOIN)
+  async handleJoin(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { name: string, roomType: string, password: string, userIds: Array<string> }
+    @MessageBody() payload: { chatroomId: string; password: string }
   ) {
-    let chatroom = undefined;
-    if (payload.roomType === "ONE_TO_ONE") {
-      console.log(payload.userIds);
-      chatroom = this.privateMessage.create(payload.userIds[0], payload.userIds[1]);
-    }
-
     try {
-      client.join(chatroom.slug);
+      await this.chatroomSocketService.joinChatroom(client, payload);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage(events.LEAVE_ROOM)
+  @SubscribeMessage(events.CHATROOM_JOINABLE_ROOMS)
+  async handleGetRooms(@ConnectedSocket() client: Socket) {
+    try {
+      const rooms = await this.chatroom.findJoinableChatroomsForUser(
+        client['decoded'].sub
+      );
+
+      client.emit(events.CHATROOM_JOINABLE_ROOMS, rooms);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_CREATE)
+  async handleCreateRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      name: string;
+      roomType: string;
+      password: string;
+      userIds: Array<string>;
+    }
+  ) {
+    let chatroom = undefined;
+
+    try {
+      if (payload.roomType !== RoomType.ONE_TO_ONE) {
+        return this.chatroomSocketService.createChatroom(client, payload);
+      }
+
+      if (payload.roomType === RoomType.ONE_TO_ONE) {
+        chatroom = this.privateMessage.create(
+          payload.userIds[0],
+          payload.userIds[1]
+        );
+      }
+      // client.join(chatroom.slug);
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_LEAVE)
   async handleLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
@@ -135,35 +175,23 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.DELETE_ROOM)
+  @SubscribeMessage(events.CHATROOM_DELETE)
   async handleDeletion(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
-    if (!chatroom) {
-      return;
-    }
-
-    if (
-      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
-    ) {
-      throw new WsException('Unauthorized to delete room');
-    }
-
     try {
-      this.chatroom.remove(chatroom.id);
-      this.server
-        .to(chatroom.slug)
-        .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
-      this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+      await this.chatroomSocketService.deleteChatroom(
+        client,
+        this.server,
+        payload
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage(events.KICK_USER)
+  @SubscribeMessage(events.CHATROOM_KICK)
   async handleKick(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { userId: string; chatroomId: string }
@@ -181,7 +209,7 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.RESTRICT_USER)
+  @SubscribeMessage(events.CHATROOM_RESTRICT_USER)
   async handleRestrict(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -229,7 +257,7 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.UNRESTRICT_USER)
+  @SubscribeMessage(events.CHATROOM_UNRESTRICT_USER)
   async handleUnrestrict(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -264,7 +292,7 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.GET_MESSAGES)
+  @SubscribeMessage(events.CHATROOM_GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string; newerThan: Date }
@@ -353,7 +381,7 @@ export class ChatGateway
       return;
     }
 
-    socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+    socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
     socket.leave(chatroom.slug);
     this.chatroomUser.remove(userId, chatroom.id);
   }

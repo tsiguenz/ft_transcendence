@@ -14,10 +14,10 @@
   </v-card>
   <v-row no-gutters>
     <v-col cols="8" class="pa-0">
-      <JoinChatroomDialog @join="pushChatroom" />
+      <JoinChatroomDialog />
     </v-col>
     <v-col cols="4" class="pa-0">
-      <NewChatroomDialog @create="pushChatroom" />
+      <NewChatroomDialog />
     </v-col>
   </v-row>
 </template>

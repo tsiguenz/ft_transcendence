@@ -34,32 +34,32 @@ export class ChatroomController {
     private readonly chatroomRestrictionService: ChatroomRestrictionService
   ) {}
 
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
-  @ApiConsumes('application/x-www-form-urlencoded')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Chatroom name' },
-        type: {
-          type: 'string',
-          description: 'Chatroom type (PRIVATE, PROTECTED. PUBLIC)'
-        },
-        password: {
-          type: 'string',
-          description: 'Chatroom password (optionnal)'
-        }
-      }
-    }
-  })
-  @Post()
-  async create(
-    @Body() createChatroomDto: CreateChatroomDto,
-    @User() user: object
-  ) {
-    return await this.chatroomService.create(user['id'], createChatroomDto);
-  }
+  // @UseGuards(AccessTokenGuard)
+  // @ApiBearerAuth()
+  // @ApiConsumes('application/x-www-form-urlencoded')
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       name: { type: 'string', description: 'Chatroom name' },
+  //       type: {
+  //         type: 'string',
+  //         description: 'Chatroom type (PRIVATE, PROTECTED. PUBLIC)'
+  //       },
+  //       password: {
+  //         type: 'string',
+  //         description: 'Chatroom password (optionnal)'
+  //       }
+  //     }
+  //   }
+  // })
+  // @Post()
+  // async create(
+  //   @Body() createChatroomDto: CreateChatroomDto,
+  //   @User() user: object
+  // ) {
+  //   return await this.chatroomService.create(user['id'], createChatroomDto);
+  // }
 
   // @UseGuards(AccessTokenGuard)
   // @ApiBearerAuth()

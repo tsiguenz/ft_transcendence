@@ -63,9 +63,9 @@ import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
+import ChatService from '../services/chat.service';
 
 export default {
-  emits: ['join'],
   data() {
     return {
       chatrooms: [],
@@ -77,22 +77,7 @@ export default {
       this.dialog = false;
     },
     async joinRoom(chatroom) {
-      try {
-        const response = await axios.post(
-          constants.API_URL + '/chatrooms/' + chatroom.id + '/join',
-          {
-            ...chatroom
-          }
-        );
-        this.chatrooms = response.data;
-        this.$emit('join', chatroom);
-        this.closeDialog();
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
+      ChatService.joinRoom({chatroomId: chatroom.id, password: chatroom.password});
     },
     async getJoinableRooms() {
       try {

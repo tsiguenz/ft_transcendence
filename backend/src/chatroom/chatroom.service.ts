@@ -47,6 +47,37 @@ export class ChatroomService {
     }
   }
 
+  async createWS(userId: string, dto: CreateChatroomDto) {
+    const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
+    let hash = null;
+
+    if (dto.type === RoomType.PROTECTED && dto.password) {
+      hash = await argon.hash(dto.password);
+    }
+
+    try {
+      const chatroom = await this.prisma.chatRoom.create({
+        data: {
+          name: dto.name,
+          type: dto.type,
+          hash: hash,
+          slug: `chatroom_${snakecaseName}`,
+          users: {
+            create: [
+              {
+                user: { connect: { id: userId } },
+                role: Role.OWNER
+              }
+            ]
+          }
+        }
+      });
+      return chatroom;
+    } catch (e) {
+      throw new NotFoundException('Could not create chatroom');
+    }
+  }
+
   async findAll() {
     return await this.prisma.chatRoom.findMany();
   }
