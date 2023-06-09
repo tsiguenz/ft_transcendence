@@ -1,15 +1,17 @@
 <template>
   <br />
-  <v-form>
-    <v-text-field
-      v-model="twoFactorCode"
-      class="mb-5"
-      label="2fa code"
-      variant="outlined"
-      @keydown.enter.prevent="verify"
-    ></v-text-field>
-    <v-btn class="log" @click="verify">Validate two factor code</v-btn>
-  </v-form>
+  <v-sheet class="sheet pa-5 ma-5">
+    <v-form>
+      <v-text-field
+        v-model="twoFactorCode"
+        class="mb-5"
+        label="2fa code"
+        variant="outlined"
+        @keydown.enter.prevent="verify"
+      ></v-text-field>
+      <v-btn class="log" @click="verify">Validate two factor code</v-btn>
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
@@ -46,7 +48,7 @@ export default {
           return;
         }
         const data = response.data;
-        this.sessionStore.home(
+        this.sessionStore.signin(
           VueJwtDecode.decode(data.access_token).sub,
           response.data.nickname
         );
@@ -65,3 +67,13 @@ export default {
   }
 };
 </script>
+
+<style>
+.sheet {
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
+}
+</style>
