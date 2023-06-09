@@ -33,8 +33,9 @@ import { useSessionStore } from '@/store/session';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import swall from 'sweetalert';
+
 export default {
-  props: ['friendname', 'isFriendAtBegining'],
+  props: ['friendname'],
   emits: ['delete'],
   data() {
     return {

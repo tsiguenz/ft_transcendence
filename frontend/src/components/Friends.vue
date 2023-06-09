@@ -55,7 +55,7 @@ export default {
   },
   
   watch: {
-    async renderPage() {
+    async friends() {
       await this.getFriends();
     },
     connectedUsersStore: {
@@ -85,7 +85,6 @@ export default {
         this.friends.forEach((friend) => {
           friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
         });
-        console.log(this.friends);
       } catch (error) {
         swall({
           title: 'Error',
@@ -108,7 +107,7 @@ export default {
             }
           }
         );
-        this.renderPage++;
+        this.friends = this.friends.filter(friend => friend.nickname !== nickname);
       } catch (error) {
         swall({
           title: 'Error',

@@ -67,14 +67,14 @@ export default {
   display: flex;
   margin-top: 18px;
   width: 45px;
-  :deep .v-text-field .v-input__control .v-field__outline::before {
+  :deep(.v-text-field .v-input__control .v-field__outline::before) {
     border: solid;
     border-radius: 5px;
   }
-  :deep .v-text-field .v-input__control .v-field__outline::after {
+  :deep(.v-text-field .v-input__control .v-field__outline::after) {
     border: none;
   }
-  :deep .mdi-magnify {
+  :deep(.mdi-magnify) {
     cursor: pointer;
   }
   &.is-expanded {

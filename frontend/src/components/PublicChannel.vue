@@ -3,9 +3,6 @@
     <v-col>
       <JoinChatroomDialog @join="pushChatroom" />
     </v-col>
-    <!-- <v-col cols="4" class="pa-0">
-      <NewChatroomDialog @create="pushChatroom" />
-    </v-col> -->
   </v-row>
 </template>
 
@@ -15,7 +12,6 @@ import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
-import NewChatroomDialog from '../components/NewChatroomDialog.vue';
 import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 import { mapStores } from 'pinia';
@@ -24,7 +20,6 @@ import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
-    NewChatroomDialog,
     JoinChatroomDialog
   },
   props: ['id', 'showFriends'],
@@ -90,11 +85,11 @@ export default {
   display: flex;
   justify-content: flex-start;
 }
-:deep .inactivebtn{
+:deep(.inactivebtn){
   background-color: var(--dark-purple) !important;
 }
-:deep .activebtn {
-  background-color: var(--light) !important; /* Lighter background color when active */
+:deep(.activebtn){
+  background-color: var(--light) !important;
   border-radius: 3px 3px 0px 0px !important;
 
 }
@@ -117,7 +112,7 @@ export default {
   border-radius: 0% !important;
 }
 
-:deep .v-list-item__overlay{
+:deep(.v-list-item__overlay){
   background-color: var(--dark-purple);
 }
 

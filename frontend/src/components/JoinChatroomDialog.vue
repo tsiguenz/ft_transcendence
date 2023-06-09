@@ -113,8 +113,6 @@ export default {
             ...chatroom
           }
         );
-
-        
         this.reply = response.data;
         this.$emit('join', chatroom);
         let i = this.chatrooms.map(item => item.id).indexOf(chatroom.id);

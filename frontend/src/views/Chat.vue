@@ -65,9 +65,9 @@ export default {
   },
   data() {
     return {
-      showFriends: false,
+      showFriends: false, // for lulu : change to true for next PR
       showPublicChannel: false,
-      showPrivateChannel: true,
+      showPrivateChannel: true, //for lulu : change to false for next PR
     };
   },
   computed: {

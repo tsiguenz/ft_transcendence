@@ -1,8 +1,7 @@
 <template>
-   <!--Print only connected users-->
     <v-list>
         <v-list-subheader>Connected Friends</v-list-subheader>
-        <div class="online-btn" @click="getFriendsProfile()"><tbody>
+        <div class="online-btn"><tbody>
            <tr v-for="user in connectedFriends" :key="user.id">
             <td class="connected" > <ProfileClick :nickname="user.nickname" :width="40" :height="40" :url-avatar="user.avatarPath" :status="userStatus(user)"></ProfileClick></td>
             <td>{{ user.nickname }}</td>
@@ -37,7 +36,8 @@ export default {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
       },
       deep: true
-    }
+    },
+
   },
     async mounted() {
         await this.getFriends();
@@ -83,9 +83,6 @@ export default {
       }
       return false;
     },
-    getAvatarPath(user) {
-      return constants.AVATARS_URL + user.avatarPath;
-}
    }
 }
 

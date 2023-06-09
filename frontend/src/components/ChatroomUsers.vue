@@ -1,10 +1,20 @@
 <template>
   <v-list class="window">
-    <v-btn block>Invite users</v-btn>
+    <v-btn class="bouton" block>Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
-      <template v-slot:activator="{ props }">
+      <template #activator="{ props }">
         <v-list-item
+          v-if="isCurrentUser(user.id)"
+          :prepend-icon="userRoleIcon[user.role]"
+          :class="{
+            'blue-border': isCurrentUser(user.id),
+            online: isOnline(user.id)
+          }"
+          :title="user.nickname"
+        ></v-list-item>
+        <v-list-item
+          v-else
           v-bind="props"
           :prepend-icon="userRoleIcon[user.role]"
           :class="{
@@ -17,25 +27,28 @@
       <v-row v-if="!isCurrentUser(user.id)" class="ma-0">
         <v-btn
           v-if="currentUserIsOwner && user.role === 'USER'"
-          @click="promote(user.id)"
+          class="bouton"
           block
+          @click="promote(user.id)"
           >Make admin</v-btn
         >
         <v-btn
           v-if="currentUserIsOwner && user.role === 'ADMIN'"
-          @click="demote(user.id)"
+          class="bouton"
           block
+          @click="demote(user.id)"
           >Revoke admin</v-btn
         >
-        <v-btn v-if="currentUserIsAdmin" block>Mute</v-btn>
-        <v-btn v-if="currentUserIsAdmin" block>Ban</v-btn>
+        <v-btn v-if="currentUserIsAdmin" class="bouton" block>Mute</v-btn>
+        <v-btn v-if="currentUserIsAdmin" class="bouton" block>Ban</v-btn>
         <v-btn
           v-if="!isUserBlocked(user.id)"
-          @click="blockUser(user.nickname)"
+          class="bouton"
           block
+          @click="blockUser(user.nickname)"
           >Block</v-btn
         >
-        <v-btn v-else @click="unblockUser(user.nickname)" block>Unblock</v-btn>
+        <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)">Unblock</v-btn>
       </v-row>
     </v-list-group>
   </v-list>
@@ -207,4 +220,15 @@ export default {
 .blocked {
   text-decoration: line-through;
 }
+
+.blue-border:deep(.mdi-chevron-down){
+  display: none;
+}
+.blue-border{
+  background-color: var(--light-purple);
+}
+.bouton{
+  background: var(--medium-purple) !important;
+}
+
 </style>

@@ -31,9 +31,6 @@
     </v-list>
   </v-card>
  <v-row no-gutters>
-    <!-- <v-col cols="8" class="pa-0">
-      <JoinChatroomDialog @join="pushChatroom" />
-    </v-col> -->
      <NewChatroomDialog @create="pushChatroom" />
   </v-row>
 </v-list>
@@ -121,10 +118,10 @@ export default {
   display: flex;
   justify-content: flex-start;
 }
-:deep .inactivebtn{
+:deep(.inactivebtn){
   background-color: var(--dark-purple) !important;
 }
-:deep .activebtn {
+:deep(.activebtn){
   background-color: var(--light) !important; /* Lighter background color when active */
   border-radius: 3px 3px 0px 0px !important;
 
@@ -148,7 +145,7 @@ export default {
   border-radius: 0% !important;
 }
 
-:deep .v-list-item__overlay{
+:deep(.v-list-item__overlay){
   background-color: var(--dark-purple);
 }
 

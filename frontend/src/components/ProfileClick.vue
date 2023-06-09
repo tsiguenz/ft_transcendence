@@ -26,7 +26,7 @@
               </v-avatar>
               <h3>{{ nickname }}</h3>
               <p class="text-caption mt-1">
-                {{ status }}
+                {{ printStatusConnection(status) }}
               </p>
               <v-divider class="my-3"></v-divider>
               <v-btn rounded variant="text"> Show Profile </v-btn>
@@ -90,6 +90,12 @@ export default {
       } else {
         return false;
     }
+  },
+  printStatusConnection(status){
+    if (status === true)
+      return "Online";
+    else
+      return "Offline";
   }
 }
 };

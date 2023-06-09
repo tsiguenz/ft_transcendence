@@ -189,27 +189,20 @@ export default {
 
 .roomName{
   background-color: var(--medium-purple);
-
 }
-
 .chating{
-  /* height:900px; */
-  /* overflow-y:auto; */
-  max-height: 300px;
+  max-height: 500px;
 }
 
 .msg{
   display: flex;
   justify-content: end;
   gap: 10px;
-
 }
-
 .msgOther{
   display: flex;
   gap: 10px;
 }
-
 
 .bubble{
   border-radius: 5px;
