@@ -16,42 +16,27 @@
     <v-row class="align-center">
       <v-col cols="3">
         <v-sheet class="sheet pa-3">
-          <div class="py-5">
-            <ProfileLadderPoints v-if="userIsMounted" :user="user" />
-          </div>
-          <ProfileAchievements v-if="userIsMounted" :user="user" :games="gameStats" />
+					<h3 class="font">Game stats</h3>
+          <ProfileGameStats v-if="userIsMounted" :user="user" :games="gameStats" />
         </v-sheet>
       </v-col>
       <v-col cols="6">
         <v-sheet color="transparent">
           <ProfileHistoryGames
             v-if="userIsMounted"
-            :gamesWin="gameStats.gamesWin"
-            :gamesLose="gameStats.gamesLose"
+            :games="gameStats"
             :users="users"
           />
         </v-sheet>
       </v-col>
       <v-col cols="3" align="center">
-        <v-sheet class="sheet pa-3">
+        <v-sheet v-if="nickname !== sessionStore.nickname" class="sheet pa-3">
           <p class="ma-10">
             <ProfileLastConnection
               v-if="userIsMounted && nickname !== sessionStore.nickname"
               :user="user"
             />
           </p>
-          <v-row class="justify-center"
-            ><h2 class="font">{{ gamesWin }}</h2></v-row
-          >
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game won</p></v-row
-          >
-          <v-row class="justify-center"
-            ><h2 class="font">{{ gamesPlayed }}</h2></v-row
-          >
-          <v-row class="justify-center mb-5"
-            ><p class="font">Game played</p></v-row
-          >
         </v-sheet>
         <v-btn
           v-if="nickname === sessionStore.nickname"
@@ -79,7 +64,7 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from './ProfilePrintAvatar.vue';
 import ProfileLadderPoints from './ProfileLadderPoints.vue';
-import ProfileAchievements from './ProfileAchievements.vue';
+import ProfileGameStats from './ProfileGameStats.vue';
 import ProfileHistoryGames from './ProfileHistoryGames.vue';
 import ProfileLastConnection from './ProfileLastConnection.vue';
 import IsFriend from '../components/IsFriend.vue';
@@ -89,7 +74,7 @@ export default {
   components: {
     ProfilePrintAvatar,
     ProfileLadderPoints,
-    ProfileAchievements,
+    ProfileGameStats,
     ProfileHistoryGames,
     IsFriend,
     ProfileLastConnection
@@ -100,9 +85,7 @@ export default {
       users: [],
       userIsMounted: false,
       gameStats: {},
-      gamesWin: 0,
-      friends: [],
-      gamesPlayed: 0
+      friends: []
     };
   },
   computed: {
@@ -126,8 +109,6 @@ export default {
         this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
         this.gameStats = responseGame.data;
-        this.gamesWin = this.gameStats.gamesWin.length;
-        this.gamesPlayed = this.gamesWin + this.gameStats.gamesLose.length;
         this.userIsMounted = true;
       } catch (error) {
         swal({

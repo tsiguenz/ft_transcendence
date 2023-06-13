@@ -13,7 +13,7 @@
             </p>
           </v-sheet>
           <v-sheet color="transparent">
-            <p>{{ setDuration(index.duration) }}</p>
+            <p>{{ setDuration(index.createdAt) }}</p>
           </v-sheet>
         </v-row>
       </div>
@@ -28,11 +28,10 @@ import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 
 export default {
-  props: ['gamesWin', 'gamesLose', 'users'],
+  props: ['games', 'users'],
   data() {
     return {
       historyGames: [],
-      games: [],
       isMounted: false
     };
   },
@@ -42,8 +41,6 @@ export default {
   },
   methods: {
     getGames() {
-      this.games.push(...this.gamesWin);
-      this.games.push(...this.gamesLose);
       this.isMounted = true;
     },
     setDuration(dateToConvert) {
