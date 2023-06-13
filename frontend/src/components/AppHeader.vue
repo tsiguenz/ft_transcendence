@@ -44,7 +44,7 @@
           ></v-img></v-avatar
         ><span class="text">LeaderBoard</span></router-link
       >
-      <router-link v-if="isLog()" class="button" to="/profile"
+      <router-link v-if="isLog()" class="button" to="/myprofile"
         ><v-avatar rounded="0" size="25px">
           <v-img
             class="icons-avatar"
@@ -67,7 +67,10 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    user() {
+      return this.sessionStore.nickname;
+    }
   },
   methods: {
     isLog() {

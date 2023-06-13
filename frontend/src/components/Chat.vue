@@ -53,9 +53,9 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
+import * as lib from '@/utils/lib';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ProfilePrintAvatar from  '../components/ProfilePrintAvatar.vue';
 
@@ -120,22 +120,22 @@ export default {
       }
     }
   },
-  created() {
-    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
-  },
+  // created() {
+  //   ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
+  // },
   mounted() {
-    ChatService.subscribeToMessages((message) => {
-      ChatService.storeMessage(message);
-    });
-    ChatService.subscribeToKick((payload) => {
-      this.$emit('leave', payload.chatroomId);
-    });
+    // ChatService.subscribeToMessages((message) => {
+    //   ChatService.storeMessage(message);
+    // });
+    // ChatService.subscribeToKick((payload) => {
+    //   this.$emit('leave', payload.chatroomId);
+    // });
     const authorNicknames = Array.from(new Set(this.messages.map(message => message.authorNickname)));
     authorNicknames.forEach(nickname => this.fetchAvatarUrl(nickname));
   },
-  beforeUnmount() {
-    ChatService.disconnect();
-  },
+  // beforeUnmount() {
+  //   ChatService.disconnect();
+  // },
   methods: {
     sendMessage() {
       if (this.newMessage == '') {
@@ -171,7 +171,7 @@ export default {
     displayError(payload) {
       swal({
         icon: 'error',
-        text: formatError(payload.message)
+        text: lib.formatError(payload.message)
       });
     },
     async fetchAvatarUrl(userName) {

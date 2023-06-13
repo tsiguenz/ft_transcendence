@@ -43,6 +43,9 @@
 </template>
 
 <script>
+import ChatService from '../services/chat.service';
+import swal from 'sweetalert';
+import * as lib from '@/utils/lib';
 import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -80,9 +83,24 @@ export default {
     }
   },
   created() {
+    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
     BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
+  mounted() {
+    ChatService.subscribeToMessages((message) => {
+      ChatService.storeMessage(message);
+    });
+  },
+  beforeUnmount() {
+    ChatService.disconnect();
+  },
   methods: {
+     displayError(payload) {
+      swal({
+        icon: 'error',
+        text: lib.formatError(payload.message)
+      });
+    },
     joinChatroom(id) {
       this.chatStore.activeChatroom = id;
       this.chatStore.hasJoinedRoom = true;
