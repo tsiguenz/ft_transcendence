@@ -1,6 +1,10 @@
 <template>
   <aside :class="`${is_expanded ? 'is-expanded' : ''}`">
-    <div class="logo"><img to="/home" src="/assets/icons/pong.png" /></div>
+    <div class="logo">
+      <router-link class="" to="/home"
+        ><v-avatar> <img src="/assets/icons/pong.png" /></v-avatar
+      ></router-link>
+    </div>
 
     <div class="menu-toggle-wrap">
       <button class="menu-toggle" @click="ToggleMenu">
@@ -32,14 +36,6 @@
           ></v-img></v-avatar
         ><span class="text">Chat</span></router-link
       >
-      <router-link v-if="isLog()" class="button" to="/friends"
-        ><v-avatar rounded="0" size="25px">
-          <v-img
-            class="icons-avatar"
-            src="/assets/icons/friends.png"
-          ></v-img></v-avatar
-        ><span class="text">Social</span></router-link
-      >
       <router-link v-if="isLog()" class="button" to="/leaderboard"
         ><v-avatar rounded="0" size="25px">
           <v-img
@@ -67,7 +63,6 @@ import { useSessionStore } from '@/store/session';
 export default {
   data() {
     return {
-      drawer: true,
       is_expanded: false
     };
   },
@@ -100,6 +95,9 @@ aside {
   font-family: 'Poppins', sans-serif;
   .logo {
     margin-bottom: 1rem;
+    .text {
+      padding-left: 2rem;
+    }
     img {
       width: 2rem;
     }

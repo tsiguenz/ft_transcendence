@@ -1,53 +1,9 @@
 <template>
-  <v-list class="window">
-    <v-card class="borderR">
-      <v-btn
-        :class="`${showFriends === true ? 'activebtn' : 'inactivebtn'}`"
-        @click="$emit('toggleFriendsView')"
-        ><v-avatar rounded="0" size="25px">
-          <v-img
-            class="icons-avatar"
-            src="/assets/icons/friends.png"
-          ></v-img></v-avatar
-        >My friends</v-btn
-      >
-    </v-card>
-    <v-card class="borderR">
-      <v-btn
-        :class="`${showPublicChannel === true ? 'activebtn' : 'inactivebtn'}`"
-        @click="$emit('togglePublicChannelView')"
-        ><v-avatar rounded="0" size="25px">
-          <v-img
-            class="icons-avatar"
-            src="/assets/icons/friends.png"
-          ></v-img></v-avatar
-        >Public Channels</v-btn
-      >
-    </v-card>
-    <v-card>
-      <v-list class="soc">
-        <p class="titleMessages">MESSAGES</p>
-        <v-list-item
-          v-for="chatroom in chatrooms"
-          :key="chatroom.id"
-          :class="{
-            activeR:
-              chatroom.id === activeRoomId &&
-              !showFriends &&
-              !showPublicChannel,
-            inactiveR: chatroom.id !== activeRoomId && !showFriends
-          }"
-          :title="chatroom.name"
-          :value="chatroom.name"
-          :active="chatroom.id == id"
-          @click="join(chatroom.id) && $emit('toggleChatView')"
-        ></v-list-item>
-      </v-list>
-    </v-card>
-    <v-row no-gutters>
-      <NewChatroomDialog @create="pushChatroom" />
-    </v-row>
-  </v-list>
+  <v-row no-gutters>
+    <v-col>
+      <JoinChatroomDialog @join="pushChatroom" />
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -55,7 +11,6 @@ import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
 import formatError from '@/utils/lib';
-import NewChatroomDialog from '../components/NewChatroomDialog.vue';
 import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 import { mapStores } from 'pinia';
@@ -64,10 +19,9 @@ import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
-    NewChatroomDialog,
     JoinChatroomDialog
   },
-  props: ['id', 'showFriends', 'showPublicChannel'],
+  props: ['id', 'showFriends'],
   emits: [
     'join',
     'toggleChatView',
@@ -138,9 +92,7 @@ export default {
   background-color: var(--dark-purple) !important;
 }
 :deep(.activebtn) {
-  background-color: var(
-    --light
-  ) !important; /* Lighter background color when active */
+  background-color: var(--light) !important;
   border-radius: 3px 3px 0px 0px !important;
 }
 

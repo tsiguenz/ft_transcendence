@@ -1,6 +1,6 @@
 <template>
   <v-btn
-    v-if="getStatusFriend(friendname) && !hover && !isMyProfile(friendname)"
+    v-if="newFriendStatus && !hover"
     color="#600FDF"
     size="x-small"
     icon
@@ -8,7 +8,7 @@
     ><img src="/assets/icons/add-friend.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="hover && getStatusFriend(friendname) && !isMyProfile(friendname)"
+    v-if="hover && newFriendStatus"
     color="#0F0124"
     size="x-small"
     icon
@@ -17,89 +17,85 @@
     ><img src="/assets/icons/trash.png" :width="20" :height="20"
   /></v-btn>
   <v-btn
-    v-if="!getStatusFriend(friendname) && !isMyProfile(friendname)"
+    v-if="!newFriendStatus"
     color="#0F0124"
     size="x-small"
     icon
-    @click="addFriend(friendname)"
+    @click="addFriend()"
     ><img src="/assets/icons/add-user.png" :width="20" :height="20"
   /></v-btn>
 </template>
 
 <script>
-import { mapStores } from 'pinia';
 import axios from 'axios';
-import { useSessionStore } from '@/store/session';
 import * as constants from '@/constants.ts';
 import formatError from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
-  props: ['friendname'],
+  inject: ['sessionStore'],
+  props: {
+    friendname: {
+      type: String,
+      required: true
+    },
+    isFriendAtBegining: {
+      type: Boolean,
+      required: true
+    }
+  },
   data() {
     return {
-      users: [],
-      friends: [],
+      newFriendStatus: false,
       hover: false
     };
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
   watch: {
-    friends() {
-      this.getFriends();
+    isFriendAtBegining: {
+      handler() {
+        this.newFriendStatus = this.isFriendAtBegining;
+      }
     }
   },
-  async mounted() {
-    await this.getFriends();
+  mounted() {
+    this.newFriendStatus = this.isFriendAtBegining;
   },
   methods: {
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data.map((friend) => friend.nickname);
-      } catch (error) {
-        console.log('error');
-      }
-    },
-    async deleteFriend(nickname) {
-      try {
-        await axios.delete(
+    async deleteFriend() {
+      await axios
+        .delete(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
+            `/users/${this.sessionStore.nickname}/friends/${this.friendname}`
+        )
+        .catch((error) => {
+          swall({
+            title: 'Error',
+            text: formatError(error.response.data.message),
+            icon: 'error',
+            button: 'OK'
+          });
+        })
+        .then(() => {
+          this.newFriendStatus = false;
         });
-      }
     },
-    async addFriend(friendname) {
-      try {
-        await axios.post(
+    async addFriend() {
+      await axios
+        .post(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${friendname}`
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
+            `/users/${this.sessionStore.nickname}/friends/${this.friendname}`
+        )
+        .catch((error) => {
+          swall({
+            title: 'Error',
+            text: formatError(error.response.data.message),
+            icon: 'error',
+            button: 'OK'
+          });
+        })
+        .then(() => {
+          this.newFriendStatus = true;
         });
-      }
-    },
-    getStatusFriend(friendname) {
-      return this.friends.includes(friendname);
-    },
-    isMyProfile(friendname) {
-      return friendname == this.sessionStore.nickname;
     }
   }
 };

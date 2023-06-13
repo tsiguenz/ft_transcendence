@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
     <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" block> + </v-btn>
+      <v-btn class="addbtn" v-bind="props" block> + </v-btn>
     </template>
-    <v-card>
+    <v-card class="window">
       <v-card-title>
         <span class="text-h5">Create chatroom</span>
       </v-card-title>
@@ -74,3 +74,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.addbtn {
+  background-color: var(--medium-purple) !important;
+}
+</style>
