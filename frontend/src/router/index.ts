@@ -31,9 +31,21 @@ const router = createRouter({
       component: () => import('../views/Leaderboard.vue')
     },
     {
-      path: '/profile',
-      name: 'Profile',
-      component: () => import('../views/Profile.vue')
+      path: '/myprofile',
+      name: 'MyProfile',
+      component: () => import('../views/MyProfile.vue'),
+      props: true
+    },
+    {
+      path: '/profile/:nickname',
+      name: 'ProfileNickname',
+      component: () => import('../views/Profile.vue'),
+      props: true
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: () => import('../views/Settings.vue')
     },
     {
       path: '/logout',

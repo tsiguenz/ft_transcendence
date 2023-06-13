@@ -23,7 +23,7 @@
 import * as constants from '@/constants.ts';
 import axios from 'axios';
 import swall from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import ProfileClick from '../components/ProfileClick.vue';
 
 export default {
@@ -63,7 +63,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });

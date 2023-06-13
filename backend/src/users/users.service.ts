@@ -30,7 +30,24 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true
+        createdAt: true,
+        lastConnection: true
+      }
+    });
+    return user;
+  }
+
+  async getUserGames(nickname: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        nickname: nickname
+      },
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        gamesWin: true,
+        gamesLose: true
       }
     });
     return user;
@@ -46,7 +63,26 @@ export class UsersService {
         nickname: true,
         ladderPoints: true,
         avatarPath: true,
-        createdAt: true
+        createdAt: true,
+        lastConnection: true
+      }
+    });
+    return user;
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        id: true,
+        nickname: true,
+        ladderPoints: true,
+        avatarPath: true,
+        createdAt: true,
+        lastConnection: true,
+        twoFactorEnable: true
       }
     });
     return user;

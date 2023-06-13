@@ -55,7 +55,7 @@ import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ProfilePrintAvatar from  '../components/ProfilePrintAvatar.vue';
 
@@ -171,7 +171,7 @@ export default {
     displayError(payload) {
       swal({
         icon: 'error',
-        text: formatError(payload.message)
+        text: lib.formatError(payload.message)
       });
     },
     async fetchAvatarUrl(userName) {
