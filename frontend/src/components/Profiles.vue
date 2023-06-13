@@ -126,7 +126,6 @@ export default {
         this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
         this.gameStats = responseGame.data;
-console.log("gameStats", this.gameStats);
         this.gamesWin = this.gameStats.gamesWin.length;
         this.gamesPlayed = this.gamesWin + this.gameStats.gamesLose.length;
         this.userIsMounted = true;
