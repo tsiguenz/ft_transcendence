@@ -59,6 +59,12 @@
           to="/settings"
           >Settings</v-btn
         >
+				<div v-else class="ma-5">
+          <IsFriend
+            :friendname="nickname"
+            :is-friend-at-begining="isFriend(user.nickname)"
+          ></IsFriend>
+				</div>
       </v-col>
     </v-row>
   </v-container>
@@ -76,6 +82,7 @@ import ProfileLadderPoints from './ProfileLadderPoints.vue';
 import ProfileAchievements from './ProfileAchievements.vue';
 import ProfileHistoryGames from './ProfileHistoryGames.vue';
 import ProfileLastConnection from './ProfileLastConnection.vue';
+import IsFriend from '../components/IsFriend.vue';
 
 export default {
   props: ['nickname'],
@@ -84,6 +91,7 @@ export default {
     ProfileLadderPoints,
     ProfileAchievements,
     ProfileHistoryGames,
+    IsFriend,
     ProfileLastConnection
   },
   data() {
@@ -93,6 +101,7 @@ export default {
       userIsMounted: false,
       gameStats: {},
       gamesWin: 0,
+      friends: [],
       gamesPlayed: 0
     };
   },
@@ -127,6 +136,25 @@ export default {
         });
         this.$router.push('/logout');
       }
+    },
+    async getFriends() {
+      try {
+        const response = await axios.get(
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
+        );
+        this.friends = response.data.map((friend) => friend.nickname);
+      } catch (error) {
+        swall({
+          title: 'Error',
+          text: lib.formatError(error.response.data.message),
+          icon: 'error',
+          button: 'OK'
+        });
+        this.$router.push('/logout');
+      }
+    },
+    isFriend(nickname) {
+      return this.friends.includes(nickname);
     }
   }
 };
