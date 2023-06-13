@@ -19,7 +19,7 @@
           <div class="py-5">
             <ProfileLadderPoints v-if="userIsMounted" :user="user" />
           </div>
-          <ProfileAchievements v-if="userIsMounted" />
+          <ProfileAchievements v-if="userIsMounted" :user="user" :games="gameStats" />
         </v-sheet>
       </v-col>
       <v-col cols="6">
@@ -126,6 +126,7 @@ export default {
         this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
         this.gameStats = responseGame.data;
+console.log("gameStats", this.gameStats);
         this.gamesWin = this.gameStats.gamesWin.length;
         this.gamesPlayed = this.gamesWin + this.gameStats.gamesLose.length;
         this.userIsMounted = true;

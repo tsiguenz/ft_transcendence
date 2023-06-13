@@ -1,16 +1,10 @@
 <template>
-  <div class="font">
-    <h2>Achievements</h2>
-    <div v-for="(title, index) in achievements.titles">
-      <v-divider />
-      <ul>
-        <h4 class="mt-5">{{ title }}</h4>
-      </ul>
-      <ul>
-        <p class="mb-5">{{ achievements.descriptions[index] }}</p>
-      </ul>
-    </div>
-  </div>
+<p>{{ ladderPoints }} ladder points</p>
+<p>{{ gamesPlayed }} games played</p>
+<p>{{ gamesWon }} games won</p>
+<p>{{ gamesLost }} games lost</p>
+<p>{{ gamesRanked }} ranked games played</p>
+<p>{{ gamesCustom}} custom games played</p>
 </template>
 
 <script>
@@ -21,33 +15,35 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
 export default {
+	props: ['user', 'games'],
   data() {
     return {
-      achievements: []
+			ladderPoints: 0,
+			gamesPlayed: 0,
+			gamesWon: 0,
+			gamesLost: 0,
+			gamesRanked: 0,
+			gamesCustom: 0,
+			totalScore: 0
     };
   },
   async mounted() {
-    this.putAchievements();
+		this.getDatas();
   },
   methods: {
-    async putAchievements() {
-      this.achievements = {
-        titles: [
-          'Super Player',
-          'Amazing player',
-          'We have a winner',
-          'Decade Dominator',
-          'Decimation Demolisher'
-        ],
-        descriptions: [
-          'Played 1 game',
-          'Played 10 games',
-          'Won 1 game',
-          'Won 10 games',
-          'Won 100 games'
-        ]
-      };
-    }
+		getDatas() {
+			this.ladderPoints = this.user.ladderPoints;
+			this.gamesWon = this.games.gamesWin.length;
+			this.gamesLost = this.games.gamesLose.length;
+			this.gamesPlayed = this.gamesWon + this.gamesLost;
+			this.gamesRanked = this.games.gamesWin.filter((games) => games.isRanked == true).length;
+			this.gamesRanked += this.games.gamesLose.filter((games) => games.isRanked == true).length;
+			this.gamesCustom= this.games.gamesWin.filter((games) => games.isRanked == false).length;
+			this.gamesCustom += this.games.gamesLose.filter((games) => games.isRanked == false).length;
+			console.log("Custom", this.gamesCustom);
+			console.log("USER", this.user);
+			console.log("GAMES", this.games);
+		}
   }
 };
 </script>
