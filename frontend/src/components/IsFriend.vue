@@ -57,6 +57,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.newFriendStatus = this.isFriendAtBegining;
+  },
   methods: {
     async deleteFriend() {
       await axios
