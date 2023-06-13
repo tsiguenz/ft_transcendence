@@ -17,7 +17,7 @@
       </v-form>
       <v-spacer></v-spacer>
       <div v-if="!isLog()" class="button-group">
-        <SignCard :toSignin="true" />
+        <SignCard :to-signin="true" />
         <SignCard />
       </div>
       <div v-if="isLog()" class="button-group">

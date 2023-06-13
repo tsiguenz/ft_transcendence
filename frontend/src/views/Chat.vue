@@ -4,13 +4,13 @@
       <v-col cols="3">
         <Chatrooms
           :id="currentChatroomId"
-          :showFriends="showFriends"
-          :showPublicChannel="showPublicChannel"
-          :showPrivateChannel="showPrivateChannel"
+          :show-friends="showFriends"
+          :show-public-channel="showPublicChannel"
+          :show-private-channel="showPrivateChannel"
           @join="joinChatroom"
-          @toggleFriendsView="toggleFriendsView"
-          @toggleChatView="toggleChatView"
-          @togglePublicChannelView="togglePublicChannelView"
+          @toggle-friends-view="toggleFriendsView"
+          @toggle-chat-view="toggleChatView"
+          @toggle-public-channel-view="togglePublicChannelView"
         />
       </v-col>
       <v-col cols="6">
