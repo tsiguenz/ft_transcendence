@@ -57,6 +57,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.newFriendStatus = this.isFriendAtBegining;
+  },
   methods: {
     async deleteFriend() {
       await axios
@@ -77,7 +80,6 @@ export default {
         });
     },
     async addFriend() {
-      console.log(`${this.sessionStore.nickname} ${this.friendname}`);
       await axios
         .post(
           constants.API_URL +
