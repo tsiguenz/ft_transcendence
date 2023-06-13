@@ -44,7 +44,7 @@ export default {
             icon: 'error',
             text: 'Invalid two factor code'
           });
-          this.$router.push('/home');
+          this.$router.replace('/home');
           return;
         }
         const data = response.data;
@@ -55,13 +55,13 @@ export default {
         this.$cookie.setCookie('jwt', data.access_token);
         this.$cookie.setCookie('refresh_token', data.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
-        this.$router.push('/home');
+        this.$router.replace('/home');
       } catch (error) {
         swal({
           icon: 'error',
           text: lib.formatError(error.response.data.message)
         });
-        this.$router.push('/home');
+        this.$router.replace('/home');
       }
     }
   }

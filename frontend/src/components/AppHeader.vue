@@ -63,7 +63,6 @@ import { useSessionStore } from '@/store/session';
 export default {
   data() {
     return {
-      drawer: true,
       is_expanded: false
     };
   },

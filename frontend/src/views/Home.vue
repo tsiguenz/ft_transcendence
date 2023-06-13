@@ -4,9 +4,11 @@
 </template>
 
 <script>
+import CustomGameMenu from '../components/CustomGameMenu.vue';
+
 export default {
-  data() {
-    return {};
+  components: {
+    CustomGameMenu
   }
 };
 </script>
