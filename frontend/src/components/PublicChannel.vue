@@ -1,6 +1,7 @@
 <template>
   <v-row no-gutters>
     <v-col>
+      <h1>JE SUIS LA FDP</h1>
       <JoinChatroomDialog @join="pushChatroom" />
     </v-col>
   </v-row>
@@ -15,73 +16,28 @@ import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useChatStore } from '@/store/chat';
-import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
     JoinChatroomDialog
   },
-  props: ['id', 'showFriends'],
-  emits: [
-    'join',
-    'toggleChatView',
-    'toggleFriendsView',
-    'togglePublicChannelView'
-  ],
-  data() {
-    return {
-      activeRoomId: false
-    };
-  },
+  emits: ['join'],
   computed: {
-    ...mapStores(useChatStore, useSessionStore),
-    chatrooms() {
-      return this.chatStore.chatrooms;
-    }
-  },
-  mounted() {
-    if (this.chatStore.chatrooms.length > 0) {
-      return;
-    }
-    this.loadChatrooms().then((_chatrooms) => {
-      this.chatStore.switchToDefaultChatroom();
-    });
+    ...mapStores(useChatStore)
   },
   methods: {
     join(id) {
       this.$emit('join', id);
-      this.activeRoomId = id;
     },
     pushChatroom(chatroom) {
       this.chatStore.addRoom(chatroom);
       this.join(chatroom.id);
-    },
-    async loadChatrooms() {
-      const chatrooms = await this.getChatrooms();
-      this.chatStore.addRoom(...chatrooms);
-      return chatrooms;
-    },
-    async getChatrooms() {
-      try {
-        const response = await axios.get(
-          constants.API_URL +
-            '/users/' +
-            this.sessionStore.nickname +
-            '/chatrooms'
-        );
-        return response.data;
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
-      }
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .v-btn {
   width: 100%;
   height: 60px;

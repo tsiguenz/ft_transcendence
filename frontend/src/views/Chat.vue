@@ -14,21 +14,15 @@
         />
       </v-col>
       <v-col cols="6">
-        <template v-if="showPrivateChannel">
-          <Chat
-            :id="currentChatroomId"
-            title="Chat"
-            :messages="messages"
-            @leave="leaveRoom"
-            @delete="leaveRoom"
-          />
-        </template>
-        <template v-else-if="showFriends">
-          <Friends />
-        </template>
-        <template v-else-if="showPublicChannel">
-          <PublicChannel />
-        </template>
+        <Chat
+          v-if="showPrivateChannel"
+          :id="currentChatroomId"
+          :messages="messages"
+          @leave="leaveRoom"
+          @delete="leaveRoom"
+        />
+        <Friends v-else-if="showFriends" />
+        <PublicChannel v-else-if="showPublicChannel" />
       </v-col>
       <v-col cols="3">
         <template v-if="showPrivateChannel">
@@ -68,9 +62,9 @@ export default {
   },
   data() {
     return {
-      showFriends: false, // for lulu : change to true for next PR
+      showFriends: true, // for lulu : change to true for next PR
       showPublicChannel: false,
-      showPrivateChannel: true //for lulu : change to false for next PR
+      showPrivateChannel: false //for lulu : change to false for next PR
     };
   },
   computed: {
@@ -95,7 +89,7 @@ export default {
     ChatService.disconnect();
   },
   methods: {
-     displayError(payload) {
+    displayError(payload) {
       swal({
         icon: 'error',
         text: lib.formatError(payload.message)
@@ -109,15 +103,11 @@ export default {
       this.showPrivateChannel = true;
     },
     leaveRoom(id) {
+      this.chatStore.removeRoom(id);
       if (id === this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
       }
-      this.chatStore.removeRoom(id);
       this.chatStore.hasJoinedRoom = false;
-      this.chatStore.removeRoom(id);
-      if (id == this.currentChatroomId) {
-        this.chatStore.switchToDefaultChatroom();
-      }
     },
     toggleFriendsView() {
       this.showFriends = true;

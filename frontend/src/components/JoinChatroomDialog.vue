@@ -105,7 +105,6 @@ import * as lib from '@/utils/lib';
 export default {
   data() {
     return {
-      activeChat: 1,
       chatrooms: [],
       dialog: false
     };
@@ -117,7 +116,7 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
-    async joinRoom(chatroom) {
+    joinRoom(chatroom) {
       ChatService.joinRoom({
         chatroomId: chatroom.id,
         password: chatroom.password

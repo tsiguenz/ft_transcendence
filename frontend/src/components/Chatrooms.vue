@@ -67,7 +67,7 @@ export default {
     NewChatroomDialog,
     JoinChatroomDialog
   },
-  props: ['id', 'showFriends', 'showPublicChannel'],
+  props: ['id', 'showFriends', 'showPublicChannel', 'showPrivateChannel'],
   emits: [
     'join',
     'toggleChatView',

@@ -67,7 +67,7 @@ export default {
       this.dialog = false;
       this.newChatroomObject = { name: '', type: 'PUBLIC', password: null };
     },
-    async newChatroom() {
+    newChatroom() {
       ChatService.createRoom(this.newChatroomObject);
       this.closeDialog();
     }

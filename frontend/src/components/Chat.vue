@@ -1,43 +1,42 @@
 <template>
   <v-toolbar class="roomName">
-      <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <EditChatroomDialog
-        v-if="currentUserIsOwner"
-        :id="id"
-        @delete="(roomId) => $emit('delete', roomId)"
-      />
-      <v-btn v-if="id && chatStore.hasJoinedRoom" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
-    </v-toolbar>
-  <v-list ref="chat"  class="overflow-y-auto window chating">
-    
+    <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <EditChatroomDialog
+      v-if="currentUserIsOwner"
+      :id="id"
+      @delete="(roomId) => $emit('delete', roomId)"
+    />
+    <v-btn
+      v-if="id && chatStore.hasJoinedRoom"
+      icon="mdi-exit-to-app"
+      @click="leaveRoom"
+    ></v-btn>
+  </v-toolbar>
+  <v-list ref="chat" class="overflow-y-auto window chating">
     <div v-for="item in messages" :key="item.sentAt">
-      <div  v-if="item.authorId === currentUserId" class="author">
-      <p class="name">{{ item.authorNickname }}</p>
-      <p  class="text-right ma-2 msg ">
-        
-        <p
-          class="bubble pa-1 bg-blue msg-content"
-          >{{ item.data }}</p
-        >
-        <ProfilePrintAvatar
-                  :wdt="40"
-                  :hgt="40"
-                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
-                ></ProfilePrintAvatar>
-      </p>
-    </div>
-    <div  v-if="item.authorId !== currentUserId" class="other">
-      <p class="nameOther">{{ item.authorNickname }}</p>
-      <p  class="text-left ma-2 msgOther ">
-        <ProfilePrintAvatar
-                  :wdt="40"
-                  :hgt="40"
-                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
-                ></ProfilePrintAvatar>
-        <p class="bubble pa-1 bg-green msg-content">{{ item.data }}</p>
-      </p>
-    </div>
+      <div v-if="item.authorId === currentUserId" class="author">
+        <p class="name">{{ item.authorNickname }}</p>
+        <span class="text-right ma-2 msg">
+          <p class="bubble pa-1 bg-blue msg-content">{{ item.data }}</p>
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(item.authorNickname)"
+          ></ProfilePrintAvatar>
+        </span>
+      </div>
+      <div v-if="item.authorId !== currentUserId" class="other">
+        <p class="nameOther">{{ item.authorNickname }}</p>
+        <span class="text-left ma-2 msgOther">
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(item.authorNickname)"
+          ></ProfilePrintAvatar>
+          <p class="bubble pa-1 bg-green msg-content">{{ item.data }}</p>
+        </span>
+      </div>
     </div>
   </v-list>
   <v-text-field
@@ -57,20 +56,20 @@ import * as lib from '@/utils/lib';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
-import ProfilePrintAvatar from  '../components/ProfilePrintAvatar.vue';
+import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
   components: {
     EditChatroomDialog,
     ProfilePrintAvatar
   },
-  props: ['id', 'title', 'messages'],
+  props: ['id', 'messages'],
   emits: ['leave', 'delete'],
   data() {
     return {
       newMessage: '',
       chatroom: [],
-      avatarUrls: {},
+      avatarUrls: {}
     };
   },
   computed: {
@@ -92,31 +91,31 @@ export default {
         return this.avatarUrls[authorNickname];
       };
     }
-    
   },
   watch: {
     messages: {
-        handler(newMessages) {
-            this.$nextTick(() => {
-                this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
-            });
-            const authorNicknames = Array.from(new Set(newMessages.map(message => message.authorNickname)));
-            authorNicknames.forEach(nickname => {
-                if (!this.avatarUrls[nickname]) {
-                    this.fetchAvatarUrl(nickname);
-                }
-            });
-        },
-        deep: true,
-        immediate: true
+      handler(newMessages) {
+        this.$nextTick(() => {
+          this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
+        });
+        const authorNicknames = Array.from(
+          new Set(newMessages.map((message) => message.authorNickname))
+        );
+        authorNicknames.forEach((nickname) => {
+          if (!this.avatarUrls[nickname]) {
+            this.fetchAvatarUrl(nickname);
+          }
+        });
+      },
+      deep: true
+      // immediate: true
     },
     id: {
       handler() {
         if (!this.id) {
           return;
         }
-        ChatService.connectRoom(this.id);
-        ChatService.getRoomMessages(this.id, this.lastMessageTime());
+        this.connectRoom();
       }
     }
   },
@@ -124,19 +123,23 @@ export default {
   //   ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
   // },
   mounted() {
+    // this.connectRoom();
     // ChatService.subscribeToMessages((message) => {
     //   ChatService.storeMessage(message);
     // });
     // ChatService.subscribeToKick((payload) => {
     //   this.$emit('leave', payload.chatroomId);
     // });
-    const authorNicknames = Array.from(new Set(this.messages.map(message => message.authorNickname)));
-    authorNicknames.forEach(nickname => this.fetchAvatarUrl(nickname));
+    const authorNicknames = Array.from(
+      new Set(this.messages.map((message) => message.authorNickname))
+    );
+    authorNicknames.forEach((nickname) => this.fetchAvatarUrl(nickname));
   },
-  // beforeUnmount() {
-  //   ChatService.disconnect();
-  // },
   methods: {
+    connectRoom() {
+      ChatService.connectRoom(this.id);
+      ChatService.getRoomMessages(this.id, this.lastMessageTime());
+    },
     sendMessage() {
       if (this.newMessage == '') {
         return;
@@ -175,46 +178,44 @@ export default {
       });
     },
     async fetchAvatarUrl(userName) {
-        const response = await axios.get(constants.API_URL + '/users/');
-        const user = response.data.find((user) => user.nickname === userName);
-        const avatarPath = constants.AVATARS_URL + user.avatarPath;
-        this.avatarUrls[userName] = avatarPath;
-  },
+      const response = await axios.get(constants.API_URL + '/users/');
+      const user = response.data.find((user) => user.nickname === userName);
+      const avatarPath = constants.AVATARS_URL + user.avatarPath;
+      this.avatarUrls[userName] = avatarPath;
+    }
   }
 };
 </script>
 
 <style scoped>
-
-
-.roomName{
+.roomName {
   background-color: var(--medium-purple);
 }
-.chating{
+.chating {
   max-height: 500px;
 }
 
-.msg{
+.msg {
   display: flex;
   justify-content: end;
   gap: 10px;
 }
-.msgOther{
+.msgOther {
   display: flex;
   gap: 10px;
 }
 
-.bubble{
+.bubble {
   border-radius: 5px;
 }
 
-.name{
+.name {
   text-align: end;
   padding-right: 10px;
   font-size: 10px;
 }
 
-.nameOther{
+.nameOther {
   padding-left: 10px;
   font-size: 10px;
 }

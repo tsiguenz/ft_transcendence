@@ -138,9 +138,6 @@ export default {
       }
     }
   },
-  beforeUnmount() {
-    ChatService.disconnect();
-  },
   methods: {
     async promote(userId) {
       try {
