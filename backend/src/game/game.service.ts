@@ -116,7 +116,7 @@ export class GameService {
     };
   }
 
-  async updateRating(userId, newRating): Promise<void> {
+  async updateRating(userId: string, newRating: number): Promise<void> {
     await this.prisma.user
       .update({
         where: { id: userId },
