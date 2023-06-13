@@ -24,23 +24,41 @@
           :title="user.nickname"
         ></v-list-item>
       </template>
-      <v-row v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn
-          v-if="currentUserIsOwner && user.role === 'USER'"
-          class="bouton"
-          block
-          @click="promote(user.id)"
-          >Make admin</v-btn
-        >
-        <v-btn
-          v-if="currentUserIsOwner && user.role === 'ADMIN'"
-          class="bouton"
-          block
-          @click="demote(user.id)"
-          >Revoke admin</v-btn
-        >
-        <v-btn v-if="currentUserIsAdmin" class="bouton" block>Mute</v-btn>
-        <v-btn v-if="currentUserIsAdmin" class="bouton" block>Ban</v-btn>
+      <div v-if="!isCurrentUser(user.id)" class="ma-0">
+        <div v-if="currentUserIsOwner">
+          <v-btn v-if="user.role === 'USER'" @click="promote(user.id)" block
+            >Make admin</v-btn
+          >
+          <v-btn
+            v-else-if="user.role === 'ADMIN'"
+            @click="demote(user.id)"
+            block
+            >Revoke admin</v-btn
+          >
+        </div>
+        <div v-if="canBeAdministered(user.role)">
+          <v-btn @click="kick(user.id)" block>Kick</v-btn>
+          <v-btn v-if="isUserMuted(user.id)" @click="unmute(user.id)" block
+            >Unmute</v-btn
+          >
+          <RestrictUserDialog
+            v-else
+            action="Mute"
+            :nickname="user.nickname"
+            :userId="user.id"
+            @restrict="mute"
+          />
+          <v-btn v-if="isUserBanned(user.id)" @click="unban(user.id)" block
+            >Unban</v-btn
+          >
+          <RestrictUserDialog
+            v-else
+            action="Ban"
+            :nickname="user.nickname"
+            :userId="user.id"
+            @restrict="ban"
+          />
+        </div>
         <v-btn
           v-if="!isUserBlocked(user.id)"
           class="bouton"
@@ -49,7 +67,7 @@
           >Block</v-btn
         >
         <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)">Unblock</v-btn>
-      </v-row>
+      </div>
     </v-list-group>
   </v-list>
 </template>
@@ -65,8 +83,12 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import RestrictUserDialog from '../components/RestrictUserDialog.vue';
 
 export default {
+  components: {
+    RestrictUserDialog
+  },
   props: ['id'],
   data() {
     return {
@@ -177,6 +199,19 @@ export default {
         });
       }
     },
+    canBeAdministered(userRole) {
+      return this.currentUserIsAdmin && userRole !== 'OWNER';
+    },
+    isUserMuted(userId) {
+      return this.chatStore
+        .getUserRestrictions(userId)
+        .filter((restriction) => restriction.type == 'MUTED').length;
+    },
+    isUserBanned(userId) {
+      return this.chatStore
+        .getUserRestrictions(userId)
+        .filter((restriction) => restriction.type == 'BANNED').length;
+    },
     isCurrentUser(userId) {
       return this.currentUserId === userId;
     },
@@ -184,27 +219,32 @@ export default {
       return this.connectedUsersStore.isConnected(id);
     },
     async blockUser(username) {
-      try {
-        BlockUserService.blockUser(username);
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
+      BlockUserService.blockUser(username);
     },
     async unblockUser(username) {
-      try {
-        BlockUserService.unblockUser(username);
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: formatError(error.response.data.message)
-        });
-      }
+      BlockUserService.unblockUser(username);
     },
     isUserBlocked(userId) {
       return BlockUserService.isUserBlocked(userId);
+    },
+    mute(params) {
+      ChatService.muteUser(params.userId, this.id, params.time);
+      this.chatStore.setUserRestriction(params.userId, 'MUTED', params.time);
+    },
+    ban(params) {
+      ChatService.banUser(params.userId, this.id, params.time);
+      this.chatStore.setUserRestriction(params.userId, 'BANNED', params.time);
+    },
+    unmute(userId) {
+      ChatService.unmuteUser(userId, this.id);
+      this.chatStore.removeUserRestriction(userId, 'MUTED');
+    },
+    unban(userId) {
+      ChatService.unbanUser(userId, this.id);
+      this.chatStore.removeUserRestriction(userId, 'BANNED');
+    },
+    kick(userId) {
+      ChatService.kickUser(userId, this.id);
     }
   }
 };
