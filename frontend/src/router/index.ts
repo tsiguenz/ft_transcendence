@@ -18,7 +18,12 @@ const router = createRouter({
     {
       path: '/game',
       name: 'Game',
-      component: () => import('../views/Game.vue')
+      component: () => import('../views/GameView.vue')
+    },
+    {
+      path: '/game/:id',
+      name: 'GameId',
+      component: () => import('../views/GameView.vue')
     },
     {
       path: '/leaderboard',
@@ -59,12 +64,12 @@ router.beforeEach((to) => {
     router.push('/home');
     return;
   }
-  // redirect to signin if not logged in and try to access authenticated routes
+  // redirect to home if not logged in and try to access authenticated routes
   if (
     !sessionStore.loggedIn &&
     !constants.UNAUTHENTICATED_ROUTES.includes(to.path)
   ) {
-    router.push('/signin');
+    router.push('/home');
     return;
   }
   // redirect to home if logged in and try to access unauthenticated routes

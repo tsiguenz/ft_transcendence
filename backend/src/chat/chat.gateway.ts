@@ -178,7 +178,6 @@ export class ChatGateway
     }
 
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
     if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
       throw new WsException('Unauthorized to restrict user');
     }
@@ -221,7 +220,6 @@ export class ChatGateway
     }
   ) {
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
     if (!(await this.canRestrictUser(payload.userId, chatroom, client))) {
       throw new WsException('Unauthorized to unrestrict user');
     }
