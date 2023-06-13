@@ -31,9 +31,9 @@ const router = createRouter({
       component: () => import('../views/Friends.vue')
     },
     {
-      path: '/profile/me',
-      name: 'ProfileMe',
-      component: () => import('../views/ProfileMe.vue'),
+      path: '/myprofile',
+      name: 'MyProfile',
+      component: () => import('../views/MyProfile.vue'),
       props: true
     },
     {
@@ -81,7 +81,7 @@ router.beforeEach((to) => {
     !sessionStore.loggedIn &&
     !constants.UNAUTHENTICATED_ROUTES.includes(to.path)
   ) {
-    router.push('/signin');
+    router.push('/home');
     return;
   }
   // redirect to home if logged in and try to access unauthenticated routes

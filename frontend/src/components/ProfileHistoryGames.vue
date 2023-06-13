@@ -8,8 +8,8 @@
           <v-sheet class="ma-4" color="transparent">
             <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
             <p>
-              Opponent {{ users[index.winnerId].nickname }} -
-              {{ users[index.loserId].nickname }}
+              Opponent {{ getUser(index.winnerId) }} -
+              {{ getUser(index.loserId) }}
             </p>
           </v-sheet>
           <v-sheet color="transparent">
@@ -54,7 +54,10 @@ export default {
       const rect = element.getBoundingClientRect();
       const height = rect.top + window.pageYOffset;
       element.style.height = `calc(100vh - ${height}px)`;
-    }
+    },
+    getUser(index) {
+			return (this.users.filter(users => users.id == index)[0].nickname);
+		}
   }
 };
 </script>
