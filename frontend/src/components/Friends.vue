@@ -21,7 +21,7 @@
         <td class="cust-td hgt-td"> <ProfileClick :nickname="friend.nickname" :status="userStatus(friend)" :width="40" :height="40" :url-avatar="getAvatarPath(friend)"></ProfileClick><p>{{ friend.nickname }}</p></td>
         <td class=" hgt-td">{{ friend.ladderPoints }}</td>
         <td class=" hgt-td">
-          <IsFriend :friendname="friend.nickname" @delete="deleteFriend(friend.nickname)"></IsFriend>
+          <IsFriend :friendname="friend.nickname" :is-friend-at-begining="isFriend(friend.nickname)"></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -55,9 +55,6 @@ export default {
   },
   
   watch: {
-    async friends() {
-      await this.getFriends();
-    },
     connectedUsersStore: {
       handler() {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
@@ -65,21 +62,16 @@ export default {
       deep: true
     }
   },
-  async mounted() {
+   async created() {
     await this.getFriends();
+    console.log("friends mounted")
     this.getConnectedFriends();
   },
   methods: {
     async getFriends() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
         );
         this.friends = response.data;
         this.friends.forEach((friend) => {
@@ -97,15 +89,10 @@ export default {
     },
     async deleteFriend(nickname) {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         await axios.delete(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`
+        
         );
         this.friends = this.friends.filter(friend => friend.nickname !== nickname);
       } catch (error) {
@@ -119,16 +106,9 @@ export default {
     },
     async addFriend(nickname) {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         await axios.post(
           constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+            `/users/${this.sessionStore.nickname}/friends/${nickname}`
         );
         this.renderPage++;
       } catch (error) {
@@ -152,12 +132,17 @@ export default {
             if (this.connectedUsers.includes(this.friends[i].id)) {
                 this.connectedFriends.push(this.friends[i]);
         }
+      }
+    },
+    getAvatarPath(user) {
+      return user.avatarPath;
+    },
+    isFriend(nickname) {
+
+        console.log(this.friends.includes(nickname));
+        return this.friends.includes(nickname);
+      },
     }
-  },
-  getAvatarPath(user) {
-    return user.avatarPath;
-  },
-  }
 };
 </script>
 

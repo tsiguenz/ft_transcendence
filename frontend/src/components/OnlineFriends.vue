@@ -46,14 +46,8 @@ export default {
    methods: {
     async getFriends() {
       try {
-        const jwt = this.$cookie.getCookie('jwt');
         const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`,
-          {
-            headers: {
-              Authorization: 'Bearer ' + jwt
-            }
-          }
+          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
         );
         this.friends = response.data;
         this.friends.forEach((friend) => {

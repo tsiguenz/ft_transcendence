@@ -35,6 +35,7 @@
           <IsFriend
             v-if="!isMyProfile(user.nickname)"
             :friendname="user.nickname"
+            :is-friend-at-begining="isFriend(user.nickname)"
           ></IsFriend>
         </td>
       </tr>
