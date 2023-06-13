@@ -23,10 +23,7 @@ export class ChatroomSocketService {
     const parsedPayload = this.parsePayload(payload);
 
     this.validatePayload(parsedPayload);
-    const chatroom = await this.chatroom.create(userId, parsedPayload);
-    client.emit(events.CHATROOM_NEW, {
-      chatroom: chatroom
-    });
+    return await this.chatroom.create(userId, parsedPayload);
   }
 
   async deleteChatroom(
@@ -56,24 +53,12 @@ export class ChatroomSocketService {
     const userId = client['decoded'].sub;
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (
-      await this.chatroomRestriction.isUserBanned(userId, payload.chatroomId)
-    ) {
-      throw new WsException('Unauthorized to join room');
-    }
     await this.chatroom.join(userId, payload.chatroomId, payload.password);
 
-    const chatroomUser = await this.chatroomUser.findOneWithRestrictions(
+    const formattedUser = await this.getFormattedChatroomUser(
       userId,
       chatroom.id
     );
-
-    const formattedUser = {
-      id: chatroomUser.id,
-      nickname: chatroomUser.nickname,
-      role: chatroomUser.chatrooms[0].role,
-      restrictions: chatroomUser.restrictions
-    };
 
     client.emit(events.CHATROOM_NEW, {
       chatroom: chatroom
@@ -92,12 +77,61 @@ export class ChatroomSocketService {
     const userId = client['decoded'].sub;
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    await this.chatroom.leave(userId, payload.chatroomId);
+    if (chatroom.type !== RoomType.ONE_TO_ONE) {
+      await this.chatroom.leave(userId, payload.chatroomId);
+    }
 
     client.leave(chatroom.slug);
     server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId
+    });
+  }
+
+  async invite(
+    client: Socket,
+    userSocket: any,
+    server: Server,
+    payload: { chatroomId: string; userId: string }
+  ) {
+    const userId = client['decoded'].sub;
+    const chatroom = await this.chatroom.findOne(payload.chatroomId);
+
+    if (
+      !(await this.chatroomUser.canUserAdministrate(userId, payload.chatroomId))
+    ) {
+      throw new WsException('Unauthorized to invite users');
+    }
+
+    if (
+      await this.chatroomRestriction.isUserBanned(
+        payload.userId,
+        payload.chatroomId
+      )
+    ) {
+      throw new WsException(`Cannot invite user to room`);
+    }
+
+    if (
+      chatroom.type !== RoomType.PRIVATE &&
+      chatroom.type !== RoomType.PROTECTED
+    ) {
+      throw new WsException(`Cannot invite to ${chatroom.type} room`);
+    }
+
+    await this.chatroom.addUser(payload.userId, payload.chatroomId);
+
+    const formattedUser = await this.getFormattedChatroomUser(
+      payload.userId,
+      chatroom.id
+    );
+
+    userSocket.emit(events.CHATROOM_NEW, {
+      chatroom: chatroom
+    });
+    server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
+      chatroomId: chatroom.id,
+      chatroomUser: formattedUser
     });
   }
 
@@ -125,5 +159,21 @@ export class ChatroomSocketService {
       type: payload.type as RoomType,
       password: payload.password
     };
+  }
+
+  private async getFormattedChatroomUser(userId: string, chatroomId: string) {
+    const chatroomUser = await this.chatroomUser.findOneWithRestrictions(
+      userId,
+      chatroomId
+    );
+
+    const formattedUser = {
+      id: chatroomUser.id,
+      nickname: chatroomUser.nickname,
+      role: chatroomUser.chatrooms[0].role,
+      restrictions: chatroomUser.restrictions
+    };
+
+    return formattedUser;
   }
 }

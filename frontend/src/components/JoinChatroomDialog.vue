@@ -77,7 +77,11 @@ export default {
       this.dialog = false;
     },
     async joinRoom(chatroom) {
-      ChatService.joinRoom({chatroomId: chatroom.id, password: chatroom.password});
+      ChatService.joinRoom({
+        chatroomId: chatroom.id,
+        password: chatroom.password
+      });
+      this.closeDialog();
     },
     async getJoinableRooms() {
       try {

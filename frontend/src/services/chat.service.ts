@@ -30,7 +30,14 @@ class ChatService {
         this.chatStore.removeUserFromRoom(payload.chatroomId, payload.userId);
       }
     );
-    // this.socketService.subscribe(events.EXCEPTION, callback);
+    this.socketService.subscribe(
+      events.CHATROOM_RESTRICTED_USER,
+      (payload: any) => {
+        console.info(
+          `RESTRICTED: [${payload.restrictionType}], until: ${payload.until}`
+        );
+      }
+    );
     // this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
@@ -138,6 +145,13 @@ class ChatService {
       name: 'SuperDuperChat',
       roomType: 'ONE_TO_ONE',
       userIds: [firstUserId, secondUserId]
+    });
+  }
+
+  inviteUser(chatroomId: string, userId: string) {
+    this.socketService.send(events.CHATROOM_INVITE_USER, {
+      chatroomId,
+      userId: '3db1f0c4-8209-4de6-acc6-b34419b3eff0'
     });
   }
 }

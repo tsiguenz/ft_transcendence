@@ -6,6 +6,7 @@ import {
 import { CreateChatroomDto, UpdateChatroomDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
+import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
 
 import { ChatRoom, ChatRoomUser, Role, RoomType } from '@prisma/client';
 import * as argon from 'argon2';
@@ -14,7 +15,8 @@ import * as argon from 'argon2';
 export class ChatroomService {
   constructor(
     private prisma: PrismaService,
-    private chatroomUser: ChatroomUserService
+    private chatroomUser: ChatroomUserService,
+    private chatroomRestriction: ChatroomRestrictionService
   ) {}
   async create(userId: string, dto: CreateChatroomDto) {
     const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
@@ -88,6 +90,15 @@ export class ChatroomService {
     });
   }
 
+  async addUser(userId: string, chatroomId: string) {
+    const chatroomUser = await this.chatroomUser.findOne(userId, chatroomId);
+    if (chatroomUser) {
+      throw new ForbiddenException('User already in room');
+    }
+
+    return await this.chatroomUser.create(userId, chatroomId);
+  }
+
   async join(
     userId: string,
     chatroomId: string,
@@ -95,20 +106,22 @@ export class ChatroomService {
   ): Promise<ChatRoomUser> {
     const chatroom = await this.findOneException(chatroomId);
 
-    if (chatroom.type === RoomType.PRIVATE) {
+    if (
+      chatroom.type === RoomType.PRIVATE ||
+      chatroom.type === RoomType.ONE_TO_ONE
+    ) {
       throw new ForbiddenException('Could not join private room');
+    }
+
+    if (await this.chatroomRestriction.isUserBanned(userId, chatroomId)) {
+      throw new ForbiddenException('Unauthorized to join room');
     }
 
     if (!(await this.roomPasswordMatches(chatroom, password))) {
       throw new ForbiddenException('Invalid password');
     }
-    // Check if user is able to join chatroom
-    const chatroomUser = await this.chatroomUser.findOne(userId, chatroomId);
-    if (chatroomUser) {
-      throw new ForbiddenException('User already in room');
-    }
-    // Check if user is banned from channel
-    return await this.chatroomUser.create(userId, chatroomId);
+
+    return await this.addUser(userId, chatroomId);
   }
 
   async leave(userId: string, chatroomId: string) {

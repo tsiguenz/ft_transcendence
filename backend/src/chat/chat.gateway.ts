@@ -145,16 +145,40 @@ export class ChatGateway
 
     try {
       if (payload.roomType !== RoomType.ONE_TO_ONE) {
-        return await this.chatroomSocketService.createChatroom(client, payload);
+        chatroom = await this.chatroomSocketService.createChatroom(
+          client,
+          payload
+        );
       }
 
       if (payload.roomType === RoomType.ONE_TO_ONE) {
-        chatroom = await this.privateMessage.create(
+        chatroom = await this.privateMessage.findOrCreate(
           payload.userIds[0],
           payload.userIds[1]
         );
       }
-      // client.join(chatroom.slug);
+
+      client.emit(events.CHATROOM_NEW, {
+        chatroom: chatroom
+      });
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_INVITE_USER)
+  async handleInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string; userId: string }
+  ) {
+    try {
+      const socket = await this.getUserSocket(payload.userId);
+      await this.chatroomSocketService.invite(
+        client,
+        socket,
+        this.server,
+        payload
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -249,10 +273,11 @@ export class ChatGateway
         until
       );
 
-      if (restrictionType == RestrictionType.MUTED) {
-        return;
+      const socket = await this.getUserSocket(payload.userId);
+      socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
+      if (restrictionType !== RestrictionType.MUTED) {
+        await this.kickUser(payload.userId, chatroom);
       }
-      await this.kickUser(payload.userId, chatroom);
     } catch (e) {
       throw new WsException((e as Error).message);
     }

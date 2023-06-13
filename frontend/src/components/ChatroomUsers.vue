@@ -1,6 +1,6 @@
 <template>
   <v-list>
-    <v-btn block>Invite users</v-btn>
+    <v-btn block @click="inviteUser">Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template v-slot:activator="{ props }">
@@ -15,11 +15,7 @@
         ></v-list-item>
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn
-          @click="privateMessage(user.id)"
-          block
-          >Private message</v-btn
-        >
+        <v-btn @click="privateMessage(user.id)" block>Private message</v-btn>
         <div v-if="currentUserIsOwner">
           <v-btn v-if="user.role === 'USER'" @click="promote(user.id)" block
             >Make admin</v-btn
@@ -129,15 +125,6 @@ export default {
       }
     }
   },
-  mounted() {
-    // TODO: Make it all work, one day
-    // ChatService.subscribeToUsers((payload) => {
-    //   ChatService.storeUser(payload);
-    // }, (payload) => {
-    //   ChatService.removeUserFromRoom(payload);
-    // });
-    // ChatService.getOnlineUsers(this.id);
-  },
   beforeUnmount() {
     ChatService.disconnect();
   },
@@ -242,6 +229,9 @@ export default {
     },
     privateMessage(userId) {
       ChatService.createOneToOne(this.currentUserId, userId);
+    },
+    inviteUser() {
+      ChatService.inviteUser(this.id, 'REPLACE-ME');
     }
   }
 };
