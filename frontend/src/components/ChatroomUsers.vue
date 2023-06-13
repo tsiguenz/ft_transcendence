@@ -1,10 +1,20 @@
 <template>
-  <v-list>
-    <v-btn block>Invite users</v-btn>
+  <v-list class="window">
+    <v-btn class="bouton" block>Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
-      <template v-slot:activator="{ props }">
+      <template #activator="{ props }">
         <v-list-item
+          v-if="isCurrentUser(user.id)"
+          :prepend-icon="userRoleIcon[user.role]"
+          :class="{
+            'blue-border': isCurrentUser(user.id),
+            online: isOnline(user.id)
+          }"
+          :title="user.nickname"
+        ></v-list-item>
+        <v-list-item
+          v-else
           v-bind="props"
           :prepend-icon="userRoleIcon[user.role]"
           :class="{
@@ -16,46 +26,49 @@
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
         <div v-if="currentUserIsOwner">
-          <v-btn v-if="user.role === 'USER'" @click="promote(user.id)" block
+          <v-btn v-if="user.role === 'USER'" block @click="promote(user.id)"
             >Make admin</v-btn
           >
           <v-btn
             v-else-if="user.role === 'ADMIN'"
-            @click="demote(user.id)"
             block
+            @click="demote(user.id)"
             >Revoke admin</v-btn
           >
         </div>
         <div v-if="canBeAdministered(user.role)">
-          <v-btn @click="kick(user.id)" block>Kick</v-btn>
-          <v-btn v-if="isUserMuted(user.id)" @click="unmute(user.id)" block
+          <v-btn block @click="kick(user.id)">Kick</v-btn>
+          <v-btn v-if="isUserMuted(user.id)" block @click="unmute(user.id)"
             >Unmute</v-btn
           >
           <RestrictUserDialog
             v-else
             action="Mute"
             :nickname="user.nickname"
-            :userId="user.id"
+            :user-id="user.id"
             @restrict="mute"
           />
-          <v-btn v-if="isUserBanned(user.id)" @click="unban(user.id)" block
+          <v-btn v-if="isUserBanned(user.id)" block @click="unban(user.id)"
             >Unban</v-btn
           >
           <RestrictUserDialog
             v-else
             action="Ban"
             :nickname="user.nickname"
-            :userId="user.id"
+            :user-id="user.id"
             @restrict="ban"
           />
         </div>
         <v-btn
           v-if="!isUserBlocked(user.id)"
-          @click="blockUser(user.nickname)"
+          class="bouton"
           block
+          @click="blockUser(user.nickname)"
           >Block</v-btn
         >
-        <v-btn v-else @click="unblockUser(user.nickname)" block>Unblock</v-btn>
+        <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)"
+          >Unblock</v-btn
+        >
       </div>
     </v-list-group>
   </v-list>
@@ -240,16 +253,21 @@ export default {
 </script>
 
 <style scoped>
-.blue-border {
-  border-color: blue;
-  border-width: 5px;
-}
-
 .online {
   color: lightgreen;
 }
 
 .blocked {
   text-decoration: line-through;
+}
+
+.blue-border:deep(.mdi-chevron-down) {
+  display: none;
+}
+.blue-border {
+  background-color: var(--light-purple);
+}
+.bouton {
+  background: var(--medium-purple) !important;
 }
 </style>

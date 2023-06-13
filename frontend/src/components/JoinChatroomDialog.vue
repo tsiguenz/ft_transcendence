@@ -1,61 +1,98 @@
 <template>
-  <v-dialog v-model="dialog" width="1024">
-    <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" block @click="getJoinableRooms()">
-        Join room
-      </v-btn>
-    </template>
-    <v-card>
-      <v-card-title>
-        <span class="text-h5">Join chatroom</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-list>
-            <v-list-subheader>Chatrooms</v-list-subheader>
-            <v-list-group
-              v-for="chatroom in chatrooms"
-              :key="chatroom.id"
-              :value="chatroom.name"
-            >
-              <template v-slot:activator="{ props }">
+  <v-card class="roomsjoin">
+    <v-card-title>
+      <span class="text-h5">Join a public room</span>
+    </v-card-title>
+    <v-divider class="my-0 divider" />
+    <v-container class="fill-height pa-0">
+      <v-row class="no-gutters elevation-4">
+        <v-col cols="12" class="flex-grow-1 flex-shrink-0">
+          <v-responsive class="overflow-y-auto fill-height" height="500">
+            <template v-if="chatrooms.length === 0">
+              <v-col col="10">
+                <v-list class="noroom">
+                  <h3>:(</h3>
+                  <h3>No chatrooms available</h3>
+                </v-list>
+              </v-col>
+            </template>
+            <template v-else>
+              <v-list subheader>
                 <v-list-item
-                  v-bind="props"
-                  :prepend-icon="
-                    chatroom.type === 'PROTECTED' ? 'mdi-lock' : 'mdi-earth'
-                  "
-                  :title="chatroom.name"
-                ></v-list-item>
-              </template>
-              <v-row class="ma-0">
-                <v-col cols="8" pa-0>
-                  <v-text-field
-                    v-if="chatroom.type === 'PROTECTED'"
-                    v-model="chatroom.password"
-                    variant="outlined"
-                    type="password"
-                    label="Password"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <v-btn size="x-large" block @click="joinRoom(chatroom)"
-                    >Join</v-btn
-                  >
-                </v-col>
-              </v-row>
-            </v-list-group>
-          </v-list>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
-          Close
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+                  v-for="chatroom in chatrooms"
+                  :key="chatroom.id"
+                  class="rooms"
+                  :value="chatroom.name"
+                >
+                  <v-row no-gutters>
+                    <v-col cols="1">
+                      <v-icon>{{
+                        chatroom.type === 'PROTECTED' ? 'mdi-lock' : 'mdi-earth'
+                      }}</v-icon>
+                    </v-col>
+
+                    <v-col cols="7">
+                      <v-list-item-title>
+                        {{ chatroom.name }}
+                      </v-list-item-title>
+                    </v-col>
+
+                    <v-col cols="3">
+                      <template v-if="chatroom.type === 'PROTECTED'">
+                        <v-dialog v-model="dialog" max-width="500px">
+                          <template #activator="{ props }">
+                            <v-btn class="joinbtn" size="small" v-bind="props"
+                              >Join</v-btn
+                            >
+                          </template>
+                          <v-card class="window">
+                            <v-card-title>
+                              <span class="text-h6">Please enter password</span>
+                              <v-text-field
+                                v-model="chatroom.password"
+                                variant="outlined"
+                                type="password"
+                                label="Password"
+                                required
+                              >
+                              </v-text-field>
+                            </v-card-title>
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn
+                                color="blue darken-1"
+                                text
+                                @click="dialog = false"
+                                >Close</v-btn
+                              >
+                              <v-btn
+                                class="joinbtn"
+                                size="small"
+                                @click="joinRoom(chatroom)"
+                                >Join</v-btn
+                              >
+                            </v-card-actions>
+                          </v-card>
+                        </v-dialog>
+                      </template>
+                      <template v-else>
+                        <v-btn
+                          class="joinbtn"
+                          size="small"
+                          @click="joinRoom(chatroom)"
+                          >Join</v-btn
+                        >
+                      </template>
+                    </v-col>
+                  </v-row>
+                </v-list-item>
+              </v-list>
+            </template>
+          </v-responsive>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -68,14 +105,19 @@ export default {
   emits: ['join'],
   data() {
     return {
+      activeChat: 1,
       chatrooms: [],
       dialog: false
     };
+  },
+  created() {
+    this.getJoinableRooms();
   },
   methods: {
     closeDialog() {
       this.dialog = false;
     },
+
     async joinRoom(chatroom) {
       try {
         const response = await axios.post(
@@ -84,9 +126,10 @@ export default {
             ...chatroom
           }
         );
-        this.chatrooms = response.data;
+        this.reply = response.data;
         this.$emit('join', chatroom);
-        this.closeDialog();
+        let i = this.chatrooms.map((item) => item.id).indexOf(chatroom.id);
+        this.chatrooms.splice(i, 1);
       } catch (error) {
         swal({
           icon: 'error',
@@ -110,3 +153,36 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.rooms {
+  height: 50px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.roomsjoin {
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--light-purple);
+  border-color: var(--light-purple) !important;
+}
+
+.v-list {
+  background: var(--dark-purple) !important;
+  border-radius: 5px !important;
+}
+
+.joinbtn {
+  background: var(--light-purple) !important;
+}
+
+.noroom {
+  height: 500px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+</style>

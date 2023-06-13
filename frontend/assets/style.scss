@@ -39,3 +39,11 @@
 .log, .signup {
     margin-left: 8px;
   }
+
+  .window{
+    background-color: var(--dark-purple);
+    border-style: solid;
+    border-radius: 2px;
+    box-shadow: 5px 5px 5px var(--light-purple) !important;
+    border-color: var(--light-purple) !important;
+  }

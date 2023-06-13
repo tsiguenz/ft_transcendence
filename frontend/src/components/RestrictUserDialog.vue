@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn v-bind="props" block>{{ action }}</v-btn>
     </template>
     <v-card>
@@ -12,8 +12,8 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                type="number"
                 v-model="banTime"
+                type="number"
                 :rules="rules"
                 label="Restrict time (minutes)"
               ></v-text-field>
@@ -46,8 +46,8 @@ import swal from 'sweetalert';
 import * as lib from '@/utils/lib';
 
 export default {
-  emits: ['restrict'],
   props: ['nickname', 'action', 'userId'],
+  emits: ['restrict'],
   data() {
     return {
       dialog: false,
