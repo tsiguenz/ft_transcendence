@@ -1,5 +1,5 @@
 <template>
-    <v-row no-gutters>
+  <v-row no-gutters>
     <v-col>
       <JoinChatroomDialog @join="pushChatroom" />
     </v-col>
@@ -7,7 +7,6 @@
 </template>
 
 <script>
-
 import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
@@ -23,11 +22,16 @@ export default {
     JoinChatroomDialog
   },
   props: ['id', 'showFriends'],
-  emits: ['join', 'toggleChatView', 'toggleFriendsView', 'togglePublicChannelView'],
-  data () {
+  emits: [
+    'join',
+    'toggleChatView',
+    'toggleFriendsView',
+    'togglePublicChannelView'
+  ],
+  data() {
     return {
       activeRoomId: false
-    }
+    };
   },
   computed: {
     ...mapStores(useChatStore, useSessionStore),
@@ -78,45 +82,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.v-btn{
+.v-btn {
   width: 100%;
   height: 60px;
   display: flex;
   justify-content: flex-start;
 }
-:deep(.inactivebtn){
+:deep(.inactivebtn) {
   background-color: var(--dark-purple) !important;
 }
-:deep(.activebtn){
+:deep(.activebtn) {
   background-color: var(--light) !important;
   border-radius: 3px 3px 0px 0px !important;
-
 }
 
-.v-avatar{
+.v-avatar {
   margin-right: 10px;
 }
 
-.titleMessages{
+.titleMessages {
   margin-left: 10px;
   opacity: 50%;
-  
 }
 
-.soc{
+.soc {
   background-color: var(--dark-purple);
 }
 
-.v-card{
+.v-card {
   border-radius: 0% !important;
 }
 
-:deep(.v-list-item__overlay){
+:deep(.v-list-item__overlay) {
   background-color: var(--dark-purple);
 }
 
-.v-list-item.activeR{
-  background-color: var(--light-purple)  !important;
+.v-list-item.activeR {
+  background-color: var(--light-purple) !important;
 }
 </style>

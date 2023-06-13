@@ -66,7 +66,9 @@
           @click="blockUser(user.nickname)"
           >Block</v-btn
         >
-        <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)">Unblock</v-btn>
+        <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)"
+          >Unblock</v-btn
+        >
       </div>
     </v-list-group>
   </v-list>
@@ -251,8 +253,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .online {
   color: lightgreen;
 }
@@ -261,14 +261,13 @@ export default {
   text-decoration: line-through;
 }
 
-.blue-border:deep(.mdi-chevron-down){
+.blue-border:deep(.mdi-chevron-down) {
   display: none;
 }
-.blue-border{
+.blue-border {
   background-color: var(--light-purple);
 }
-.bouton{
+.bouton {
   background: var(--medium-purple) !important;
 }
-
 </style>

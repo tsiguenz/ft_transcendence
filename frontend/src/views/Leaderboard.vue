@@ -122,7 +122,7 @@ export default {
       }
     },
     userStatus(user) {
-      if (this.connectedUsers.includes(user.id)){
+      if (this.connectedUsers.includes(user.id)) {
         return true;
       }
       return false;

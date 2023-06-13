@@ -67,7 +67,7 @@ export default {
   methods: {
     async getUsersAvatarPath() {
       //Put the 3 users avatar path in an array
-      
+
       this.avatarPath[0] = constants.AVATARS_URL + this.users.first.avatarPath;
       this.avatarPath[1] = constants.AVATARS_URL + this.users.second.avatarPath;
       this.avatarPath[2] = constants.AVATARS_URL + this.users.third.avatarPath;

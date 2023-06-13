@@ -91,8 +91,7 @@ export default {
 </script>
 
 <style scoped>
-.addbtn{
+.addbtn {
   background-color: var(--medium-purple) !important;
 }
-
 </style>

@@ -11,7 +11,12 @@
                 :url-avatar="urlAvatar"
               ></ProfilePrintAvatar>
             </v-avatar>
-            <v-icon :class="status ? 'co' : 'unco'" class="statusUser" size="15px" icon="mdi-circle"></v-icon>
+            <v-icon
+              :class="status ? 'co' : 'unco'"
+              class="statusUser"
+              size="15px"
+              icon="mdi-circle"
+            ></v-icon>
           </v-btn>
         </template>
         <v-card>
@@ -86,18 +91,16 @@ export default {
     },
     userStatus(user) {
       if (this.connectedUsers.includes(user)) {
-       return true;
+        return true;
       } else {
         return false;
+      }
+    },
+    printStatusConnection(status) {
+      if (status === true) return 'Online';
+      else return 'Offline';
     }
-  },
-  printStatusConnection(status){
-    if (status === true)
-      return "Online";
-    else
-      return "Offline";
   }
-}
 };
 </script>
 
@@ -111,20 +114,18 @@ export default {
   background: var(--dark-alt);
 }
 
-.statusUser{
+.statusUser {
   position: absolute;
   bottom: -5px;
   right: -5px;
   border-color: #ffff;
 }
 
-.co{
+.co {
   color: #58c400;
 }
 
-.unco{
+.unco {
   color: #757575;
-
 }
-
 </style>

@@ -67,7 +67,7 @@ export default {
     return {
       showFriends: false, // for lulu : change to true for next PR
       showPublicChannel: false,
-      showPrivateChannel: true, //for lulu : change to false for next PR
+      showPrivateChannel: true //for lulu : change to false for next PR
     };
   },
   computed: {
@@ -84,12 +84,12 @@ export default {
   },
   methods: {
     joinChatroom(id) {
-    this.chatStore.activeChatroom = id;
-    this.chatStore.hasJoinedRoom = true;
-    this.showFriends = false;
-    this.showPublicChannel = false;
-    this.showPrivateChannel = true;
-  },
+      this.chatStore.activeChatroom = id;
+      this.chatStore.hasJoinedRoom = true;
+      this.showFriends = false;
+      this.showPublicChannel = false;
+      this.showPrivateChannel = true;
+    },
     leaveRoom(id) {
       if (id === this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
@@ -115,13 +115,11 @@ export default {
       this.showPublicChannel = true;
       this.showFriends = false;
       this.showPrivateChannel = false;
-    },
+    }
   }
 };
 </script>
 
 <style scoped>
 /* Your component styles here */
-
-
 </style>

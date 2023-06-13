@@ -1,12 +1,10 @@
 <template>
   <aside :class="`${is_expanded ? 'is-expanded' : ''}`">
-    <div class="logo"><router-link class="" to="/home"
-        ><v-avatar>
-          <img
-            src="/assets/icons/pong.png"
-          ></v-avatar
-        ></router-link
-      ></div>
+    <div class="logo">
+      <router-link class="" to="/home"
+        ><v-avatar> <img src="/assets/icons/pong.png" /></v-avatar
+      ></router-link>
+    </div>
 
     <div class="menu-toggle-wrap">
       <button class="menu-toggle" @click="ToggleMenu">
@@ -98,7 +96,7 @@ aside {
   font-family: 'Poppins', sans-serif;
   .logo {
     margin-bottom: 1rem;
-    .text{
+    .text {
       padding-left: 2rem;
     }
     img {
@@ -129,7 +127,6 @@ aside {
         transform: rotate(-180deg);
       }
     }
-  
   }
 
   .menu {

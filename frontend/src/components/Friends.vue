@@ -1,13 +1,13 @@
 <template>
-            <v-table  v-if="friends.length === 0" class="friends" density="compact">
-              <h2>Friends</h2>
-              <v-col col="10">
-                <v-list class="noroom">
-                  <h3> :( </h3>
-                  <h3> Oops nothing here </h3>
-                </v-list>
-              </v-col>
-            </v-table>
+  <v-table v-if="friends.length === 0" class="friends" density="compact">
+    <h2>Friends</h2>
+    <v-col col="10">
+      <v-list class="noroom">
+        <h3>:(</h3>
+        <h3>Oops nothing here</h3>
+      </v-list>
+    </v-col>
+  </v-table>
   <v-table v-else class="friends" density="compact">
     <thead>
       <tr class="cust-tr">
@@ -17,11 +17,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr  v-for="friend in friends" :key="friend.id">
-        <td class="cust-td hgt-td"> <ProfileClick :nickname="friend.nickname" :status="userStatus(friend)" :width="40" :height="40" :url-avatar="getAvatarPath(friend)"></ProfileClick><p>{{ friend.nickname }}</p></td>
-        <td class=" hgt-td">{{ friend.ladderPoints }}</td>
-        <td class=" hgt-td">
-          <IsFriend :friendname="friend.nickname" :is-friend-at-begining="isFriend(friend.nickname)"></IsFriend>
+      <tr v-for="friend in friends" :key="friend.id">
+        <td class="cust-td hgt-td">
+          <ProfileClick
+            :nickname="friend.nickname"
+            :status="userStatus(friend)"
+            :width="40"
+            :height="40"
+            :url-avatar="getAvatarPath(friend)"
+          ></ProfileClick>
+          <p>{{ friend.nickname }}</p>
+        </td>
+        <td class="hgt-td">{{ friend.ladderPoints }}</td>
+        <td class="hgt-td">
+          <IsFriend
+            :friendname="friend.nickname"
+            :is-friend-at-begining="isFriend(friend.nickname)"
+          ></IsFriend>
         </td>
       </tr>
     </tbody>
@@ -42,7 +54,7 @@ export default {
     ProfileClick
   },
   inject: ['connectedUsersStore', 'sessionStore'],
-  
+
   data() {
     return {
       friends: [],
@@ -50,10 +62,8 @@ export default {
       renderPage: 0,
       connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: []
-
     };
   },
-  
   watch: {
     connectedUsersStore: {
       handler() {
@@ -62,9 +72,8 @@ export default {
       deep: true
     }
   },
-   async created() {
+  async created() {
     await this.getFriends();
-    console.log("friends mounted")
     this.getConnectedFriends();
   },
   methods: {
@@ -92,9 +101,10 @@ export default {
         await axios.delete(
           constants.API_URL +
             `/users/${this.sessionStore.nickname}/friends/${nickname}`
-        
         );
-        this.friends = this.friends.filter(friend => friend.nickname !== nickname);
+        this.friends = this.friends.filter(
+          (friend) => friend.nickname !== nickname
+        );
       } catch (error) {
         swall({
           title: 'Error',
@@ -121,16 +131,16 @@ export default {
       }
     },
     userStatus(user) {
-      if (this.connectedUsers.includes(user.id)){
+      if (this.connectedUsers.includes(user.id)) {
         return true;
       }
       return false;
     },
     getConnectedFriends() {
-        this.connectedFriends = [];
-        for (let i = 0; i < this.friends.length; i++) {
-            if (this.connectedUsers.includes(this.friends[i].id)) {
-                this.connectedFriends.push(this.friends[i]);
+      this.connectedFriends = [];
+      for (let i = 0; i < this.friends.length; i++) {
+        if (this.connectedUsers.includes(this.friends[i].id)) {
+          this.connectedFriends.push(this.friends[i]);
         }
       }
     },
@@ -138,20 +148,17 @@ export default {
       return user.avatarPath;
     },
     isFriend(nickname) {
-
-        console.log(this.friends.includes(nickname));
-        return this.friends.includes(nickname);
-      },
+      return this.friends.some((friend) => friend.nickname === nickname);
     }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-
-.noroom{
+.noroom {
   background-color: var(--dark-purple);
 }
-.friends{
+.friends {
   padding-top: 12px;
   text-align: center;
   background-color: var(--dark-purple);
@@ -159,23 +166,22 @@ export default {
   box-shadow: 5px 5px 5px var(--light-purple);
 }
 
-.cust-th{
+.cust-th {
   color: #ffff !important;
   text-transform: uppercase;
 }
 
-.hgt-td{
+.hgt-td {
   height: 60px !important;
 }
 
-.cust-td{
+.cust-td {
   display: flex !important;
   padding: 1rem;
-  p{
+  p {
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 10px;
   }
 }
-
 </style>

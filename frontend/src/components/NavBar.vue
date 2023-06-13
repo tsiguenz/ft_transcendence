@@ -80,7 +80,7 @@ export default {
   &.is-expanded {
     width: 300px;
     transition: width 0.3s;
-    :deep .v-field--variant-filled .v-field__overlay {
+    :deep(.v-field--variant-filled .v-field__overlay) {
       background-color: var(--light);
     }
   }
