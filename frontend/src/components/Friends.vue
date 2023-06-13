@@ -33,6 +33,7 @@
           <IsFriend
             :friendname="friend.nickname"
             :is-friend-at-begining="isFriend(friend.nickname)"
+            @refresh-friends="getFriends()"
           ></IsFriend>
         </td>
       </tr>
@@ -59,7 +60,6 @@ export default {
     return {
       friends: [],
       newFriend: '',
-      renderPage: 0,
       connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: []
     };
@@ -94,40 +94,6 @@ export default {
           button: 'OK'
         });
         this.$router.push('/logout');
-      }
-    },
-    async deleteFriend(nickname) {
-      try {
-        await axios.delete(
-          constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`
-        );
-        this.friends = this.friends.filter(
-          (friend) => friend.nickname !== nickname
-        );
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-      }
-    },
-    async addFriend(nickname) {
-      try {
-        await axios.post(
-          constants.API_URL +
-            `/users/${this.sessionStore.nickname}/friends/${nickname}`
-        );
-        this.renderPage++;
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
       }
     },
     userStatus(user) {
