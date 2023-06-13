@@ -38,19 +38,20 @@ export class UsersService {
   }
 
   async getUserGames(nickname: string) {
-    const user = await this.prisma.user.findUnique({
+    const games = await this.prisma.user.findUnique({
       where: {
         nickname: nickname
       },
       select: {
-        id: true,
-        nickname: true,
-        ladderPoints: true,
         gamesWin: true,
         gamesLose: true
       }
     });
-    return user;
+    const formatedGames = games.gamesWin.concat(games.gamesLose);
+    formatedGames.sort((a, b) => {
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
+    return formatedGames;
   }
 
   async getUserById(userId: string) {
