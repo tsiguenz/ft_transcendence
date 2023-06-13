@@ -105,12 +105,15 @@ import * as lib from '@/utils/lib';
 export default {
   data() {
     return {
+      dialog: false,
       chatrooms: [],
-      dialog: false
     };
   },
   created() {
     this.getJoinableRooms();
+    ChatService.subscribeToNewRooms((payload) => {
+      this.removeChatroom(payload.chatroom.id);
+    });
   },
   methods: {
     closeDialog() {
@@ -122,6 +125,12 @@ export default {
         password: chatroom.password
       });
       this.closeDialog();
+    },
+    removeChatroom(chatroomId) {
+      this.chatrooms = this.chatrooms.filter(
+        (item) => item.id !== chatroomId
+      );
+
     },
     async getJoinableRooms() {
       try {

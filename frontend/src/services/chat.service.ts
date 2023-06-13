@@ -12,9 +12,7 @@ class ChatService {
   ) {}
 
   setup(jwt: string, callback: Function) {
-    console.log('SOCKET IO SETUP');
     this.socketService.setupSocketConnection(jwt);
-    console.log(this.socketService.socket);
     this.socketService.subscribe(events.EXCEPTION, callback);
     this.socketService.subscribe(events.CHATROOM_NEW, (payload: any) => {
       this.chatStore.addRoom(payload.chatroom);
@@ -54,6 +52,10 @@ class ChatService {
 
   subscribeToMessages(callback: Function) {
     this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
+  }
+
+  subscribeToNewRooms(callback: Function) {
+    this.socketService.subscribe(events.CHATROOM_NEW, callback);
   }
 
   subscribeToKick(callback: Function) {

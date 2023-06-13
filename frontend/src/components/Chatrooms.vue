@@ -56,7 +56,6 @@ import * as constants from '@/constants';
 import swal from 'sweetalert';
 import * as lib from '@/utils/lib';
 import NewChatroomDialog from '../components/NewChatroomDialog.vue';
-import JoinChatroomDialog from '../components/JoinChatroomDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useChatStore } from '@/store/chat';
@@ -65,7 +64,6 @@ import { useSessionStore } from '@/store/session';
 export default {
   components: {
     NewChatroomDialog,
-    JoinChatroomDialog
   },
   props: ['id', 'showFriends', 'showPublicChannel', 'showPrivateChannel'],
   emits: [

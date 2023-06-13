@@ -22,7 +22,7 @@
           @delete="leaveRoom"
         />
         <Friends v-else-if="showFriends" />
-        <PublicChannel v-else-if="showPublicChannel" />
+        <JoinChatroom v-else-if="showPublicChannel" />
       </v-col>
       <v-col cols="3">
         <template v-if="showPrivateChannel">
@@ -49,7 +49,7 @@ import Chatrooms from '../components/Chatrooms.vue';
 import ChatroomUsers from '../components/ChatroomUsers.vue';
 import Friends from '../components/Friends.vue';
 import OnlineFriends from '../components/OnlineFriends.vue';
-import PublicChannel from '../components/PublicChannel.vue';
+import JoinChatroom from '../components/JoinChatroom.vue';
 
 export default {
   components: {
@@ -58,7 +58,7 @@ export default {
     ChatroomUsers,
     Friends,
     OnlineFriends,
-    PublicChannel
+    JoinChatroom
   },
   data() {
     return {
