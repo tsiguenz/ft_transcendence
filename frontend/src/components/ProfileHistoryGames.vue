@@ -56,8 +56,8 @@ export default {
       element.style.height = `calc(100vh - ${height}px)`;
     },
     getUser(index) {
-			return (this.users.filter(users => users.id == index)[0].nickname);
-		}
+      return this.users.filter((users) => users.id == index)[0].nickname;
+    }
   }
 };
 </script>
