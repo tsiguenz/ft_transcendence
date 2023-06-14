@@ -122,7 +122,6 @@ export default {
   mounted() {
     this.connectRoom();
     ChatService.subscribeToKick((payload) => {
-      ChatService.leaveRoom(payload.chatroomId);
       this.$emit('leave', payload.chatroomId);
     });
     const authorNicknames = Array.from(
