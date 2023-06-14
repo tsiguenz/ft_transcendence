@@ -72,9 +72,10 @@ export class GameService {
     const loser = winner.id === player1.id ? player2 : player1;
     const winnerInfos = await this.user.getUserById(winner.id);
     const loserInfos = await this.user.getUserById(loser.id);
+    let newRating = null;
     if (!winnerInfos || !loserInfos) return;
     if (room.datas.isRanked)
-      await this.updateUsersRating(winnerInfos, loserInfos);
+      newRating = await this.updateUsersRating(winnerInfos, loserInfos);
     await this.prisma.game
       .create({
         data: {
@@ -84,6 +85,8 @@ export class GameService {
           loserId: loser.id,
           previousWinnerRating: winnerInfos.ladderPoints,
           previousLoserRating: loserInfos.ladderPoints,
+          newWinnerRating: newRating ? newRating.winner : null,
+          newLoserRating: newRating ? newRating.loser : null,
           winnerScore: winner.points,
           loserScore: loser.points
         }
@@ -91,12 +94,13 @@ export class GameService {
       .catch((err) => console.log(err));
   }
 
-  async updateUsersRating(winner: Player, loser: Player): Promise<void> {
+  async updateUsersRating(winner: Player, loser: Player) {
     const winnerRating = winner.ladderPoints;
     const loserRating = loser.ladderPoints;
     const newRating = this.calculateNewRating(winnerRating, loserRating);
     await this.updateRating(winner.id, newRating.winner);
     await this.updateRating(loser.id, newRating.loser);
+    return newRating;
   }
 
   // https://en.wikipedia.org/wiki/Elo_rating_system
@@ -108,11 +112,11 @@ export class GameService {
     const K = 40;
     const pWinner = Math.round((1 / (1 + Math.pow(10, -D / 400))) * 10) / 10;
     const pLoser = Math.round((1 / (1 + Math.pow(10, D / 400))) * 10) / 10;
-    const newWinnerScore = Math.round(winnerRating + K * (1 - pWinner));
-    const newLoserScore = Math.round(loserRating + K * (0 - pLoser));
+    const newWinnerRating = Math.round(winnerRating + K * (1 - pWinner));
+    const newLoserRating = Math.round(loserRating + K * (0 - pLoser));
     return {
-      winner: newWinnerScore,
-      loser: newLoserScore
+      winner: newWinnerRating,
+      loser: newLoserRating
     };
   }
 
