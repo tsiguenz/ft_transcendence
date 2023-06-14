@@ -121,6 +121,9 @@ export default {
   },
   mounted() {
     this.connectRoom();
+    ChatService.subscribeToKick((payload) => {
+      this.leaveRoom();
+    });
     const authorNicknames = Array.from(
       new Set(this.messages.map((message) => message.authorNickname))
     );

@@ -97,7 +97,7 @@ export default {
       });
     },
     joinChatroom(id) {
-      this.chatStore.activeChatroom = id;
+      this.chatStore.joinRoom(id);
       this.showFriends = false;
       this.showPublicChannel = false;
       this.showPrivateChannel = true;

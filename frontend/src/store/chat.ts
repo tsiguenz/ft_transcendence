@@ -74,22 +74,6 @@ export const useChatStore = defineStore('chat', {
       }
     },
 
-    // storeUser(chatroomId, users) {
-    //   if (!this.users.hasOwnProperty(chatroomId)) {
-    //     this.users[chatroomId] = [];
-    //   }
-    //   this.users[chatroomId].push(...users);
-    // },
-
-    // removeUser(payload) {
-    //   const chatroomId: number = payload.chatroomId;
-    //   if (this.users.hasOwnProperty(chatroomId)) {
-    //     this.users[chatroomId] = this.users[chatroomId].filter(
-    //       (user) => user.id !== payload.id
-    //     );
-    //   }
-    // },
-
     setUserRole(userId, chatroomId, role) {
       const i = this.users.findIndex((e) => e.id == userId);
       this.users[i].role = role;
@@ -118,7 +102,7 @@ export const useChatStore = defineStore('chat', {
       );
     },
 
-    isUserOnline(userId: number, chatroomId: number) {
+    isUserOnline(userId: string, chatroomId: string) {
       if (this.users.hasOwnProperty(chatroomId)) {
         return this.users[chatroomId].find((user) => user.id === userId);
       }

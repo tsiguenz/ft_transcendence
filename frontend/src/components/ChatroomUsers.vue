@@ -128,6 +128,7 @@ export default {
   watch: {
     id: {
       handler() {
+        console.log("Room ID changed!: " + this.id)
         if (!this.id) {
           this.chatStore.users = [];
           return;

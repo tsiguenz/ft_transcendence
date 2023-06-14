@@ -16,7 +16,6 @@ class ChatService {
     this.socketService.subscribe(events.EXCEPTION, callback);
     this.socketService.subscribe(events.CHATROOM_NEW, (payload: any) => {
       this.chatStore.addRoom(payload.chatroom);
-      this.chatStore.joinRoom(payload.chatroom.id);
     });
     this.socketService.subscribe(
       events.CHATROOM_USER_CONNECT,
@@ -64,10 +63,6 @@ class ChatService {
   createRoom(payload: { name: string; type: string; password: string }) {
     this.socketService.send(events.CHATROOM_CREATE, payload);
   }
-
-  // getRooms() {
-  //   this.socketService.send(events.CHATROOM_JOINABLE_ROOMS);
-  // }
 
   joinRoom(payload: { chatroomId: string; password: string }) {
     this.socketService.send(events.CHATROOM_JOIN, payload);
