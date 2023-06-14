@@ -11,6 +11,12 @@
                 :url-avatar="urlAvatar"
               ></ProfilePrintAvatar>
             </v-avatar>
+            <v-icon
+              :class="status ? 'co' : 'unco'"
+              class="statusUser"
+              size="15px"
+              icon="mdi-circle"
+            ></v-icon>
           </v-btn>
         </template>
         <v-card>
@@ -25,10 +31,12 @@
               </v-avatar>
               <h3>{{ nickname }}</h3>
               <p class="text-caption mt-1">
-                {{ status }}
+                {{ printStatusConnection(status) }}
               </p>
               <v-divider class="my-3"></v-divider>
-              <v-btn rounded variant="text"> Show Profile </v-btn>
+              <router-link class="button" :to="'/profile/' + nickname"
+                >Show Profile</router-link
+              >
             </div>
           </v-card-text>
         </v-card>
@@ -39,10 +47,6 @@
 
 <script>
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
-import axios from 'axios';
-import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
-import swall from 'sweetalert';
 
 export default {
   components: {
@@ -52,8 +56,8 @@ export default {
   props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
   data() {
     return {
-      users: [],
-      connectedUsers: this.connectedUsersStore.connectedUsers
+      connectedUsers: this.connectedUsersStore.connectedUsers,
+      connected: false
     };
   },
   watch: {
@@ -64,28 +68,17 @@ export default {
       deep: true
     }
   },
-  async mounted() {
-    await this.getUsers();
-  },
   methods: {
-    async getUsers() {
-      try {
-        const response = await axios.get(constants.API_URL + '/users');
-        this.users = response.data;
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
+    userStatus(user) {
+      if (this.connectedUsers.includes(user)) {
+        return true;
+      } else {
+        return false;
       }
     },
-    userStatus(user) {
-      return this.connectedUsers.includes(user.id)
-        ? 'Connected'
-        : 'Disconnected';
+    printStatusConnection(status) {
+      if (status === true) return 'Online';
+      else return 'Offline';
     }
   }
 };
@@ -99,5 +92,20 @@ export default {
 
 .conttext {
   background: var(--dark-alt);
+}
+
+.statusUser {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  border-color: #ffff;
+}
+
+.co {
+  color: #58c400;
+}
+
+.unco {
+  color: #757575;
 }
 </style>

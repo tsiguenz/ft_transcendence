@@ -13,7 +13,7 @@ model User {
   id              String         @id @default(uuid())
   fortyTwoId      Int?           @unique
   nickname        String         @unique
-  ladderPoints    Int            @default(0)
+  ladderPoints    Int            @default(1000)
   avatarPath      String         @default("/default.jpeg")
   twoFactorEnable Boolean        @default(false)
   twoFactorSecret String?
@@ -45,14 +45,16 @@ model Game {
   id                   String  @id
   isRanked             Boolean
   winnerId             String
-  winner               User  @relation("winner", fields: [winnerId], references: [id])
+  winner               User  @relation("winner", fields: [winnerId], references: [id], onDelete: Cascade)
   loserId              String
-  loser                User  @relation("loser", fields: [loserId], references: [id])
+  loser                User  @relation("loser", fields: [loserId], references: [id], onDelete: Cascade)
   previousWinnerRating Int
   previousLoserRating  Int
+  newWinnerRating      Int?
+  newLoserRating       Int?
   winnerScore          Int
   loserScore           Int
-  duration             DateTime  @default(now())
+  createdAt            DateTime  @default(now())
 
   @@map("games")
 }

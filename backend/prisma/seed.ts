@@ -1,47 +1,43 @@
 // https://www.prisma.io/docs/guides/database/seed-database
 import { PrismaClient } from '@prisma/client';
 import * as argon from 'argon2';
+import { v4 as uuid } from 'uuid';
 
 const prisma = new PrismaClient();
 
 async function populateUsers() {
   await prisma.user.upsert({
-    where: { id: '1' },
+    where: { nickname: 'gmorange' },
     create: {
-      id: '1',
       nickname: 'gmorange',
-      ladderPoints: 682,
+      ladderPoints: 2542,
       hash: await argon.hash('gmetire')
     },
     update: {}
   });
   await prisma.user.upsert({
-    where: { id: '2' },
+    where: { nickname: 'abourdar' },
     create: {
-      id: '2',
       nickname: 'abourdar',
-      ladderPoints: 836,
+      ladderPoints: 1914,
       hash: await argon.hash('pioupiou')
     },
     update: {}
   });
   await prisma.user.upsert({
-    where: { id: '3' },
+    where: { nickname: 'lpassera' },
     create: {
-      id: '3',
       nickname: 'lpassera',
-      ladderPoints: 712,
+      ladderPoints: 2292,
       hash: await argon.hash('dudududududuel')
     },
     update: {}
   });
   await prisma.user.upsert({
-    where: { id: '4' },
+    where: { nickname: 'tsiguenz' },
     create: {
-      id: '4',
       nickname: 'tsiguenz',
-      // oopsi miss click
-      ladderPoints: 999999999,
+      ladderPoints: 1639,
       hash: await argon.hash('password')
     },
     update: {}
@@ -68,14 +64,16 @@ async function populateGames() {
     const randomScore1 = Math.floor(Math.random() * 10) + 1;
     const randomScore2 = Math.floor(Math.random() * 10) + 1;
     await prisma.game.upsert({
-      where: { id: i.toString() },
+      where: { id: uuid() },
       create: {
-        id: i.toString(),
+        id: uuid(),
         isRanked: randomBoolean,
         winnerId: winner.id,
         loserId: loser.id,
         previousWinnerRating: winner.ladderPoints,
         previousLoserRating: loser.ladderPoints,
+        newWinnerRating: winner.ladderPoints + 10,
+        newLoserRating: loser.ladderPoints - 10,
         winnerScore: randomScore1,
         loserScore: randomScore2
       },
@@ -88,7 +86,6 @@ async function main() {
   await populateUsers();
   await populateChatrooms();
   await populateGames();
-  // await populateMessages();
 }
 
 main()

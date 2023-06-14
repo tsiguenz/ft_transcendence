@@ -29,7 +29,7 @@
 <script>
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
@@ -44,6 +44,7 @@ export default {
       required: true
     }
   },
+  emits: ['refresh-friends'],
   data() {
     return {
       newFriendStatus: false,
@@ -57,6 +58,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.newFriendStatus = this.isFriendAtBegining;
+  },
   methods: {
     async deleteFriend() {
       await axios
@@ -67,13 +71,14 @@ export default {
         .catch((error) => {
           swall({
             title: 'Error',
-            text: formatError(error.response.data.message),
+            text: lib.formatError(error.response.data.message),
             icon: 'error',
             button: 'OK'
           });
         })
         .then(() => {
           this.newFriendStatus = false;
+          this.$emit('refresh-friends');
         });
     },
     async addFriend() {
@@ -85,13 +90,14 @@ export default {
         .catch((error) => {
           swall({
             title: 'Error',
-            text: formatError(error.response.data.message),
+            text: lib.formatError(error.response.data.message),
             icon: 'error',
             button: 'OK'
           });
         })
         .then(() => {
           this.newFriendStatus = true;
+          this.$emit('refresh-friends');
         });
     }
   }

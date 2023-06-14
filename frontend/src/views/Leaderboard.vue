@@ -10,7 +10,6 @@
         <th class="cust-th"></th>
         <th class="cust-th">Nickname</th>
         <th class="cust-th">Ladder points</th>
-        <th class="cust-th">Status</th>
         <th class="cust-th"></th>
       </tr>
     </thead>
@@ -32,7 +31,6 @@
           <p>{{ user.nickname }}</p>
         </td>
         <td class="hgt-td">{{ user.ladderPoints }}</td>
-        <td class="hgt-td">{{ userStatus(user) }}</td>
         <td class="hgt-td">
           <IsFriend
             v-if="!isMyProfile(user.nickname)"
@@ -51,7 +49,7 @@ import IsFriend from '../components/IsFriend.vue';
 import Ranking from '../components/Ranking.vue';
 import axios from 'axios';
 import * as constants from '@/constants.ts';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
@@ -100,7 +98,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -116,7 +114,7 @@ export default {
       } catch (error) {
         swall({
           title: 'Error',
-          text: formatError(error.response.data.message),
+          text: lib.formatError(error.response.data.message),
           icon: 'error',
           button: 'OK'
         });
@@ -124,9 +122,10 @@ export default {
       }
     },
     userStatus(user) {
-      return this.connectedUsers.includes(user.id)
-        ? 'Connected'
-        : 'Disconnected';
+      if (this.connectedUsers.includes(user.id)) {
+        return true;
+      }
+      return false;
     },
     getLeaders() {
       return {

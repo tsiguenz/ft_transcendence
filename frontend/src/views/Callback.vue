@@ -1,16 +1,19 @@
 <template>
-  <v-form v-if="printForm">
-    <v-text-field
-      v-model="nickname"
-      class="mb-5"
-      label="Nickname"
-      variant="outlined"
-      autocomplete="username"
-      required
-      @keydown.enter.prevent="signin42"
-    ></v-text-field>
-    <v-btn @click="signin42">Create account</v-btn>
-  </v-form>
+  <v-sheet class="sheet pa-5 mt-5">
+    <h4 class="font">Choose your nickname</h4>
+    <v-form v-if="printForm">
+      <v-text-field
+        v-model="nickname"
+        class="mb-5"
+        label="Nickname"
+        variant="outlined"
+        autocomplete="username"
+        required
+        @keydown.enter.prevent="signin42"
+      ></v-text-field>
+      <v-btn @click="signin42" class="log">Create account</v-btn>
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
@@ -20,7 +23,7 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
@@ -47,7 +50,7 @@ export default {
           icon: 'error',
           text: 'You need to be connected to 42 to access this page'
         });
-        this.$router.push('/home');
+        this.$router.replace('/home');
         return;
       }
       if (this.nickname === '' && this.printForm === true) {
@@ -61,7 +64,7 @@ export default {
           access_token42: this.accessToken42
         });
         if (response.data.message === 'Two factor code required') {
-          this.$router.push(`/2fa/verify?id=${response.data.id}`);
+          this.$router.replace(`/2fa/verify?id=${response.data.id}`);
           return;
         }
         if (response.data.message == 'Nickname required') {
@@ -77,11 +80,29 @@ export default {
           response.data.nickname
         );
         this.$root.connectAndSubscribeStatusSocket();
-        this.$router.push('/home');
+        this.$router.replace('/home');
       } catch (error) {
-        swal({ icon: 'error', text: formatError(error.response.data.message) });
+        swal({
+          icon: 'error',
+          text: lib.formatError(error.response.data.message)
+        });
       }
     }
   }
 };
 </script>
+<style>
+.font {
+  font-family: 'Poppins', serif;
+}
+.close {
+  background: var(--dark-purple);
+}
+.sheet {
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
+}
+</style>

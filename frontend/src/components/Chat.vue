@@ -1,30 +1,42 @@
 <template>
-  <v-list ref="chat" height="1000" class="overflow-y-auto">
-    <v-toolbar color="">
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <EditChatroomDialog
-        v-if="currentUserIsOwner"
-        :id="id"
-        @delete="(roomId) => $emit('delete', roomId)"
-      />
-      <v-btn icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
-    </v-toolbar>
-    <div v-for="item in messages" :key="item.sentAt">
-      <p class="text-right ma-2">
-        <a
-          v-if="item.authorId === currentUserId"
-          class="rounded-pill pa-1 bg-blue"
-          >{{ item.data }}</a
-        >
-      </p>
-      <p class="text-left ma-2">
-        <a
-          v-if="item.authorId !== currentUserId"
-          class="rounded-pill pa-1 bg-green"
-          >{{ item.authorNickname }}: {{ item.data }}</a
-        >
-      </p>
+  <v-toolbar class="roomName">
+    <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <EditChatroomDialog
+      v-if="currentUserIsOwner"
+      :id="id"
+      @delete="(roomId) => $emit('delete', roomId)"
+    />
+    <v-btn
+      v-if="id && chatStore.hasJoinedRoom"
+      icon="mdi-exit-to-app"
+      @click="leaveRoom"
+    ></v-btn>
+  </v-toolbar>
+  <v-list ref="chat" class="overflow-y-auto window chating">
+    <div v-for="message in messages" :key="message.sentAt">
+      <div v-if="message.authorId === currentUserId" class="author">
+        <p class="name">{{ message.authorNickname }}</p>
+        <span class="text-right ma-2 msg">
+          <p class="bubble pa-1 bg-blue msg-content">{{ message.data }}</p>
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
+          ></ProfilePrintAvatar>
+        </span>
+      </div>
+      <div v-if="message.authorId !== currentUserId" class="other">
+        <p class="nameOther">{{ message.authorNickname }}</p>
+        <span class="text-left ma-2 msgOther">
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
+          ></ProfilePrintAvatar>
+          <p class="bubble pa-1 bg-green msg-content">{{ message.data }}</p>
+        </span>
+      </div>
     </div>
   </v-list>
   <v-text-field
@@ -40,18 +52,22 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as constants from '@/constants.ts';
+import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
+import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
   components: {
-    EditChatroomDialog
+    EditChatroomDialog,
+    ProfilePrintAvatar
   },
   props: ['id', 'title', 'messages'],
   emits: ['leave', 'delete'],
   data() {
     return {
-      newMessage: ''
+      newMessage: '',
+      chatroom: []
     };
   },
   computed: {
@@ -67,6 +83,11 @@ export default {
         return false;
       }
       return true;
+    },
+    getAvatarUrlComputed() {
+      return (avatarPath) => {
+        return constants.AVATARS_URL + avatarPath;
+      };
     }
   },
   watch: {
@@ -76,14 +97,14 @@ export default {
           this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
         });
       },
-      deep: true
+      deep: true,
+      immediate: true
     },
     id: {
       handler() {
         if (!this.id) {
           return;
         }
-
         ChatService.joinRoom(this.id);
         ChatService.getRoomMessages(this.id, this.lastMessageTime());
       }
@@ -119,18 +140,67 @@ export default {
       ChatService.leaveRoom(this.id);
     },
     lastMessageTime() {
-      // eslint-disable-next-line no-prototype-builtins
       if (!this.messages || this.messages.length < 1) {
         return new Date(null);
       }
       return new Date(this.messages.at(-1).sentAt);
     },
+    currentChatroomName() {
+      if (!this.id) {
+        return '';
+      }
+      const chatroom = this.chatStore.chatrooms.find((x) => x.id === this.id);
+      if (!chatroom) {
+        return '';
+      }
+      return chatroom.name;
+    },
     displayError(payload) {
       swal({
         icon: 'error',
-        text: formatError(payload.message)
+        text: lib.formatError(payload.message)
       });
     }
   }
 };
 </script>
+
+<style scoped>
+.roomName {
+  background-color: var(--medium-purple);
+}
+.chating {
+  max-height: 500px;
+}
+
+.msg {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+}
+.msgOther {
+  display: flex;
+  gap: 10px;
+}
+
+.bubble {
+  border-radius: 5px;
+}
+
+.name {
+  text-align: end;
+  padding-right: 10px;
+  font-size: 10px;
+}
+
+.nameOther {
+  padding-left: 10px;
+  font-size: 10px;
+}
+
+.msg-content {
+  max-width: 300px;
+  word-wrap: break-word;
+  text-align: left;
+}
+</style>

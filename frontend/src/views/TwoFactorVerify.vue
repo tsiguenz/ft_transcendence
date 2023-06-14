@@ -1,15 +1,17 @@
 <template>
   <br />
-  <v-form>
-    <v-text-field
-      v-model="twoFactorCode"
-      class="mb-5"
-      label="2fa code"
-      variant="outlined"
-      @keydown.enter.prevent="verify"
-    ></v-text-field>
-    <v-btn @click="verify">Validate two factor code</v-btn>
-  </v-form>
+  <v-sheet class="sheet pa-5 ma-5">
+    <v-form>
+      <v-text-field
+        v-model="twoFactorCode"
+        class="mb-5"
+        label="2fa code"
+        variant="outlined"
+        @keydown.enter.prevent="verify"
+      ></v-text-field>
+      <v-btn class="log" @click="verify">Validate two factor code</v-btn>
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
@@ -18,7 +20,7 @@ import * as constants from '@/constants.ts';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import swal from 'sweetalert';
-import formatError from '@/utils/lib';
+import * as lib from '@/utils/lib';
 import VueJwtDecode from 'vue-jwt-decode';
 
 export default {
@@ -42,7 +44,7 @@ export default {
             icon: 'error',
             text: 'Invalid two factor code'
           });
-          this.$router.push('/signin');
+          this.$router.replace('/home');
           return;
         }
         const data = response.data;
@@ -53,15 +55,25 @@ export default {
         this.$cookie.setCookie('jwt', data.access_token);
         this.$cookie.setCookie('refresh_token', data.refresh_token);
         this.$root.connectAndSubscribeStatusSocket();
-        this.$router.push('/home');
+        this.$router.replace('/home');
       } catch (error) {
         swal({
           icon: 'error',
-          text: formatError(error.response.data.message)
+          text: lib.formatError(error.response.data.message)
         });
-        this.$router.push('/signin');
+        this.$router.replace('/home');
       }
     }
   }
 };
 </script>
+
+<style>
+.sheet {
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
+}
+</style>

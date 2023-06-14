@@ -96,6 +96,7 @@ export default {
   display: flex;
   margin-top: 18px;
   width: 300px;
+
   :deep(.v-text-field .v-input__control .v-field__outline::before) {
     border: solid;
     border-radius: 3px;
@@ -108,6 +109,7 @@ export default {
   }
   .table{
     background-color: var(--light);
+
   }
 }
 </style>

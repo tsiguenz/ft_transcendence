@@ -2,7 +2,7 @@
   <v-btn v-if="!isLog()" class="log">
     <div v-if="toSignin">Sign In</div>
     <div v-else>Sign up</div>
-    <v-dialog v-model="dialog" activator="parent">
+    <v-dialog persistent v-model="dialog" activator="parent">
       <v-container>
         <v-row align="center" justify="center">
           <v-card class="card" height="100%" width="400px">
@@ -10,7 +10,7 @@
               <div class="d-flex justify-space-between">
                 <div v-if="toSignin">Sign In</div>
                 <div v-else>Sign up</div>
-                <v-btn class="card" @click="dialog = false"
+                <v-btn class="card" @click="reset"
                   ><v-icon icon="mdi-close"></v-icon
                 ></v-btn>
               </div>
@@ -21,7 +21,7 @@
                 <v-icon icon="mdi-alert-box"></v-icon>
                 {{ message }}
               </div>
-              <v-form v-if="toSignin">
+              <v-form ref="form" v-if="toSignin">
                 <v-text-field
                   v-model="nickname"
                   autocomplete="username"
@@ -39,7 +39,7 @@
                   @keydown.enter.prevent="signin"
                 ></v-text-field>
               </v-form>
-              <v-form v-else v-model="isFormValid">
+              <v-form ref="form" v-else v-model="isFormValid">
                 <v-text-field
                   v-model="nickname"
                   autocomplete="username"
@@ -153,6 +153,10 @@ export default {
       } catch (error) {
         this.setErrorMessage(error.response.data.message);
       }
+    },
+    reset() {
+      this.$refs.form.reset();
+      this.dialog = false;
     },
     signin42() {
       window.location.href = this.auth42;
