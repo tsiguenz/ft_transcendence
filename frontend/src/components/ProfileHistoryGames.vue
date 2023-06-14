@@ -8,8 +8,7 @@
           <v-sheet class="ma-4" color="transparent">
             <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
             <p>
-              Opponent {{ getUser(index.winnerId) }} -
-              {{ getUser(index.loserId) }}
+              Opponent: {{ getUser(index.winnerId, index.loserId) }}
             </p>
           </v-sheet>
           <v-sheet color="transparent">
@@ -27,7 +26,7 @@ import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 
 export default {
-  props: ['games', 'users'],
+  props: ['games', 'users', 'user'],
   data() {
     return {
       historyGames: [],
@@ -44,8 +43,10 @@ export default {
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
-    getUser(index) {
-      return this.users.filter((users) => users.id == index)[0].nickname;
+    getUser(winnerIndex, loserIndex) {
+      const winnerNickname = this.users.filter((users) => users.id == winnerIndex)[0].nickname;
+      const loserNickname = this.users.filter((users) => users.id == loserIndex)[0].nickname;
+			return ((this.user.nickname == winnerNickname) ? loserNickname : winnerNickname);
     }
   }
 };

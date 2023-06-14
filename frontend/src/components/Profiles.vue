@@ -49,6 +49,7 @@
             v-if="userIsMounted"
             :games="gameStats"
             :users="users"
+						:user="user"
           />
         </v-sheet>
       </v-col>
