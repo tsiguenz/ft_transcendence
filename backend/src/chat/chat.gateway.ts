@@ -25,7 +25,7 @@ import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect 
 {
   constructor(
     private auth: AuthService,
@@ -407,6 +407,10 @@ export class ChatGateway
 
     socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
     socket.leave(chatroom.slug);
+    this.server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
+      chatroomId: chatroom.id,
+      userId
+    });
     this.chatroomUser.remove(userId, chatroom.id);
   }
 
