@@ -106,7 +106,7 @@ export default {
   data() {
     return {
       dialog: false,
-      chatrooms: [],
+      chatrooms: []
     };
   },
   created() {
@@ -127,10 +127,7 @@ export default {
       this.closeDialog();
     },
     removeChatroom(chatroomId) {
-      this.chatrooms = this.chatrooms.filter(
-        (item) => item.id !== chatroomId
-      );
-
+      this.chatrooms = this.chatrooms.filter((item) => item.id !== chatroomId);
     },
     async getJoinableRooms() {
       try {

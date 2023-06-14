@@ -8,7 +8,7 @@
       @delete="(roomId) => $emit('delete', roomId)"
     />
     <v-btn
-      v-if="id && chatStore.hasJoinedRoom"
+      v-if="id"
       icon="mdi-exit-to-app"
       @click="leaveRoom"
     ></v-btn>
@@ -119,17 +119,8 @@ export default {
       }
     }
   },
-  // created() {
-  //   ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
-  // },
   mounted() {
-    // this.connectRoom();
-    // ChatService.subscribeToMessages((message) => {
-    //   ChatService.storeMessage(message);
-    // });
-    // ChatService.subscribeToKick((payload) => {
-    //   this.$emit('leave', payload.chatroomId);
-    // });
+    this.connectRoom();
     const authorNicknames = Array.from(
       new Set(this.messages.map((message) => message.authorNickname))
     );
@@ -141,18 +132,17 @@ export default {
       ChatService.getRoomMessages(this.id, this.lastMessageTime());
     },
     sendMessage() {
-      if (this.newMessage == '') {
-        return;
+      if (this.newMessage !== '') {
+        ChatService.sendMessage({
+          chatroomId: this.id,
+          message: this.newMessage
+        });
+        this.newMessage = '';
       }
-      ChatService.sendMessage({
-        chatroomId: this.id,
-        message: this.newMessage
-      });
-      this.newMessage = '';
     },
     leaveRoom() {
-      this.$emit('leave', this.id);
       ChatService.leaveRoom(this.id);
+      this.$emit('leave', this.id);
     },
     lastMessageTime() {
       // eslint-disable-next-line no-prototype-builtins
@@ -170,12 +160,6 @@ export default {
         return '';
       }
       return chatroom.name;
-    },
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
     },
     async fetchAvatarUrl(userName) {
       const response = await axios.get(constants.API_URL + '/users/');

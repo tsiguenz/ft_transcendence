@@ -81,6 +81,7 @@ export default {
     BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   mounted() {
+    console.log('Chat view mounted');
     ChatService.subscribeToMessages((message) => {
       ChatService.storeMessage(message);
     });
@@ -97,7 +98,6 @@ export default {
     },
     joinChatroom(id) {
       this.chatStore.activeChatroom = id;
-      this.chatStore.hasJoinedRoom = true;
       this.showFriends = false;
       this.showPublicChannel = false;
       this.showPrivateChannel = true;
@@ -107,7 +107,6 @@ export default {
       if (id === this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
       }
-      this.chatStore.hasJoinedRoom = false;
     },
     toggleFriendsView() {
       this.showFriends = true;

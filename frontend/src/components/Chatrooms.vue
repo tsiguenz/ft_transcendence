@@ -63,7 +63,7 @@ import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
-    NewChatroomDialog,
+    NewChatroomDialog
   },
   props: ['id', 'showFriends', 'showPublicChannel', 'showPrivateChannel'],
   emits: [

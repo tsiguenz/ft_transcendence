@@ -42,7 +42,6 @@ class ChatService {
   }
 
   disconnect() {
-    console.log('DISCONNECT ICI');
     this.socketService.disconnect();
   }
 
