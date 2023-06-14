@@ -47,10 +47,6 @@
 
 <script>
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
-import axios from 'axios';
-import * as constants from '@/constants.ts';
-import * as lib from '@/utils/lib';
-import swall from 'sweetalert';
 
 export default {
   components: {
@@ -60,7 +56,6 @@ export default {
   props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
   data() {
     return {
-      users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers,
       connected: false
     };
@@ -73,24 +68,7 @@ export default {
       deep: true
     }
   },
-  async mounted() {
-    await this.getUsers();
-  },
   methods: {
-    async getUsers() {
-      try {
-        const response = await axios.get(constants.API_URL + '/users');
-        this.users = response.data;
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     userStatus(user) {
       if (this.connectedUsers.includes(user)) {
         return true;
