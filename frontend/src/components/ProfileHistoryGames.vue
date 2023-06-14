@@ -7,8 +7,9 @@
         <v-row class="justify-space-between" align="center">
           <v-sheet class="ma-4" color="transparent">
             <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-            <p>Opponent: {{ getUser(index.winnerId, index.loserId) }}</p>
+            <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p>
           </v-sheet>
+					TEST {{ getPoints(index.winnerId, index.loserId, index) }}
           <v-sheet color="transparent">
             <p>{{ setDuration(index.createdAt) }}</p>
           </v-sheet>
@@ -37,21 +38,31 @@ export default {
   methods: {
     getGames() {
       this.isMounted = true;
+console.log("Games", this.games);
     },
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
-    getUser(winnerIndex, loserIndex) {
-      const winnerNickname = this.users.filter(
-        (users) => users.id == winnerIndex
-      )[0].nickname;
-      const loserNickname = this.users.filter(
-        (users) => users.id == loserIndex
-      )[0].nickname;
+    getOpponent(winnerIndex, loserIndex) {
+      const winnerNickname = this.getUser(winnerIndex).nickname;
+      const loserNickname = this.getUser(loserIndex).nickname;
       return this.user.nickname == winnerNickname
         ? loserNickname
         : winnerNickname;
-    }
+    },
+		getPoints(winnerIndex, loserIndex, currentGame) {
+      const winner = this.getUser(winnerIndex);
+      const loser = this.getUser(loserIndex);
+			if (this.user.id == winner.id)
+			return (currentGame.previousWinnerRating);
+else
+console.log("loser");
+		},
+		getUser(index) {
+      return (this.users.filter(
+        (users) => users.id == index
+      )[0]);
+		}
   }
 };
 </script>
