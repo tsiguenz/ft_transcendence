@@ -128,16 +128,12 @@ export default {
   watch: {
     id: {
       handler() {
-        console.log("Room ID changed!: " + this.id)
-        if (!this.id) {
-          this.chatStore.users = [];
-          return;
-        }
-        this.getChatroomUsers(this.id).then((users) => {
-          this.chatStore.users = users;
-        });
+        this.setRoomUsers();
       }
     }
+  },
+  mounted() {
+    this.setRoomUsers();
   },
   methods: {
     async promote(userId) {
@@ -190,6 +186,15 @@ export default {
           text: lib.formatError(error.response.data.message)
         });
       }
+    },
+    setRoomUsers() {
+      if (!this.id) {
+        this.chatStore.users = [];
+        return;
+      }
+      this.getChatroomUsers(this.id).then((users) => {
+        this.chatStore.users = users;
+      });
     },
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';

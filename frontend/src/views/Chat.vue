@@ -25,12 +25,8 @@
         <JoinChatroom v-else-if="showPublicChannel" />
       </v-col>
       <v-col cols="3">
-        <template v-if="showPrivateChannel">
-          <ChatroomUsers :id="currentChatroomId" />
-        </template>
-        <template v-else>
-          <OnlineFriends />
-        </template>
+        <ChatroomUsers :id="currentChatroomId" v-if="showPrivateChannel" />
+        <OnlineFriends v-else />
       </v-col>
     </v-row>
   </v-container>
@@ -81,7 +77,6 @@ export default {
     BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   mounted() {
-    console.log('Chat view mounted');
     ChatService.subscribeToMessages((message) => {
       ChatService.storeMessage(message);
     });
@@ -110,17 +105,17 @@ export default {
     },
     toggleFriendsView() {
       this.showFriends = true;
-      this.showPrivateChannel = false;
       this.showPublicChannel = false;
+      this.showPrivateChannel = false;
     },
     toggleChatView() {
       this.showFriends = false;
-      this.showPrivateChannel = true;
       this.showPublicChannel = false;
+      this.showPrivateChannel = true;
     },
     togglePublicChannelView() {
-      this.showPublicChannel = true;
       this.showFriends = false;
+      this.showPublicChannel = true;
       this.showPrivateChannel = false;
     }
   }
