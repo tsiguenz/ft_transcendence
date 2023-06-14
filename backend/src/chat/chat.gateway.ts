@@ -60,6 +60,7 @@ export class ChatGateway
       this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
         authorId: user.id,
         authorNickname: user.nickname,
+        authorAvatarUrl: user.avatarPath,
         chatroomId: chatroom.id,
         sentAt: message.createdAt,
         data: payload.message
@@ -266,10 +267,12 @@ export class ChatGateway
       chatroom.id,
       payload.newerThan
     );
+    const user = await this.users.getUserById(client['decoded'].sub);
     for (const id in messages) {
       client.emit(events.MESSAGE_TO_CLIENT, {
         authorId: messages[id].author.id,
         authorNickname: messages[id].author.nickname,
+        authorAvatarUrl: user.avatarPath,
         chatroomId: chatroom.id,
         sentAt: messages[id].createdAt,
         data: messages[id].content

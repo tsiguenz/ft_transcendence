@@ -1,43 +1,42 @@
 <template>
   <v-toolbar class="roomName">
-      <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <EditChatroomDialog
-        v-if="currentUserIsOwner"
-        :id="id"
-        @delete="(roomId) => $emit('delete', roomId)"
-      />
-      <v-btn v-if="id && chatStore.hasJoinedRoom" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
-    </v-toolbar>
-  <v-list ref="chat"  class="overflow-y-auto window chating">
-    
-    <div v-for="item in messages" :key="item.sentAt">
-      <div  v-if="item.authorId === currentUserId" class="author">
-      <p class="name">{{ item.authorNickname }}</p>
-      <p  class="text-right ma-2 msg ">
-        
-        <p
-          class="bubble pa-1 bg-blue msg-content"
-          >{{ item.data }}</p
-        >
-        <ProfilePrintAvatar
-                  :wdt="40"
-                  :hgt="40"
-                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
-                ></ProfilePrintAvatar>
-      </p>
-    </div>
-    <div  v-if="item.authorId !== currentUserId" class="other">
-      <p class="nameOther">{{ item.authorNickname }}</p>
-      <p  class="text-left ma-2 msgOther ">
-        <ProfilePrintAvatar
-                  :wdt="40"
-                  :hgt="40"
-                  :url-avatar="getAvatarUrlComputed(item.authorNickname)"
-                ></ProfilePrintAvatar>
-        <p class="bubble pa-1 bg-green msg-content">{{ item.data }}</p>
-      </p>
-    </div>
+    <v-toolbar-title>{{ currentChatroomName() }}</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <EditChatroomDialog
+      v-if="currentUserIsOwner"
+      :id="id"
+      @delete="(roomId) => $emit('delete', roomId)"
+    />
+    <v-btn
+      v-if="id && chatStore.hasJoinedRoom"
+      icon="mdi-exit-to-app"
+      @click="leaveRoom"
+    ></v-btn>
+  </v-toolbar>
+  <v-list ref="chat" class="overflow-y-auto window chating">
+    <div v-for="message in messages" :key="message.sentAt">
+      <div v-if="message.authorId === currentUserId" class="author">
+        <p class="name">{{ message.authorNickname }}</p>
+        <span class="text-right ma-2 msg">
+          <p class="bubble pa-1 bg-blue msg-content">{{ message.data }}</p>
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
+          ></ProfilePrintAvatar>
+        </span>
+      </div>
+      <div v-if="message.authorId !== currentUserId" class="other">
+        <p class="nameOther">{{ message.authorNickname }}</p>
+        <span class="text-left ma-2 msgOther">
+          <ProfilePrintAvatar
+            :wdt="40"
+            :hgt="40"
+            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
+          ></ProfilePrintAvatar>
+          <p class="bubble pa-1 bg-green msg-content">{{ message.data }}</p>
+        </span>
+      </div>
     </div>
   </v-list>
   <v-text-field
@@ -53,11 +52,10 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
-import axios from 'axios';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
-import ProfilePrintAvatar from  '../components/ProfilePrintAvatar.vue';
+import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
 export default {
   components: {
@@ -69,8 +67,7 @@ export default {
   data() {
     return {
       newMessage: '',
-      chatroom: [],
-      avatarUrls: {},
+      chatroom: []
     };
   },
   computed: {
@@ -88,27 +85,20 @@ export default {
       return true;
     },
     getAvatarUrlComputed() {
-      return (authorNickname) => {
-        return this.avatarUrls[authorNickname];
+      return (avatarPath) => {
+        return constants.AVATARS_URL + avatarPath;
       };
     }
-    
   },
   watch: {
     messages: {
-        handler(newMessages) {
-            this.$nextTick(() => {
-                this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
-            });
-            const authorNicknames = Array.from(new Set(newMessages.map(message => message.authorNickname)));
-            authorNicknames.forEach(nickname => {
-                if (!this.avatarUrls[nickname]) {
-                    this.fetchAvatarUrl(nickname);
-                }
-            });
-        },
-        deep: true,
-        immediate: true
+      handler() {
+        this.$nextTick(() => {
+          this.$refs.chat.$el.scrollTop = this.$refs.chat.$el.scrollHeight;
+        });
+      },
+      deep: true,
+      immediate: true
     },
     id: {
       handler() {
@@ -130,8 +120,6 @@ export default {
     ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
-    const authorNicknames = Array.from(new Set(this.messages.map(message => message.authorNickname)));
-    authorNicknames.forEach(nickname => this.fetchAvatarUrl(nickname));
   },
   beforeUnmount() {
     ChatService.disconnect();
@@ -152,7 +140,6 @@ export default {
       ChatService.leaveRoom(this.id);
     },
     lastMessageTime() {
-      // eslint-disable-next-line no-prototype-builtins
       if (!this.messages || this.messages.length < 1) {
         return new Date(null);
       }
@@ -173,48 +160,40 @@ export default {
         icon: 'error',
         text: lib.formatError(payload.message)
       });
-    },
-    async fetchAvatarUrl(userName) {
-        const response = await axios.get(constants.API_URL + '/users/');
-        const user = response.data.find((user) => user.nickname === userName);
-        const avatarPath = constants.AVATARS_URL + user.avatarPath;
-        this.avatarUrls[userName] = avatarPath;
-  },
+    }
   }
 };
 </script>
 
 <style scoped>
-
-
-.roomName{
+.roomName {
   background-color: var(--medium-purple);
 }
-.chating{
+.chating {
   max-height: 500px;
 }
 
-.msg{
+.msg {
   display: flex;
   justify-content: end;
   gap: 10px;
 }
-.msgOther{
+.msgOther {
   display: flex;
   gap: 10px;
 }
 
-.bubble{
+.bubble {
   border-radius: 5px;
 }
 
-.name{
+.name {
   text-align: end;
   padding-right: 10px;
   font-size: 10px;
 }
 
-.nameOther{
+.nameOther {
   padding-left: 10px;
   font-size: 10px;
 }
