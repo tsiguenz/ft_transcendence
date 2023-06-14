@@ -6,6 +6,7 @@ export const AVATARS_URL = `${BACKEND_URL}/avatars`;
 export const CHAT_SOCKET_URL = `${BACKEND_URL}/chat`;
 export const STATUS_SOCKET_URL = `${BACKEND_URL}/status`;
 export const GAME_SOCKET_URL = `${BACKEND_URL}/game`;
+export const GAME_CUSTOM_URL = `${FRONTEND_URL}/game/`;
 export const UNAUTHENTICATED_ROUTES = ['/home', '/42/callback', '/2fa/verify'];
 export const UNAUTHENTICATED_ROUTES_WITHOUT_HOME =
   UNAUTHENTICATED_ROUTES.filter((route) => route != '/home');

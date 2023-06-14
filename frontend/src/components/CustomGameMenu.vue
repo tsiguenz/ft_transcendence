@@ -58,7 +58,7 @@
     />
     <v-btn class="log" @click="createCustomRoom()">Create custom game</v-btn>
   </v-container>
-  <WaitingGame v-if="isInQueue" />
+  <WaitingGame v-if="isInQueue" :game-id="gameId" />
 </template>
 
 <script>
@@ -75,6 +75,7 @@ export default {
   data() {
     return {
       socketioGame: null,
+      gameId: '',
       inGameView: false,
       alreadyInGame: false,
       isInQueue: false,
@@ -109,13 +110,19 @@ export default {
   methods: {
     createCustomRoom() {
       if (this.alreadyInGame) return swal('You are already in game!');
-      this.isInQueue = true;
-      this.subscribeStartGame();
+      this.subscribeCustomRoomCreated();
+      if (!this.inGameView) this.subscribeStartGame();
       this.socketioGame.send('createCustomRoom', this.customGameDatas);
     },
     subscribeStartGame() {
       this.socketioGame.subscribe('startGame', (payload) => {
         this.$router.push('/game/' + payload.gameId);
+      });
+    },
+    subscribeCustomRoomCreated() {
+      this.socketioGame.subscribe('customRoomCreated', (payload) => {
+        this.isInQueue = true;
+        this.gameId = payload.gameId;
       });
     }
   }
