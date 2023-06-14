@@ -1,10 +1,12 @@
 <template>
-  <div v-if="!isLog">
-    <h4 class="font">Disconnect since :</h4>
-    <p class="font">{{ disconnectSince }}</p>
-  </div>
-  <div v-else>
-    <h4 class="font">Online</h4>
+  <div class="profileLastConnectionText">
+    <div v-if="!isLog">
+      <h4 class="font">Disconnect since :</h4>
+      <p class="font">{{ disconnectSince }}</p>
+    </div>
+    <div v-else>
+      <h4 class="font">Online</h4>
+    </div>
   </div>
 </template>
 
@@ -27,24 +29,31 @@ export default {
   computed: {
     ...mapStores(useSessionStore)
   },
+  watch: {
+    connectedUsersStore: {
+      handler() {
+        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+        this.isLog = this.connectedUsers.includes(this.user.id);
+      },
+      deep: true
+    }
+  },
   mounted() {
     this.calculateDifference();
   },
   methods: {
     calculateDifference() {
-      if (this.connectedUsers.includes(this.user.id)) {
-        this.isLog = true;
-        return;
-      }
-      this.isLog = false;
       this.disconnectSince = lib.convertDate(this.user.lastConnection);
+      this.isLog = this.connectedUsers.includes(this.user.id);
     }
   }
 };
 </script>
 
 <style>
-.font {
+.profileLastConnectionText {
   font-family: 'Poppins', serif;
+  text-align: center;
+  line-height: 3vh;
 }
 </style>
