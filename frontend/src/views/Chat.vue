@@ -58,9 +58,9 @@ export default {
   },
   data() {
     return {
-      showFriends: true, // for lulu : change to true for next PR
+      showFriends: true,
       showPublicChannel: false,
-      showPrivateChannel: false //for lulu : change to false for next PR
+      showPrivateChannel: false
     };
   },
   computed: {
@@ -123,5 +123,4 @@ export default {
 </script>
 
 <style scoped>
-/* Your component styles here */
 </style>

@@ -150,7 +150,7 @@ class ChatService {
   inviteUser(chatroomId: string, userId: string) {
     this.socketService.send(events.CHATROOM_INVITE_USER, {
       chatroomId,
-      userId: '3db1f0c4-8209-4de6-acc6-b34419b3eff0'
+      userId
     });
   }
 }

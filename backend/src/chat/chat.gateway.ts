@@ -118,19 +118,6 @@ export class ChatGateway
     }
   }
 
-  // @SubscribeMessage(events.CHATROOM_JOINABLE_ROOMS)
-  // async handleGetRooms(@ConnectedSocket() client: Socket) {
-  //   try {
-  //     const rooms = await this.chatroom.findJoinableChatroomsForUser(
-  //       client['decoded'].sub
-  //     );
-
-  //     client.emit(events.CHATROOM_JOINABLE_ROOMS, rooms);
-  //   } catch (e) {
-  //     throw new WsException((e as Error).message);
-  //   }
-  // }
-
   @SubscribeMessage(events.CHATROOM_CREATE)
   async handleCreateRoom(
     @ConnectedSocket() client: Socket,
@@ -365,11 +352,6 @@ export class ChatGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  // TODO: Refactor this huge function
-  // Should it do all of this?
-  // Couldn't we extract parts of it in more appropriates services/modules?
-  // Is this connection handler really secure?
-  // We should decouple  Prisma and the ChatGetway
   async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
     if (!(client.handshake.auth && client.handshake.auth.token)) {
