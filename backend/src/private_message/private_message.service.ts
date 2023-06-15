@@ -41,7 +41,6 @@ export class PrivateMessageService {
     secondUserId: string
   ): Promise<ChatRoom> {
     const chatroom = await this.findOne(firstUserId, secondUserId);
-    console.log(chatroom);
     if (chatroom.length > 0) {
       return chatroom[0];
     }
