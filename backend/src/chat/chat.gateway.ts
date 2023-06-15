@@ -25,7 +25,7 @@ import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect 
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
     private auth: AuthService,
@@ -156,6 +156,10 @@ export class ChatGateway
           payload.userIds[0],
           payload.userIds[1]
         );
+        const socket = await this.getUserSocket(payload.userIds[1]);
+        socket.emit(events.CHATROOM_NEW, {
+          chatroom: chatroom
+        });
       }
 
       client.emit(events.CHATROOM_NEW, {
