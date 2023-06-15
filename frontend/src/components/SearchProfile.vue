@@ -1,13 +1,11 @@
 <template>
   <div v-if="isLog()" class="search-container">
-    <v-form  @submit.prevent @click="getUsers()">
+    <v-form class="search-bar" @submit.prevent @click="getUsers()">
       <v-text-field
         v-model="search"
         placeholder="Search"
         class="expanding-search mt-1"
         prepend-inner-icon="mdi-magnify"
-        @focus="searchClosed()"
-        @blur="searchClosed()"
       ></v-text-field>
     </v-form>
     <div
@@ -18,9 +16,10 @@
         class="table" >
         <tbody>
           <tr v-for="user in filteredUsers" :key="user.id">
-            <v-btn><router-link
+            <router-link class="name"
           :to="'/profile/' + user.nickname"
-          @click="is_expanded === false">{{ user.nickname }}</router-link></v-btn>
+          @click="search = ''"
+          >{{ user.nickname }}</router-link>
           </tr>
         </tbody>
       </table>
@@ -39,7 +38,7 @@ export default {
         return{
             users: [],
             search: "",
-            is_expanded: false
+            is_expanded: true
         };
     },
     computed: {
@@ -69,7 +68,7 @@ export default {
 
 <style lang="scss">
 
-.v-form {
+.search-bar{
   display: flex;
   width: 300px;
   :deep(.v-text-field .v-input__control .v-field__outline::before) {
@@ -87,6 +86,8 @@ export default {
 
 .search-container {
   position: relative;
+  background-color: var(--dark-purple) !important;
+  border-radius: 3px 3px;
 }
 
 .search-results {
@@ -95,14 +96,19 @@ export default {
     display: unset;
     width: auto;
     z-index: 1000; /* This should be higher than the z-index of your navbar */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-    background-color: var(--dark-purple);
   }
 }
 .v-input__details {
   display: none !important;
 }
 
+.name{
+  text-decoration: none;
+  color: #ffff;
+}
+
+.name:hover{
+  background-color: var(--light);
+}
 
 </style>

@@ -17,12 +17,10 @@
 import SignCard from './SignCard.vue';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
-import SearchProfile from './SearchProfile.vue';
 
 export default {
   components: {
     SignCard,
-    SearchProfile
   },
   data() {
     return {

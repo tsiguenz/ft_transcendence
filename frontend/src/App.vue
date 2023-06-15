@@ -114,5 +114,6 @@ button {
 
 .search {
   position: absolute;
+  z-index: 1000;
 }
 </style>
