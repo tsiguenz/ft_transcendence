@@ -1,28 +1,32 @@
 <template>
-  <v-sheet class="font" color="transparent">
+  <v-sheet class="ma-5 font" color="transparent">
     <h2>History Games</h2>
     <v-sheet color="transparent">
-      <div v-if="isMounted" v-for="index in games">
+      <div v-for="index in games">
         <v-divider />
         <v-sheet class="my-3 py-5" color="transparent">
           <v-row class="justify-space-between">
-            <div><p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-            <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p></div>
-            <div><p>
-              Ladder points:
-              {{ getPreviousRating(index.winnerId, index.loserId, index) }}
-              <v-icon
-                v-if="
-                  getPreviousRating(index.winnerId, index.loserId, index) <
-                  getNewRating(index.winnerId, index.loserId, index)
-                "
-                icon="mdi-trending-up"
-                color="green"
-              ></v-icon>
-              <v-icon v-else icon="mdi-trending-down" color="red"></v-icon>
-              {{ getNewRating(index.winnerId, index.loserId, index) }}
-            </p>
-            <p>Date: {{ setDuration(index.createdAt) }}</p></div>
+            <div>
+              <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+              <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p>
+            </div>
+            <div>
+              <p>
+                Ladder points:
+                {{ getPreviousRating(index.winnerId, index.loserId, index) }}
+                <v-icon
+                  v-if="
+                    getPreviousRating(index.winnerId, index.loserId, index) <
+                    getNewRating(index.winnerId, index.loserId, index)
+                  "
+                  icon="mdi-trending-up"
+                  color="green"
+                ></v-icon>
+                <v-icon v-else icon="mdi-trending-down" color="red"></v-icon>
+                {{ getNewRating(index.winnerId, index.loserId, index) }}
+              </p>
+              <p>Date: {{ setDuration(index.createdAt) }}</p>
+            </div>
           </v-row>
         </v-sheet>
       </div>
@@ -38,17 +42,9 @@ import * as lib from '@/utils/lib';
 export default {
   props: ['games', 'users', 'user'],
   data() {
-    return {
-      isMounted: false
-    };
-  },
-  async mounted() {
-    await this.getGames();
+    return {};
   },
   methods: {
-    getGames() {
-      this.isMounted = true;
-    },
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
