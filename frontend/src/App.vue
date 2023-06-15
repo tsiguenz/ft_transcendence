@@ -15,6 +15,7 @@ import AppHeader from './components/AppHeader.vue';
 import Navbar from './components/NavBar.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import { useFriendStore } from '@/store/friend';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
 import { STATUS_SOCKET_URL } from './constants';
@@ -27,7 +28,8 @@ export default {
   provide() {
     return {
       connectedUsersStore: this.connectedUsersStore,
-      sessionStore: this.sessionStore
+      sessionStore: this.sessionStore,
+      friendStore: this.friendStore
     };
   },
   data() {
@@ -37,7 +39,8 @@ export default {
   },
   computed: {
     ...mapStores(useConnectedUsersStore),
-    ...mapStores(useSessionStore)
+    ...mapStores(useSessionStore),
+    ...mapStores(useFriendStore)
   },
   created() {
     if (this.sessionStore.loggedIn) this.connectStatusSocket();

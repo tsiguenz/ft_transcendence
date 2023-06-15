@@ -54,11 +54,10 @@ export default {
     IsFriend,
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'FriendStore'],
 
   data() {
     return {
-      friends: [],
       newFriend: '',
       connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: []
@@ -73,29 +72,15 @@ export default {
     }
   },
   async created() {
-    await this.getFriends();
+    await this.friendStore.setFriends(this.sessionStore.nickname);
     this.getConnectedFriends();
   },
+  computed: {
+    friends() {
+      this.friendStore.friends;
+    }
+  },
   methods: {
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data;
-        this.friends.forEach((friend) => {
-          friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
-        });
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     userStatus(user) {
       if (this.connectedUsers.includes(user.id)) {
         return true;
