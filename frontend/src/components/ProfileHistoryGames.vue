@@ -6,9 +6,9 @@
         <v-divider />
         <v-sheet class="my-3 py-5" color="transparent">
           <v-row class="justify-space-between">
-            <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-            <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p>
-            <p>
+            <div><p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+            <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p></div>
+            <div><p>
               Ladder points:
               {{ getPreviousRating(index.winnerId, index.loserId, index) }}
               <v-icon
@@ -22,7 +22,7 @@
               <v-icon v-else icon="mdi-trending-down" color="red"></v-icon>
               {{ getNewRating(index.winnerId, index.loserId, index) }}
             </p>
-            <p>Date: {{ setDuration(index.createdAt) }}</p>
+            <p>Date: {{ setDuration(index.createdAt) }}</p></div>
           </v-row>
         </v-sheet>
       </div>
