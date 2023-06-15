@@ -2,18 +2,29 @@
   <v-sheet class="font" color="transparent">
     <h2>History Games</h2>
     <v-sheet color="transparent">
-      <div v-if="isMounted" class="pr-5" v-for="index in games">
+      <div v-if="isMounted" v-for="index in games">
         <v-divider />
-        <v-row class="justify-space-between" align="center">
-          <v-sheet class="ma-4" color="transparent">
+        <v-sheet class="my-3 py-5" color="transparent">
+          <v-row class="justify-space-between">
             <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
             <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p>
-          </v-sheet>
-					TEST {{ getPoints(index.winnerId, index.loserId, index) }}
-          <v-sheet color="transparent">
-            <p>{{ setDuration(index.createdAt) }}</p>
-          </v-sheet>
-        </v-row>
+            <p>
+              Ladder points:
+              {{ getPreviousRating(index.winnerId, index.loserId, index) }}
+              <v-icon
+                v-if="
+                  getPreviousRating(index.winnerId, index.loserId, index) <
+                  getNewRating(index.winnerId, index.loserId, index)
+                "
+                icon="mdi-trending-up"
+                color="green"
+              ></v-icon>
+              <v-icon v-else icon="mdi-trending-down" color="red"></v-icon>
+              {{ getNewRating(index.winnerId, index.loserId, index) }}
+            </p>
+            <p>Date: {{ setDuration(index.createdAt) }}</p>
+          </v-row>
+        </v-sheet>
       </div>
     </v-sheet>
   </v-sheet>
@@ -28,7 +39,6 @@ export default {
   props: ['games', 'users', 'user'],
   data() {
     return {
-      historyGames: [],
       isMounted: false
     };
   },
@@ -38,7 +48,6 @@ export default {
   methods: {
     getGames() {
       this.isMounted = true;
-console.log("Games", this.games);
     },
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
@@ -50,19 +59,21 @@ console.log("Games", this.games);
         ? loserNickname
         : winnerNickname;
     },
-		getPoints(winnerIndex, loserIndex, currentGame) {
+    getPreviousRating(winnerIndex, loserIndex, currentGame) {
       const winner = this.getUser(winnerIndex);
       const loser = this.getUser(loserIndex);
-			if (this.user.id == winner.id)
-			return (currentGame.previousWinnerRating);
-else
-console.log("loser");
-		},
-		getUser(index) {
-      return (this.users.filter(
-        (users) => users.id == index
-      )[0]);
-		}
+      if (this.user.id == winner.id) return currentGame.previousWinnerRating;
+      else return currentGame.previousLoserRating;
+    },
+    getNewRating(winnerIndex, loserIndex, currentGame) {
+      const winner = this.getUser(winnerIndex);
+      const loser = this.getUser(loserIndex);
+      if (this.user.id == winner.id) return currentGame.newWinnerRating;
+      else return currentGame.newLoserRating;
+    },
+    getUser(index) {
+      return this.users.filter((users) => users.id == index)[0];
+    }
   }
 };
 </script>
