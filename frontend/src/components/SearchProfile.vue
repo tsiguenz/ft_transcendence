@@ -1,34 +1,36 @@
 <template>
-  <v-form
-        class="closed"
-        :class="`${is_expanded ? 'is-expanded' : ''}`"
-        @submit.prevent
-      >
-  <v-text-field
-          v-model="search"
-          placeholder="Search"
-          class="expanding-search mt-1"
-          prepend-inner-icon="mdi-magnify"
-          @focus="searchClosed"
-          @blur="searchClosed"
-        >
-        </v-text-field> <br> <br>
-     
-</v-form>
-  <table id="myTable" class="table">
-    <tbody v-if="search !== '' ">
-      <tr v-for="user in filteredUsers" :key="user.id">
-          <router-link to="/chat"><td>{{ user.nickname }}</td></router-link>
-      </tr>
-    </tbody>
-   </table>
- </template>
+  <div v-if="isLog()" class="search-container">
+    <v-form  @submit.prevent @click="getUsers()">
+      <v-text-field
+        v-model="search"
+        placeholder="Search"
+        class="expanding-search mt-1"
+        prepend-inner-icon="mdi-magnify"
+        @focus="searchClosed()"
+        @blur="searchClosed()"
+      ></v-text-field>
+    </v-form>
+    <div
+          v-if="search !== ''"
+          :class="`${is_expanded ? 'is-expanded' : 'search-results'}`">
+      <table
+        id="myTable"
+        class="table" >
+        <tbody>
+          <tr v-for="user in filteredUsers" :key="user.id">
+            <v-btn><router-link
+          :to="'/profile/' + user.nickname"
+          @click="is_expanded === false">{{ user.nickname }}</router-link></v-btn>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
 
 <script>
 import * as constants from '@/constants.ts';
 import axios from 'axios';
-import formatError from '@/utils/lib';
-import swall from 'sweetalert';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
@@ -41,7 +43,7 @@ export default {
         };
     },
     computed: {
-    filteredUsers() {
+      filteredUsers() {
       return this.users.filter(p => {
         return p.nickname.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
       });
@@ -49,43 +51,30 @@ export default {
     ...mapStores(useSessionStore)
 
     },
-    async created() {
-    await this.getUsers();
-  },
     methods: {
-    async getUsers() {
-      try {
+      async getUsers() {
+      if (!this.isLog()) return;
         const response = await axios.get(constants.API_URL + '/users');
         this.users = response.data;
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
-    searchClosed() {
-      this.is_expanded = !this.is_expanded;
     },
     isLog() {
       return this.sessionStore.loggedIn;
     },
+    searchClosed() {
+      this.is_expanded = !this.is_expanded;
+    }
   }
 }
 </script>
 
 <style lang="scss">
 
-.closed {
+.v-form {
   display: flex;
-  margin-top: 18px;
-  width: 45px;
+  width: 300px;
   :deep(.v-text-field .v-input__control .v-field__outline::before) {
     border: solid;
-    border-radius: 5px;
+    border-radius: 3px;
   }
   :deep(.v-text-field .v-input__control .v-field__outline::after) {
     border: none;
@@ -93,13 +82,27 @@ export default {
   :deep(.mdi-magnify) {
     cursor: pointer;
   }
+
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-results {
+  display: none;
   &.is-expanded {
-    width: 300px;
-    transition: width 0.3s;
-    :deep .v-field--variant-filled .v-field__overlay {
-      background-color: var(--light);
-    }
+    display: unset;
+    width: auto;
+    z-index: 1000; /* This should be higher than the z-index of your navbar */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    background-color: var(--dark-purple);
   }
 }
+.v-input__details {
+  display: none !important;
+}
+
 
 </style>
