@@ -50,6 +50,8 @@ model Game {
   loser                User  @relation("loser", fields: [loserId], references: [id], onDelete: Cascade)
   previousWinnerRating Int
   previousLoserRating  Int
+  newWinnerRating      Int?
+  newLoserRating       Int?
   winnerScore          Int
   loserScore           Int
   createdAt            DateTime  @default(now())

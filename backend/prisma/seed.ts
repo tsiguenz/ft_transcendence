@@ -72,6 +72,8 @@ async function populateGames() {
         loserId: loser.id,
         previousWinnerRating: winner.ladderPoints,
         previousLoserRating: loser.ladderPoints,
+        newWinnerRating: winner.ladderPoints + 10,
+        newLoserRating: loser.ladderPoints - 10,
         winnerScore: randomScore1,
         loserScore: randomScore2
       },

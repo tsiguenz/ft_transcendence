@@ -44,6 +44,7 @@ export default {
       required: true
     }
   },
+  emits: ['refresh-friends'],
   data() {
     return {
       newFriendStatus: false,
@@ -77,6 +78,7 @@ export default {
         })
         .then(() => {
           this.newFriendStatus = false;
+          this.$emit('refresh-friends');
         });
     },
     async addFriend() {
@@ -95,6 +97,7 @@ export default {
         })
         .then(() => {
           this.newFriendStatus = true;
+          this.$emit('refresh-friends');
         });
     }
   }
