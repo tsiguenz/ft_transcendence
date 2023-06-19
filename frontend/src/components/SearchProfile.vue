@@ -13,13 +13,10 @@
           :class="`${is_expanded ? 'is-expanded' : 'search-results'}`">
       <table
         id="myTable"
-        class="table" >
-        <tbody>
-          <tr v-for="user in filteredUsers" :key="user.id">
-            <router-link class="name"
-          :to="'/profile/' + user.nickname"
-          @click="search = ''"
-          >{{ user.nickname }}</router-link>
+        class="widthfor tablefor" >
+        <tbody class="widthfor" >
+          <tr class="widthfor namefor" v-for="user in filteredUsers" :key="user.id">
+            <div class="name" @click="userSelected(user)">{{ user.nickname }}</div>
           </tr>
         </tbody>
       </table>
@@ -61,7 +58,12 @@ export default {
     },
     searchClosed() {
       this.is_expanded = !this.is_expanded;
-    }
+    },
+    userSelected(user) {
+        this.$emit('user-selected', user);
+        this.search = '';
+      },
+      
   }
 }
 </script>
@@ -84,10 +86,15 @@ export default {
 
 }
 
+.widthfor{
+  width: 300px !important;
+}
+
 .search-container {
   position: relative;
   background-color: var(--dark-purple) !important;
   border-radius: 3px 3px;
+  
 }
 
 .search-results {
@@ -102,13 +109,25 @@ export default {
   display: none !important;
 }
 
+.namefor{
+  height: 30px;
+}
+
 .name{
   text-decoration: none;
   color: #ffff;
+  width: 100%;
+  padding-left: 5px;
+  padding-top: 2px;
 }
 
-.name:hover{
+.namefor:hover{
   background-color: var(--light);
+  
+}
+
+.tablefor{
+  box-shadow: var(--light) 0px 3px 8px;
 }
 
 </style>

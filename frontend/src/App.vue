@@ -4,7 +4,7 @@
       <AppHeader></AppHeader>
       <div class="content-wrapper">
         <Navbar />
-        <SearchProfile class="search" />
+        <SearchProfile class="search" @user-selected="onUserSelected" />
         <router-view />
       </div>
     </div>
@@ -74,7 +74,10 @@ export default {
     unsubscribeAndDisconnectStatusSocket() {
       this.unsubscribeStatusSocket();
       this.disconnectStatusSocket();
-    }
+    },
+    onUserSelected(user) {
+      this.$router.push(`/profile/${user.nickname}`);
+  }
   }
 };
 </script>
