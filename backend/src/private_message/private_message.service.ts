@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RoomType, ChatRoom } from '@prisma/client';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class PrivateMessageService {
@@ -23,7 +24,7 @@ export class PrivateMessageService {
   async findOne(
     firstUserId: string,
     secondUserId: string
-  ): Promise<Array<ChatRoom>> {
+  ) {
     return await this.prisma.chatRoom.findMany({
       where: {
         AND: [
@@ -32,14 +33,29 @@ export class PrivateMessageService {
           { users: { some: { userId: secondUserId } } }
         ]
       },
-      include: { users: true }
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        type: true,
+        users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                nickname: true
+              }
+            }
+          }
+        }
+      }
     });
   }
 
   async findOrCreate(
     firstUserId: string,
     secondUserId: string
-  ): Promise<ChatRoom> {
+  ) {
     const chatroom = await this.findOne(firstUserId, secondUserId);
     if (chatroom.length > 0) {
       return chatroom[0];
@@ -55,7 +71,7 @@ export class PrivateMessageService {
       where: { id: secondUserId }
     });
 
-    const roomName = `(${firstUser.nickname} - ${secondUser.nickname}) Private message`;
+    const roomName = `Private message ${uuid()}`;
     return await this.prisma.chatRoom.create({
       data: {
         name: roomName,
@@ -71,6 +87,22 @@ export class PrivateMessageService {
               user: { connect: { id: secondUserId } }
             }
           ]
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        type: true,
+        users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                nickname: true
+              }
+            }
+          }
         }
       }
     });
