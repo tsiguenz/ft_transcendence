@@ -63,7 +63,7 @@ export class PrivateMessageService {
     return await this.create(firstUserId, secondUserId);
   }
 
-  async create(firstUserId: string, secondUserId: string): Promise<ChatRoom> {
+  async create(firstUserId: string, secondUserId: string) {
     const firstUser = await this.prisma.user.findUnique({
       where: { id: firstUserId }
     });

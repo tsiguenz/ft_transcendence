@@ -1,6 +1,7 @@
 import SocketioService from './socketio.service';
 import * as events from '@/socketioEvents';
 import { useChatStore } from '@/store/chat';
+import { useSessionStore } from '@/store/session';
 import { CHAT_SOCKET_URL } from '@/constants';
 
 class ChatService {
@@ -8,7 +9,8 @@ class ChatService {
     private socketService: SocketioService = new SocketioService(
       CHAT_SOCKET_URL
     ),
-    private chatStore: useChatStore = useChatStore()
+    private chatStore: useChatStore = useChatStore(),
+    private sessionStore: useSessionStore = useSessionStore()
   ) {}
 
   setup(jwt: string, callback: Function) {
