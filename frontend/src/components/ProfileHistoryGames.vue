@@ -8,23 +8,11 @@
           <v-row class="justify-space-between">
             <div>
               <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-              <p>Opponent: {{ getOpponent(index.winnerId, index.loserId) }}</p>
+							<ProfileOpponent :opponent="getOpponent(index.winnerId, index.loserId)" />
             </div>
             <div>
-              <p>
-                Ladder points:
-                {{ getPreviousRating(index.winnerId, index.loserId, index) }}
-                <v-icon
-                  v-if="
-                    getPreviousRating(index.winnerId, index.loserId, index) <
-                    getNewRating(index.winnerId, index.loserId, index)
-                  "
-                  icon="mdi-trending-up"
-                  color="green"
-                ></v-icon>
-                <v-icon v-else icon="mdi-trending-down" color="red"></v-icon>
-                {{ getNewRating(index.winnerId, index.loserId, index) }}
-              </p>
+              <VariationPoints v-if="index.isRanked" :game="index" :users="users" :user="user" />
+							<p v-else>Custom Game</p>
               <p>Date: {{ setDuration(index.createdAt) }}</p>
             </div>
           </v-row>
@@ -38,34 +26,33 @@
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
+import VariationPoints from './ProfileVariationPoints.vue';
+import ProfileClick from './ProfileClick.vue';
+import ProfileOpponent from './ProfileOpponent.vue';
 
 export default {
   props: ['games', 'users', 'user'],
+	components: {
+    ProfileClick,
+		VariationPoints,
+		ProfileOpponent 
+	},
+  inject: ['connectedUsersStore'],
   data() {
-    return {};
+    return {
+      connectedUsers: this.connectedUsersStore.connectedUsers
+		};
   },
   methods: {
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
     getOpponent(winnerIndex, loserIndex) {
-      const winnerNickname = this.getUser(winnerIndex).nickname;
-      const loserNickname = this.getUser(loserIndex).nickname;
-      return this.user.nickname == winnerNickname
-        ? loserNickname
-        : winnerNickname;
-    },
-    getPreviousRating(winnerIndex, loserIndex, currentGame) {
       const winner = this.getUser(winnerIndex);
       const loser = this.getUser(loserIndex);
-      if (this.user.id == winner.id) return currentGame.previousWinnerRating;
-      else return currentGame.previousLoserRating;
-    },
-    getNewRating(winnerIndex, loserIndex, currentGame) {
-      const winner = this.getUser(winnerIndex);
-      const loser = this.getUser(loserIndex);
-      if (this.user.id == winner.id) return currentGame.newWinnerRating;
-      else return currentGame.newLoserRating;
+      return this.user.nickname == winner.nickname
+        ? loser
+        : winner;
     },
     getUser(index) {
       return this.users.filter((users) => users.id == index)[0];
