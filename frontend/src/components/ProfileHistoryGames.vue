@@ -6,12 +6,12 @@
         <v-divider />
         <v-sheet class="my-3 py-5" color="transparent">
           <v-row class="align-center justify-space-between">
-            <div>
+            <v-sheet width="40%" color="transparent">
               <ProfileOpponent
                 :opponent="getOpponent(index.winnerId, index.loserId)"
               />
-            </div>
-            <div>
+            </v-sheet>
+            <v-sheet width="50%" color="transparent">
               <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
               <VariationPoints
                 v-if="index.isRanked"
@@ -21,7 +21,7 @@
               />
               <p v-else>Custom Game</p>
               <p>Date: {{ setDuration(index.createdAt) }}</p>
-            </div>
+            </v-sheet>
           </v-row>
         </v-sheet>
       </div>
