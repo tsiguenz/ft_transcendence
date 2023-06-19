@@ -1,6 +1,6 @@
 <template>
   <v-list class="window">
-    <v-btn class="bouton" block>Invite users</v-btn>
+    <v-btn class="bouton" block @click="inviteUser">Invite users</v-btn>
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template #activator="{ props }">
@@ -25,6 +25,7 @@
         ></v-list-item>
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
+        <v-btn @click="privateMessage(user.id)" block>Private message</v-btn>
         <div v-if="currentUserIsOwner">
           <v-btn v-if="user.role === 'USER'" block @click="promote(user.id)"
             >Make admin</v-btn
@@ -127,27 +128,12 @@ export default {
   watch: {
     id: {
       handler() {
-        if (!this.id) {
-          this.chatStore.users = [];
-          return;
-        }
-        this.getChatroomUsers(this.id).then((users) => {
-          this.chatStore.users = users;
-        });
+        this.setRoomUsers();
       }
     }
   },
   mounted() {
-    // TODO: Make it all work, one day
-    // ChatService.subscribeToUsers((payload) => {
-    //   ChatService.storeUser(payload);
-    // }, (payload) => {
-    //   ChatService.removeUserFromRoom(payload);
-    // });
-    // ChatService.getOnlineUsers(this.id);
-  },
-  beforeUnmount() {
-    ChatService.disconnect();
+    this.setRoomUsers();
   },
   methods: {
     async promote(userId) {
@@ -201,6 +187,15 @@ export default {
         });
       }
     },
+    setRoomUsers() {
+      if (!this.id) {
+        this.chatStore.users = [];
+        return;
+      }
+      this.getChatroomUsers(this.id).then((users) => {
+        this.chatStore.users = users;
+      });
+    },
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
     },
@@ -247,6 +242,12 @@ export default {
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);
+    },
+    privateMessage(userId) {
+      ChatService.createOneToOne(this.currentUserId, userId);
+    },
+    inviteUser() {
+      ChatService.inviteUser(this.id, 'REPLACE-ME');
     }
   }
 };

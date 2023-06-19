@@ -16,8 +16,11 @@ import { Socket, Server } from 'socket.io';
 import { ChatroomService } from '../chatroom/chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
+import { PrivateMessageService } from '../private_message/private_message.service';
 import { UsersService } from '../users/users.service';
-import { RestrictionType, ChatRoom } from '@prisma/client';
+import { RestrictionType, ChatRoom, RoomType } from '@prisma/client';
+import { ChatroomSocketService } from './services/chatroom.socket.service';
+import { CreateChatroomPayload } from '../chat/interfaces/createChatroom.interface';
 import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -30,7 +33,9 @@ export class ChatGateway
     private users: UsersService,
     private chatroom: ChatroomService,
     private chatroomUser: ChatroomUserService,
-    private chatroomRestriction: ChatroomRestrictionService
+    private chatroomRestriction: ChatroomRestrictionService,
+    private privateMessage: PrivateMessageService,
+    private chatroomSocketService: ChatroomSocketService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -70,12 +75,11 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.JOIN_ROOM)
-  async handleJoin(
+  @SubscribeMessage(events.CHATROOM_CONNECT)
+  async handleConnect(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    // TODO: refactor these checks
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
     if (!chatroom) {
@@ -98,54 +102,113 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.LEAVE_ROOM)
+  @SubscribeMessage(events.CHATROOM_JOIN)
+  async handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string; password: string }
+  ) {
+    try {
+      await this.chatroomSocketService.joinChatroom(
+        client,
+        this.server,
+        payload
+      );
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_CREATE)
+  async handleCreateRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      name: string;
+      roomType: string;
+      password: string;
+      userIds: Array<string>;
+    }
+  ) {
+    let chatroom = undefined;
+
+    try {
+      if (payload.roomType !== RoomType.ONE_TO_ONE) {
+        chatroom = await this.chatroomSocketService.createChatroom(
+          client,
+          payload
+        );
+      }
+
+      if (payload.roomType === RoomType.ONE_TO_ONE) {
+        chatroom = await this.privateMessage.findOrCreate(
+          payload.userIds[0],
+          payload.userIds[1]
+        );
+        const socket = await this.getUserSocket(payload.userIds[1]);
+        socket.emit(events.CHATROOM_NEW, {
+          chatroom: chatroom
+        });
+      }
+
+      client.emit(events.CHATROOM_NEW, {
+        chatroom: chatroom
+      });
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_INVITE_USER)
+  async handleInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatroomId: string; userId: string }
+  ) {
+    try {
+      const socket = await this.getUserSocket(payload.userId);
+      await this.chatroomSocketService.invite(
+        client,
+        socket,
+        this.server,
+        payload
+      );
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
+  @SubscribeMessage(events.CHATROOM_LEAVE)
   async handleLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
-    if (!chatroom) {
-      return;
-    }
-
     try {
-      await this.chatroom.leave(client['decoded'].sub, chatroom.id);
-      client.leave(chatroom.slug);
+      await this.chatroomSocketService.leaveChatroom(
+        client,
+        this.server,
+        payload
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage(events.DELETE_ROOM)
+  @SubscribeMessage(events.CHATROOM_DELETE)
   async handleDeletion(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string }
   ) {
-    const chatroom = await this.chatroom.findOne(payload.chatroomId);
-
-    if (!chatroom) {
-      return;
-    }
-
-    if (
-      !(await this.chatroomUser.isUserOwner(client['decoded'].sub, chatroom.id))
-    ) {
-      throw new WsException('Unauthorized to delete room');
-    }
-
     try {
-      this.chatroom.remove(chatroom.id);
-      this.server
-        .to(chatroom.slug)
-        .emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
-      this.server.in(chatroom.slug).socketsLeave(chatroom.slug);
+      await this.chatroomSocketService.deleteChatroom(
+        client,
+        this.server,
+        payload
+      );
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage(events.KICK_USER)
+  @SubscribeMessage(events.CHATROOM_KICK)
   async handleKick(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { userId: string; chatroomId: string }
@@ -163,7 +226,7 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.RESTRICT_USER)
+  @SubscribeMessage(events.CHATROOM_RESTRICT_USER)
   async handleRestrict(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -201,16 +264,17 @@ export class ChatGateway
         until
       );
 
-      if (restrictionType == RestrictionType.MUTED) {
-        return;
+      const socket = await this.getUserSocket(payload.userId);
+      socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
+      if (restrictionType !== RestrictionType.MUTED) {
+        await this.kickUser(payload.userId, chatroom);
       }
-      await this.kickUser(payload.userId, chatroom);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
   }
 
-  @SubscribeMessage(events.UNRESTRICT_USER)
+  @SubscribeMessage(events.CHATROOM_UNRESTRICT_USER)
   async handleUnrestrict(
     @ConnectedSocket() client: Socket,
     @MessageBody()
@@ -244,7 +308,7 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage(events.GET_MESSAGES)
+  @SubscribeMessage(events.CHATROOM_GET_MESSAGES)
   async handleMessageHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatroomId: string; newerThan: Date }
@@ -288,11 +352,6 @@ export class ChatGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  // TODO: Refactor this huge function
-  // Should it do all of this?
-  // Couldn't we extract parts of it in more appropriates services/modules?
-  // Is this connection handler really secure?
-  // We should decouple  Prisma and the ChatGetway
   async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
     if (!(client.handshake.auth && client.handshake.auth.token)) {
@@ -335,8 +394,12 @@ export class ChatGateway
       return;
     }
 
-    socket.emit(events.KICKED_FROM_ROOM, { chatroomId: chatroom.id });
+    socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
     socket.leave(chatroom.slug);
+    this.server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
+      chatroomId: chatroom.id,
+      userId
+    });
     this.chatroomUser.remove(userId, chatroom.id);
   }
 

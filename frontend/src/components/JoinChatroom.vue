@@ -99,43 +99,35 @@
 import axios from 'axios';
 import * as constants from '@/constants';
 import swal from 'sweetalert';
+import ChatService from '../services/chat.service';
 import * as lib from '@/utils/lib';
 
 export default {
-  emits: ['join'],
   data() {
     return {
-      activeChat: 1,
-      chatrooms: [],
-      dialog: false
+      dialog: false,
+      chatrooms: []
     };
   },
   created() {
     this.getJoinableRooms();
+    ChatService.subscribeToNewRooms((payload) => {
+      this.removeChatroom(payload.chatroom.id);
+    });
   },
   methods: {
     closeDialog() {
       this.dialog = false;
     },
-
-    async joinRoom(chatroom) {
-      try {
-        const response = await axios.post(
-          constants.API_URL + '/chatrooms/' + chatroom.id + '/join',
-          {
-            ...chatroom
-          }
-        );
-        this.reply = response.data;
-        this.$emit('join', chatroom);
-        let i = this.chatrooms.map((item) => item.id).indexOf(chatroom.id);
-        this.chatrooms.splice(i, 1);
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
-      }
+    joinRoom(chatroom) {
+      ChatService.joinRoom({
+        chatroomId: chatroom.id,
+        password: chatroom.password
+      });
+      this.closeDialog();
+    },
+    removeChatroom(chatroomId) {
+      this.chatrooms = this.chatrooms.filter((item) => item.id !== chatroomId);
     },
     async getJoinableRooms() {
       try {
