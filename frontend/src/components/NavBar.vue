@@ -20,12 +20,12 @@ import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
-    SignCard,
+    SignCard
   },
   data() {
     return {
       users: [],
-      search: "",
+      search: ''
     };
   },
   computed: {
@@ -37,8 +37,8 @@ export default {
   methods: {
     isLog() {
       return this.sessionStore.loggedIn;
-    },
-}
+    }
+  }
 };
 </script>
 

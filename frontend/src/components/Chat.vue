@@ -7,11 +7,7 @@
       :id="id"
       @delete="(roomId) => $emit('delete', roomId)"
     />
-    <v-btn
-      v-if="id"
-      icon="mdi-exit-to-app"
-      @click="leaveRoom"
-    ></v-btn>
+    <v-btn v-if="id" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
     <div v-for="message in messages" :key="message.sentAt">

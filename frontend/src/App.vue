@@ -26,7 +26,6 @@ export default {
     AppHeader,
     Navbar,
     SearchProfile
-
   },
   provide() {
     return {
@@ -77,7 +76,7 @@ export default {
     },
     onUserSelected(user) {
       this.$router.push(`/profile/${user.nickname}`);
-  }
+    }
   }
 };
 </script>
