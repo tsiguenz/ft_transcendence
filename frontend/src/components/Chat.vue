@@ -114,9 +114,6 @@ export default {
       this.$emit('leave', payload.chatroomId);
     });
   },
-  beforeUnmount() {
-    ChatService.disconnect();
-  },
   methods: {
     connectRoom() {
       ChatService.connectRoom(this.id);
