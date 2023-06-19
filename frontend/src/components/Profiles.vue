@@ -8,7 +8,7 @@
               v-if="userIsMounted"
               :wdt="100"
               :hgt="100"
-              :urlAvatar="user.avatarPath"
+              :url-avatar="user.avatarPath"
             />
           </v-row>
           <v-row justify="center">
@@ -82,7 +82,6 @@ import ProfileLastConnection from './ProfileLastConnection.vue';
 import IsFriend from '../components/IsFriend.vue';
 
 export default {
-  props: ['nickname'],
   components: {
     ProfilePrintAvatar,
     ProfileLadderPoints,
@@ -91,6 +90,7 @@ export default {
     IsFriend,
     ProfileLastConnection
   },
+  props: ['nickname'],
   data() {
     return {
       user: {},
@@ -102,6 +102,12 @@ export default {
   },
   computed: {
     ...mapStores(useSessionStore)
+  },
+  watch: {
+    nickname() {
+      this.getProfile();
+      this.getFriends();
+    }
   },
   async mounted() {
     await this.getProfile();
