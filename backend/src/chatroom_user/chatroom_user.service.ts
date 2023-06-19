@@ -58,6 +58,38 @@ export class ChatroomUserService {
     });
   }
 
+  async findOneWithRestrictions(userId: string, chatroomId: string) {
+    return await this.prisma.user.findFirst({
+      where: { id: userId },
+      select: {
+        id: true,
+        nickname: true,
+        chatrooms: {
+          select: {
+            role: true,
+            chatRoom: false,
+            userId: false
+          },
+          where: {
+            chatRoomId: chatroomId
+          }
+        },
+        restrictions: {
+          select: {
+            type: true,
+            restrictedUntil: true
+          },
+          where: {
+            chatRoomId: chatroomId,
+            restrictedUntil: {
+              gte: new Date()
+            }
+          }
+        }
+      }
+    });
+  }
+
   async create(
     userId: string,
     chatroomId: string,

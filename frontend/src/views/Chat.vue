@@ -14,35 +14,28 @@
         />
       </v-col>
       <v-col cols="6">
-        <template v-if="showPrivateChannel">
-          <Chat
-            :id="currentChatroomId"
-            title="Chat"
-            :messages="messages"
-            @leave="leaveRoom"
-            @delete="leaveRoom"
-          />
-        </template>
-        <template v-else-if="showFriends">
-          <Friends />
-        </template>
-        <template v-else-if="showPublicChannel">
-          <PublicChannel />
-        </template>
+        <Chat
+          v-if="showPrivateChannel"
+          :id="currentChatroomId"
+          :messages="messages"
+          @leave="leaveRoom"
+          @delete="leaveRoom"
+        />
+        <Friends v-else-if="showFriends" />
+        <JoinChatroom v-else-if="showPublicChannel" />
       </v-col>
       <v-col cols="3">
-        <template v-if="showPrivateChannel">
-          <ChatroomUsers :id="currentChatroomId" />
-        </template>
-        <template v-else>
-          <OnlineFriends />
-        </template>
+        <ChatroomUsers :id="currentChatroomId" v-if="showPrivateChannel" />
+        <OnlineFriends v-else />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import ChatService from '../services/chat.service';
+import swal from 'sweetalert';
+import * as lib from '@/utils/lib';
 import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
@@ -52,7 +45,7 @@ import Chatrooms from '../components/Chatrooms.vue';
 import ChatroomUsers from '../components/ChatroomUsers.vue';
 import Friends from '../components/Friends.vue';
 import OnlineFriends from '../components/OnlineFriends.vue';
-import PublicChannel from '../components/PublicChannel.vue';
+import JoinChatroom from '../components/JoinChatroom.vue';
 
 export default {
   components: {
@@ -61,13 +54,13 @@ export default {
     ChatroomUsers,
     Friends,
     OnlineFriends,
-    PublicChannel
+    JoinChatroom
   },
   data() {
     return {
-      showFriends: false, // for lulu : change to true for next PR
+      showFriends: true,
       showPublicChannel: false,
-      showPrivateChannel: true //for lulu : change to false for next PR
+      showPrivateChannel: false
     };
   },
   computed: {
@@ -80,40 +73,49 @@ export default {
     }
   },
   created() {
+    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
     BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
+  mounted() {
+    ChatService.subscribeToMessages((message) => {
+      ChatService.storeMessage(message);
+    });
+  },
+  beforeUnmount() {
+    ChatService.disconnect();
+  },
   methods: {
+    displayError(payload) {
+      swal({
+        icon: 'error',
+        text: lib.formatError(payload.message)
+      });
+    },
     joinChatroom(id) {
-      this.chatStore.activeChatroom = id;
-      this.chatStore.hasJoinedRoom = true;
+      this.chatStore.joinRoom(id);
       this.showFriends = false;
       this.showPublicChannel = false;
       this.showPrivateChannel = true;
     },
     leaveRoom(id) {
+      this.chatStore.removeRoom(id);
       if (id === this.currentChatroomId) {
-        this.chatStore.switchToDefaultChatroom();
-      }
-      this.chatStore.removeRoom(id);
-      this.chatStore.hasJoinedRoom = false;
-      this.chatStore.removeRoom(id);
-      if (id == this.currentChatroomId) {
         this.chatStore.switchToDefaultChatroom();
       }
     },
     toggleFriendsView() {
       this.showFriends = true;
-      this.showPrivateChannel = false;
       this.showPublicChannel = false;
+      this.showPrivateChannel = false;
     },
     toggleChatView() {
       this.showFriends = false;
-      this.showPrivateChannel = true;
       this.showPublicChannel = false;
+      this.showPrivateChannel = true;
     },
     togglePublicChannelView() {
-      this.showPublicChannel = true;
       this.showFriends = false;
+      this.showPublicChannel = true;
       this.showPrivateChannel = false;
     }
   }
@@ -121,5 +123,4 @@ export default {
 </script>
 
 <style scoped>
-/* Your component styles here */
 </style>

@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia';
+import { useSessionStore } from '@/store/session';
 
+
+const sessionStore = useSessionStore();
 export const useChatStore = defineStore('chat', {
   state() {
     return {
@@ -46,37 +49,46 @@ export const useChatStore = defineStore('chat', {
   },
   actions: {
     addRoom(...rooms) {
-      this.chatrooms.push(...rooms);
+      for (const room of rooms) {
+        if (!this.chatrooms.some((e) => e.id === room.id)) {
+          this.chatrooms.push(this.renameRoom(room));
+        }
+      }
+    },
+    renameRoom(room) {
+      if (room.type !== "ONE_TO_ONE") {
+        return room;
+      }
+      const otherUser = room.users.find(e => e.user.nickname !== sessionStore.nickname)
+
+      room.name = `PM [${otherUser.user.nickname}]`;
+      return room; 
     },
     removeRoom(roomId) {
       this.chatrooms = this.chatrooms.filter((room) => room.id !== roomId);
       delete this.messages[roomId];
     },
-    // joinChatroom(chatroomId: number) {},
+    joinRoom(chatroomId) {
+      this.activeChatroom = chatroomId;
+    },
     storeMessage(message) {
-      const chatroomId: number = message.chatroomId;
+      const chatroomId: string = message.chatroomId;
 
       if (!this.messages.hasOwnProperty(chatroomId)) {
         this.messages[chatroomId] = [];
       }
       this.messages[chatroomId].push(message);
     },
-
-    // storeUser(chatroomId, users) {
-    //   if (!this.users.hasOwnProperty(chatroomId)) {
-    //     this.users[chatroomId] = [];
-    //   }
-    //   this.users[chatroomId].push(...users);
-    // },
-
-    // removeUser(payload) {
-    //   const chatroomId: number = payload.chatroomId;
-    //   if (this.users.hasOwnProperty(chatroomId)) {
-    //     this.users[chatroomId] = this.users[chatroomId].filter(
-    //       (user) => user.id !== payload.id
-    //     );
-    //   }
-    // },
+    addUserToRoom(chatroomId: string, user: string) {
+      if (this.activeChatroom === chatroomId) {
+        this.users.push(user);
+      }
+    },
+    removeUserFromRoom(chatroomId: string, userId: string) {
+      if (this.activeChatroom === chatroomId) {
+        this.users = this.users.filter((user) => user.id !== userId);
+      }
+    },
 
     setUserRole(userId, chatroomId, role) {
       const i = this.users.findIndex((e) => e.id == userId);
@@ -106,7 +118,7 @@ export const useChatStore = defineStore('chat', {
       );
     },
 
-    isUserOnline(userId: number, chatroomId: number) {
+    isUserOnline(userId: string, chatroomId: string) {
       if (this.users.hasOwnProperty(chatroomId)) {
         return this.users[chatroomId].find((user) => user.id === userId);
       }

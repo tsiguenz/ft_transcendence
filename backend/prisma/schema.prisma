@@ -134,6 +134,7 @@ enum Role {
 }
 
 enum RoomType {
+  ONE_TO_ONE
   PRIVATE
   PROTECTED
   PUBLIC

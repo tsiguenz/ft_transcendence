@@ -330,7 +330,18 @@ export class UsersService {
       select: {
         id: true,
         name: true,
-        slug: true
+        slug: true,
+        type: true,
+        users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                nickname: true
+              }
+            }
+          }
+        }
       }
     });
   }
