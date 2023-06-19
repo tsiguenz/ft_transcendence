@@ -98,6 +98,15 @@ export default {
       friends: []
     };
   },
+  watch: {
+    nickname: {
+      handler() {
+        this.nickname != this.user.nickname;
+        this.getProfile();
+        this.getFriends();
+      }
+    }
+  },
   computed: {
     ...mapStores(useSessionStore)
   },

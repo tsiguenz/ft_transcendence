@@ -5,14 +5,21 @@
       <div v-for="index in games">
         <v-divider />
         <v-sheet class="my-3 py-5" color="transparent">
-          <v-row class="justify-space-between">
+          <v-row class="align-center justify-space-between">
             <div>
-              <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-							<ProfileOpponent :opponent="getOpponent(index.winnerId, index.loserId)" />
+              <ProfileOpponent
+                :opponent="getOpponent(index.winnerId, index.loserId)"
+              />
             </div>
             <div>
-              <VariationPoints v-if="index.isRanked" :game="index" :users="users" :user="user" />
-							<p v-else>Custom Game</p>
+              <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+              <VariationPoints
+                v-if="index.isRanked"
+                :game="index"
+                :users="users"
+                :user="user"
+              />
+              <p v-else>Custom Game</p>
               <p>Date: {{ setDuration(index.createdAt) }}</p>
             </div>
           </v-row>
@@ -32,16 +39,16 @@ import ProfileOpponent from './ProfileOpponent.vue';
 
 export default {
   props: ['games', 'users', 'user'],
-	components: {
+  components: {
     ProfileClick,
-		VariationPoints,
-		ProfileOpponent 
-	},
+    VariationPoints,
+    ProfileOpponent
+  },
   inject: ['connectedUsersStore'],
   data() {
     return {
       connectedUsers: this.connectedUsersStore.connectedUsers
-		};
+    };
   },
   methods: {
     setDuration(dateToConvert) {
@@ -50,9 +57,7 @@ export default {
     getOpponent(winnerIndex, loserIndex) {
       const winner = this.getUser(winnerIndex);
       const loser = this.getUser(loserIndex);
-      return this.user.nickname == winner.nickname
-        ? loser
-        : winner;
+      return this.user.nickname == winner.nickname ? loser : winner;
     },
     getUser(index) {
       return this.users.filter((users) => users.id == index)[0];
