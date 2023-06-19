@@ -143,7 +143,6 @@ class ChatService {
 
   createOneToOne(firstUserId: string, secondUserId: string) {
     this.socketService.send(events.CHATROOM_CREATE, {
-      name: 'SuperDuperChat',
       roomType: 'ONE_TO_ONE',
       userIds: [firstUserId, secondUserId]
     });
