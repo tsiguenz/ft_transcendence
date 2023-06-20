@@ -34,10 +34,7 @@ export default {
   },
   methods: {
     userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
+      return this.connectedUsers.includes(user.id);
     },
     getAvatarPath(user) {
       return constants.AVATARS_URL + user.avatarPath;
