@@ -16,7 +16,7 @@ export const useFriendStore = defineStore('friend', {
     async setFriends(username: string) {
       try {
         const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
+          constants.API_URL + `/users/${username}/friends`
         );
         this.friends = response.data;
         this.friends.forEach((friend) => {

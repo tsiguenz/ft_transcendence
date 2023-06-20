@@ -33,7 +33,6 @@
           <IsFriend
             :friendname="friend.nickname"
             :is-friend-at-begining="isFriend(friend.nickname)"
-            @refresh-friends="getFriends()"
           ></IsFriend>
         </td>
       </tr>
@@ -43,9 +42,6 @@
 
 <script>
 import * as constants from '@/constants.ts';
-import axios from 'axios';
-import swall from 'sweetalert';
-import * as lib from '@/utils/lib';
 import IsFriend from '../components/IsFriend.vue';
 import ProfileClick from '../components/ProfileClick.vue';
 
@@ -54,13 +50,14 @@ export default {
     IsFriend,
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore', 'FriendStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
 
   data() {
     return {
       newFriend: '',
       connectedUsers: this.connectedUsersStore.connectedUsers,
-      connectedFriends: []
+      connectedFriends: [],
+      friends: this.friendStore.friends
     };
   },
   watch: {
@@ -69,16 +66,16 @@ export default {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
       },
       deep: true
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
-  async created() {
-    await this.friendStore.setFriends(this.sessionStore.nickname);
-    this.getConnectedFriends();
-  },
-  computed: {
-    friends() {
-      this.friendStore.friends;
-    }
+  created() {
+    this.friendStore.setFriends(this.sessionStore.nickname).then(this.getConnectedFriends());
   },
   methods: {
     userStatus(user) {
