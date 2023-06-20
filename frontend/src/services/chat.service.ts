@@ -1,6 +1,7 @@
 import SocketioService from './socketio.service';
 import * as events from '@/socketioEvents';
 import { useChatStore } from '@/store/chat';
+import { useSessionStore } from '@/store/session';
 import { CHAT_SOCKET_URL } from '@/constants';
 
 class ChatService {
@@ -8,12 +9,37 @@ class ChatService {
     private socketService: SocketioService = new SocketioService(
       CHAT_SOCKET_URL
     ),
-    private chatStore: useChatStore = useChatStore()
+    private chatStore: useChatStore = useChatStore(),
+    private sessionStore: useSessionStore = useSessionStore()
   ) {}
 
   setup(jwt: string, callback: Function) {
     this.socketService.setupSocketConnection(jwt);
     this.socketService.subscribe(events.EXCEPTION, callback);
+    this.socketService.subscribe(events.CHATROOM_NEW, (payload: any) => {
+      this.chatStore.addRoom(payload.chatroom);
+    });
+    this.socketService.subscribe(
+      events.CHATROOM_USER_CONNECT,
+      (payload: any) => {
+        this.chatStore.addUserToRoom(payload.chatroomId, payload.chatroomUser);
+      }
+    );
+    this.socketService.subscribe(
+      events.CHATROOM_USER_DISCONNECT,
+      (payload: any) => {
+        this.chatStore.removeUserFromRoom(payload.chatroomId, payload.userId);
+      }
+    );
+    this.socketService.subscribe(
+      events.CHATROOM_RESTRICTED_USER,
+      (payload: any) => {
+        console.info(
+          `RESTRICTED: [${payload.restrictionType}], until: ${payload.until}`
+        );
+      }
+    );
+    // this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
   disconnect() {
@@ -28,24 +54,38 @@ class ChatService {
     this.socketService.subscribe(events.MESSAGE_TO_CLIENT, callback);
   }
 
-  subscribeToKick(callback: Function) {
-    this.socketService.subscribe(events.KICKED_FROM_ROOM, callback);
+  subscribeToNewRooms(callback: Function) {
+    this.socketService.subscribe(events.CHATROOM_NEW, callback);
   }
 
-  joinRoom(chatroomId: number) {
-    this.socketService.send(events.JOIN_ROOM, { chatroomId: chatroomId });
+  subscribeToKick(callback: Function) {
+    this.socketService.subscribe(events.CHATROOM_KICKED, callback);
+  }
+
+  createRoom(payload: { name: string; type: string; password: string }) {
+    this.socketService.send(events.CHATROOM_CREATE, payload);
+  }
+
+  joinRoom(payload: { chatroomId: string; password: string }) {
+    this.socketService.send(events.CHATROOM_JOIN, payload);
+  }
+
+  connectRoom(chatroomId: number) {
+    this.socketService.send(events.CHATROOM_CONNECT, {
+      chatroomId: chatroomId
+    });
   }
 
   leaveRoom(chatroomId: number) {
-    this.socketService.send(events.LEAVE_ROOM, { chatroomId: chatroomId });
+    this.socketService.send(events.CHATROOM_LEAVE, { chatroomId: chatroomId });
   }
 
   deleteRoom(chatroomId: number) {
-    this.socketService.send(events.DELETE_ROOM, { chatroomId: chatroomId });
+    this.socketService.send(events.CHATROOM_DELETE, { chatroomId: chatroomId });
   }
 
   getRoomMessages(chatroomId: number, newerThan: Date = new Date(null)) {
-    this.socketService.send(events.GET_MESSAGES, {
+    this.socketService.send(events.CHATROOM_GET_MESSAGES, {
       chatroomId: chatroomId,
       newerThan: newerThan
     });
@@ -64,7 +104,7 @@ class ChatService {
   }
 
   muteUser(userId: string, chatroomId: string, time: number) {
-    this.socketService.send(events.RESTRICT_USER, {
+    this.socketService.send(events.CHATROOM_RESTRICT_USER, {
       userId,
       chatroomId,
       restrictionType: 'MUTED',
@@ -73,7 +113,7 @@ class ChatService {
   }
 
   banUser(userId: string, chatroomId: string, time: number) {
-    this.socketService.send(events.RESTRICT_USER, {
+    this.socketService.send(events.CHATROOM_RESTRICT_USER, {
       userId,
       chatroomId,
       restrictionType: 'BANNED',
@@ -82,7 +122,7 @@ class ChatService {
   }
 
   unmuteUser(userId: string, chatroomId: string) {
-    this.socketService.send(events.UNRESTRICT_USER, {
+    this.socketService.send(events.CHATROOM_UNRESTRICT_USER, {
       userId,
       chatroomId,
       restrictionType: 'MUTED'
@@ -90,7 +130,7 @@ class ChatService {
   }
 
   unbanUser(userId: string, chatroomId: string) {
-    this.socketService.send(events.UNRESTRICT_USER, {
+    this.socketService.send(events.CHATROOM_UNRESTRICT_USER, {
       userId,
       chatroomId,
       restrictionType: 'BANNED'
@@ -98,7 +138,21 @@ class ChatService {
   }
 
   kickUser(userId: string, chatroomId: string) {
-    this.socketService.send(events.KICK_USER, { userId, chatroomId });
+    this.socketService.send(events.CHATROOM_KICK, { userId, chatroomId });
+  }
+
+  createOneToOne(firstUserId: string, secondUserId: string) {
+    this.socketService.send(events.CHATROOM_CREATE, {
+      roomType: 'ONE_TO_ONE',
+      userIds: [firstUserId, secondUserId]
+    });
+  }
+
+  inviteUser(chatroomId: string, userId: string) {
+    this.socketService.send(events.CHATROOM_INVITE_USER, {
+      chatroomId,
+      userId
+    });
   }
 }
 
