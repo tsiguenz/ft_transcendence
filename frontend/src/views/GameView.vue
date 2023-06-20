@@ -230,20 +230,18 @@ export default {
   original size of the canvas
   but it's not responsive
   */
-  margin-left: 20%;
-  height: 525px;
-  width: 858px;
+	margin: auto;
+  width: 70%;
+	aspect-ratio: auto 1 / 0.611888112;
   background-color: var(--dark-alt);
   border: 3px solid var(--light);
 }
 
 .v-container {
-  height: 50%;
-  width: 50%;
+  height: 100%;
+  width: 100%;
   margin: 0 auto;
   display: flex;
-  flex-direction: row;
   justify-content: center;
-  align-items: center;
 }
 </style>
