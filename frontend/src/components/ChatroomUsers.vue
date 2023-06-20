@@ -1,6 +1,6 @@
 <template>
   <v-list class="window">
-    <v-btn class="bouton" block @click="inviteUser">Invite users</v-btn>
+    <InviteUserDialog :id="id" />
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template #activator="{ props }">
@@ -87,10 +87,12 @@ import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import RestrictUserDialog from '../components/RestrictUserDialog.vue';
+import InviteUserDialog from '../components/InviteUserDialog.vue';
 
 export default {
   components: {
-    RestrictUserDialog
+    RestrictUserDialog,
+    InviteUserDialog
   },
   props: ['id'],
   data() {

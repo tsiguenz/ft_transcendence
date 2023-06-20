@@ -43,6 +43,7 @@ export default {
       is_expanded: true
     };
   },
+  emits: ['user-selected'],
   computed: {
     filteredUsers() {
       return this.users.filter((p) => {
