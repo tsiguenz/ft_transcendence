@@ -52,13 +52,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants';
-import swal from 'sweetalert';
-import * as lib from '@/utils/lib';
+import ChatService from '../services/chat.service';
 
 export default {
-  emits: ['create'],
   data() {
     return {
       newChatroomObject: { name: '', type: 'PUBLIC', password: null },
@@ -71,20 +67,9 @@ export default {
       this.dialog = false;
       this.newChatroomObject = { name: '', type: 'PUBLIC', password: null };
     },
-    async newChatroom() {
-      // TODO: clean the input to protect injection
-      try {
-        const response = await axios.post(constants.API_URL + '/chatrooms', {
-          ...this.newChatroomObject
-        });
-        this.$emit('create', response.data);
-        this.closeDialog();
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
-      }
+    newChatroom() {
+      ChatService.createRoom(this.newChatroomObject);
+      this.closeDialog();
     }
   }
 };

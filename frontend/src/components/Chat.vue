@@ -7,11 +7,7 @@
       :id="id"
       @delete="(roomId) => $emit('delete', roomId)"
     />
-    <v-btn
-      v-if="id && chatStore.hasJoinedRoom"
-      icon="mdi-exit-to-app"
-      @click="leaveRoom"
-    ></v-btn>
+    <v-btn v-if="id" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
     <div v-for="message in messages" :key="message.sentAt">
@@ -53,7 +49,6 @@ import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
-import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 
@@ -62,7 +57,7 @@ export default {
     EditChatroomDialog,
     ProfilePrintAvatar
   },
-  props: ['id', 'title', 'messages'],
+  props: ['id', 'messages'],
   emits: ['leave', 'delete'],
   data() {
     return {
@@ -105,39 +100,33 @@ export default {
         if (!this.id) {
           return;
         }
-        ChatService.joinRoom(this.id);
-        ChatService.getRoomMessages(this.id, this.lastMessageTime());
+        this.connectRoom();
       }
     }
   },
-  created() {
-    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
-  },
   mounted() {
-    ChatService.subscribeToMessages((message) => {
-      ChatService.storeMessage(message);
-    });
+    this.connectRoom();
     ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
   },
-  beforeUnmount() {
-    ChatService.disconnect();
-  },
   methods: {
+    connectRoom() {
+      ChatService.connectRoom(this.id);
+      ChatService.getRoomMessages(this.id, this.lastMessageTime());
+    },
     sendMessage() {
-      if (this.newMessage == '') {
-        return;
+      if (this.newMessage !== '') {
+        ChatService.sendMessage({
+          chatroomId: this.id,
+          message: this.newMessage
+        });
+        this.newMessage = '';
       }
-      ChatService.sendMessage({
-        chatroomId: this.id,
-        message: this.newMessage
-      });
-      this.newMessage = '';
     },
     leaveRoom() {
-      this.$emit('leave', this.id);
       ChatService.leaveRoom(this.id);
+      this.$emit('leave', this.id);
     },
     lastMessageTime() {
       if (!this.messages || this.messages.length < 1) {
@@ -170,7 +159,7 @@ export default {
   background-color: var(--medium-purple);
 }
 .chating {
-  max-height: 500px;
+  height: 70vh;
 }
 
 .msg {

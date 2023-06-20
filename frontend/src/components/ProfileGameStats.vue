@@ -38,14 +38,21 @@ export default {
       gamesLost: 0,
       gamesRanked: 0,
       gamesCustom: 0,
-      totalScore: 0
+      totalScore: 0,
+      currentUser: []
     };
+  },
+  watch: {
+    user() {
+      if (this.currentUser != this.user) this.getDatas();
+    }
   },
   async mounted() {
     this.getDatas();
   },
   methods: {
     getDatas() {
+      this.currentUser = this.user;
       this.gamesPlayed = this.games.length;
       const gamesWin = this.games.filter(
         (games) => games.winnerId == this.user.id

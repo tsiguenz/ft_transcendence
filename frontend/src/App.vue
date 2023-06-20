@@ -4,6 +4,7 @@
       <AppHeader></AppHeader>
       <div class="content-wrapper">
         <Navbar />
+        <SearchProfile class="search" @user-selected="onUserSelected" />
         <router-view />
       </div>
     </div>
@@ -19,11 +20,13 @@ import { useFriendStore } from '@/store/friend';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
 import { STATUS_SOCKET_URL } from './constants';
+import SearchProfile from './components/SearchProfile.vue';
 
 export default {
   components: {
     AppHeader,
-    Navbar
+    Navbar,
+    SearchProfile
   },
   provide() {
     return {
@@ -73,6 +76,9 @@ export default {
     unsubscribeAndDisconnectStatusSocket() {
       this.unsubscribeStatusSocket();
       this.disconnectStatusSocket();
+    },
+    onUserSelected(user) {
+      this.$router.push(`/profile/${user.nickname}`);
     }
   }
 };
@@ -109,5 +115,10 @@ button {
     flex: 1 1 0;
     padding: 2rem;
   }
+}
+
+.search {
+  position: absolute;
+  z-index: 1000;
 }
 </style>

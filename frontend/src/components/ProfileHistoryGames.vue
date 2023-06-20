@@ -1,18 +1,29 @@
 <template>
-  <v-sheet class="font" color="transparent">
+  <v-sheet class="ma-5 font" color="transparent">
     <h2>History Games</h2>
     <v-sheet color="transparent">
-      <div v-if="isMounted" class="pr-5" v-for="index in games">
+      <div v-for="index in games">
         <v-divider />
-        <v-row class="justify-space-between" align="center">
-          <v-sheet class="ma-4" color="transparent">
-            <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
-            <p>Opponent: {{ getUser(index.winnerId, index.loserId) }}</p>
-          </v-sheet>
-          <v-sheet color="transparent">
-            <p>{{ setDuration(index.createdAt) }}</p>
-          </v-sheet>
-        </v-row>
+        <v-sheet class="my-3 py-5" color="transparent">
+          <v-row class="align-center justify-space-between">
+            <v-sheet width="40%" color="transparent">
+              <ProfileOpponent
+                :opponent="getOpponent(index.winnerId, index.loserId)"
+              />
+            </v-sheet>
+            <v-sheet width="50%" color="transparent">
+              <p>Score: {{ index.winnerScore }} - {{ index.loserScore }}</p>
+              <VariationPoints
+                v-if="index.isRanked"
+                :game="index"
+                :users="users"
+                :user="user"
+              />
+              <p v-else>Custom Game</p>
+              <p>Date: {{ setDuration(index.createdAt) }}</p>
+            </v-sheet>
+          </v-row>
+        </v-sheet>
       </div>
     </v-sheet>
   </v-sheet>
@@ -22,35 +33,34 @@
 import axios from 'axios';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
+import VariationPoints from './ProfileVariationPoints.vue';
+import ProfileClick from './ProfileClick.vue';
+import ProfileOpponent from './ProfileOpponent.vue';
 
 export default {
   props: ['games', 'users', 'user'],
+  components: {
+    ProfileClick,
+    VariationPoints,
+    ProfileOpponent
+  },
+  inject: ['connectedUsersStore'],
   data() {
     return {
-      historyGames: [],
-      isMounted: false
+      connectedUsers: this.connectedUsersStore.connectedUsers
     };
   },
-  async mounted() {
-    await this.getGames();
-  },
   methods: {
-    getGames() {
-      this.isMounted = true;
-    },
     setDuration(dateToConvert) {
       return lib.convertDate(dateToConvert);
     },
-    getUser(winnerIndex, loserIndex) {
-      const winnerNickname = this.users.filter(
-        (users) => users.id == winnerIndex
-      )[0].nickname;
-      const loserNickname = this.users.filter(
-        (users) => users.id == loserIndex
-      )[0].nickname;
-      return this.user.nickname == winnerNickname
-        ? loserNickname
-        : winnerNickname;
+    getOpponent(winnerIndex, loserIndex) {
+      const winner = this.getUser(winnerIndex);
+      const loser = this.getUser(loserIndex);
+      return this.user.nickname == winner.nickname ? loser : winner;
+    },
+    getUser(index) {
+      return this.users.filter((users) => users.id == index)[0];
     }
   }
 };

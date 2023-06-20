@@ -8,7 +8,7 @@
               v-if="userIsMounted"
               :wdt="100"
               :hgt="100"
-              :urlAvatar="user.avatarPath"
+              :url-avatar="user.avatarPath"
             />
           </v-row>
           <v-row justify="center">
@@ -44,14 +44,12 @@
         </div>
       </v-col>
       <v-col cols="6">
-        <v-sheet color="transparent">
-          <ProfileHistoryGames
-            v-if="userIsMounted"
-            :games="gameStats"
-            :users="users"
-            :user="user"
-          />
-        </v-sheet>
+        <ProfileHistoryGames
+          v-if="userIsMounted"
+          :games="gameStats"
+          :users="users"
+          :user="user"
+        />
       </v-col>
       <v-col cols="3">
         <v-sheet class="position sheet pa-3">
@@ -82,7 +80,6 @@ import ProfileLastConnection from './ProfileLastConnection.vue';
 import IsFriend from '../components/IsFriend.vue';
 
 export default {
-  props: ['nickname'],
   components: {
     ProfilePrintAvatar,
     ProfileLadderPoints,
@@ -91,6 +88,7 @@ export default {
     IsFriend,
     ProfileLastConnection
   },
+  props: ['nickname'],
   data() {
     return {
       user: {},
@@ -100,8 +98,23 @@ export default {
       friends: []
     };
   },
+  watch: {
+    nickname: {
+      handler() {
+        this.nickname != this.user.nickname;
+        this.getProfile();
+        this.getFriends();
+      }
+    }
+  },
   computed: {
     ...mapStores(useSessionStore)
+  },
+  watch: {
+    nickname() {
+      this.getProfile();
+      this.getFriends();
+    }
   },
   async mounted() {
     await this.getProfile();
