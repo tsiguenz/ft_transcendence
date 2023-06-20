@@ -226,13 +226,9 @@ export default {
 
 <style scoped>
 #canvas {
-  /*
-  original size of the canvas
-  but it's not responsive
-  */
-	margin: auto;
-  width: 70%;
-	aspect-ratio: auto 1 / 0.611888112;
+  margin: auto;
+  max-width: 70%;
+  max-height: 70%;
   background-color: var(--dark-alt);
   border: 3px solid var(--light);
 }
