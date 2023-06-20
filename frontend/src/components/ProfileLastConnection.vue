@@ -23,7 +23,8 @@ export default {
     return {
       isLog: false,
       disconnectSince: '',
-      connectedUsers: this.connectedUsersStore.connectedUsers
+      connectedUsers: this.connectedUsersStore.connectedUsers,
+      currentUser: []
     };
   },
   computed: {
@@ -36,6 +37,9 @@ export default {
         this.isLog = this.connectedUsers.includes(this.user.id);
       },
       deep: true
+    },
+    user() {
+      if (this.currentUser != this.user) this.calculateDifference();
     }
   },
   mounted() {
@@ -43,6 +47,7 @@ export default {
   },
   methods: {
     calculateDifference() {
+      this.currentUser = this.user;
       this.disconnectSince = lib.convertDate(this.user.lastConnection);
       this.isLog = this.connectedUsers.includes(this.user.id);
     }

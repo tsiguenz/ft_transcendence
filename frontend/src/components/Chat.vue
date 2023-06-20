@@ -159,7 +159,7 @@ export default {
   background-color: var(--medium-purple);
 }
 .chating {
-  max-height: 500px;
+  height: 70vh;
 }
 
 .msg {

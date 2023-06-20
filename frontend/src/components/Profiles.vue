@@ -44,14 +44,12 @@
         </div>
       </v-col>
       <v-col cols="6">
-        <v-sheet color="transparent">
-          <ProfileHistoryGames
-            v-if="userIsMounted"
-            :games="gameStats"
-            :users="users"
-            :user="user"
-          />
-        </v-sheet>
+        <ProfileHistoryGames
+          v-if="userIsMounted"
+          :games="gameStats"
+          :users="users"
+          :user="user"
+        />
       </v-col>
       <v-col cols="3">
         <v-sheet class="position sheet pa-3">
@@ -99,6 +97,15 @@ export default {
       gameStats: {},
       friends: []
     };
+  },
+  watch: {
+    nickname: {
+      handler() {
+        this.nickname != this.user.nickname;
+        this.getProfile();
+        this.getFriends();
+      }
+    }
   },
   computed: {
     ...mapStores(useSessionStore)
