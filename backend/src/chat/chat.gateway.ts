@@ -145,9 +145,11 @@ export class ChatGateway
           payload.userIds[1]
         );
         const socket = await this.getUserSocket(payload.userIds[1]);
-        socket.emit(events.CHATROOM_NEW, {
-          chatroom: chatroom
-        });
+        if (socket) {
+          socket.emit(events.CHATROOM_NEW, {
+            chatroom: chatroom
+          }); 
+        }
       }
 
       client.emit(events.CHATROOM_NEW, {
@@ -265,10 +267,12 @@ export class ChatGateway
       );
 
       const socket = await this.getUserSocket(payload.userId);
-      socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
-      if (restrictionType !== RestrictionType.MUTED) {
-        await this.kickUser(payload.userId, chatroom);
-      }
+      if (socket) {
+        socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
+        if (restrictionType !== RestrictionType.MUTED) {
+         await this.kickUser(payload.userId, chatroom);
+       }
+     }
     } catch (e) {
       throw new WsException((e as Error).message);
     }

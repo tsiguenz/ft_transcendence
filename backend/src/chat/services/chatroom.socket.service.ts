@@ -125,10 +125,11 @@ export class ChatroomSocketService {
       payload.userId,
       chatroom.id
     );
-
-    userSocket.emit(events.CHATROOM_NEW, {
-      chatroom: chatroom
-    });
+    if (userSocket) {
+      userSocket.emit(events.CHATROOM_NEW, {
+       chatroom: chatroom
+      });
+    }
     server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
       chatroomId: chatroom.id,
       chatroomUser: formattedUser
