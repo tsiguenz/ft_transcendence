@@ -61,7 +61,7 @@ export default {
 }
 
 .sign-btn{
-  width: 320px; /* Adjust the width as desired */
+  width: 320px;
   height: 40px;
   margin-left: 0 !important;
 }
