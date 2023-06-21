@@ -19,7 +19,11 @@
                 :users="users"
                 :user="user"
               />
-              <p v-else>Custom Game</p>
+              <p v-else>
+                Custom game
+                <span v-if="user.id === index.winnerId"> won !</span>
+                <span v-else> lost</span>
+              </p>
               <p>Date: {{ setDuration(index.createdAt) }}</p>
             </v-sheet>
           </v-row>

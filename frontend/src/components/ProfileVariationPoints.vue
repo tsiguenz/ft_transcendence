@@ -52,8 +52,8 @@ export default {
           this.game
         );
       if (this.differenceOfPoints > 0)
-        this.winLose = 'Win ' + this.differenceOfPoints + ' points';
-      else this.winLose = 'Lose ' + this.differenceOfPoints * -1 + ' points';
+        this.winLose = 'Won ' + this.differenceOfPoints + ' points';
+      else this.winLose = 'Lost ' + this.differenceOfPoints * -1 + ' points';
     },
     getPreviousRating(winnerIndex, loserIndex, currentGame) {
       if (this.user.id == this.winner.id)
