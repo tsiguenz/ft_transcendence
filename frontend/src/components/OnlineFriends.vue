@@ -30,10 +30,10 @@ export default {
   components: {
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
   data() {
     return {
-      friends: [],
+      friends: this.friendStore.friends,
       connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: []
     };
@@ -44,32 +44,18 @@ export default {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
       },
       deep: true
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
-  async mounted() {
-    await this.getFriends();
-    this.getConnectedFriends();
+  mounted() {
+    this.friendStore.setFriends(this.sessionStore.nickname).then(this.getConnectedFriends());
   },
   methods: {
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data;
-        this.friends.forEach((friend) => {
-          friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
-        });
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     getConnectedFriends() {
       this.connectedFriends = [];
       for (let i = 0; i < this.friends.length; i++) {

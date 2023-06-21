@@ -33,7 +33,6 @@
           <IsFriend
             :friendname="friend.nickname"
             :is-friend-at-begining="isFriend(friend.nickname)"
-            @refresh-friends="getFriends()"
           ></IsFriend>
         </td>
       </tr>
@@ -43,9 +42,6 @@
 
 <script>
 import * as constants from '@/constants.ts';
-import axios from 'axios';
-import swall from 'sweetalert';
-import * as lib from '@/utils/lib';
 import IsFriend from '../components/IsFriend.vue';
 import ProfileClick from '../components/ProfileClick.vue';
 
@@ -54,14 +50,14 @@ export default {
     IsFriend,
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
 
   data() {
     return {
-      friends: [],
       newFriend: '',
       connectedUsers: this.connectedUsersStore.connectedUsers,
-      connectedFriends: []
+      connectedFriends: [],
+      friends: this.friendStore.friends
     };
   },
   watch: {
@@ -70,32 +66,18 @@ export default {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
       },
       deep: true
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
-  async created() {
-    await this.getFriends();
-    this.getConnectedFriends();
+  created() {
+    this.friendStore.setFriends(this.sessionStore.nickname).then(this.getConnectedFriends());
   },
   methods: {
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data;
-        this.friends.forEach((friend) => {
-          friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
-        });
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     userStatus(user) {
       if (this.connectedUsers.includes(user.id)) {
         return true;

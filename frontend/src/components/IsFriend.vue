@@ -33,7 +33,7 @@ import * as lib from '@/utils/lib';
 import swall from 'sweetalert';
 
 export default {
-  inject: ['sessionStore'],
+  inject: ['sessionStore', 'friendStore'],
   props: {
     friendname: {
       type: String,
@@ -44,7 +44,6 @@ export default {
       required: true
     }
   },
-  emits: ['refresh-friends'],
   data() {
     return {
       newFriendStatus: false,
@@ -78,7 +77,7 @@ export default {
         })
         .then(() => {
           this.newFriendStatus = false;
-          this.$emit('refresh-friends');
+          this.friendStore.setFriends(this.sessionStore.nickname);
         });
     },
     async addFriend() {
@@ -97,7 +96,7 @@ export default {
         })
         .then(() => {
           this.newFriendStatus = true;
-          this.$emit('refresh-friends');
+          this.friendStore.setFriends(this.sessionStore.nickname);
         });
     }
   }

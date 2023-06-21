@@ -58,10 +58,10 @@ export default {
     IsFriend,
     Ranking
   },
-  inject: ['connectedUsersStore', 'sessionStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
   data() {
     return {
-      friends: [],
+      friends: this.friendStore.friends,
       users: [],
       connectedUsers: this.connectedUsersStore.connectedUsers
     };
@@ -84,33 +84,23 @@ export default {
         this.connectedUsers = this.connectedUsersStore.connectedUsers;
       },
       deep: true
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
   async created() {
     await this.getUsers();
-    await this.getFriends();
+    this.friendStore.setFriends(this.sessionStore.nickname)
   },
   methods: {
     async getUsers() {
       try {
         const response = await axios.get(constants.API_URL + '/users');
         this.users = response.data;
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data.map((friend) => friend.nickname);
       } catch (error) {
         swall({
           title: 'Error',
