@@ -113,6 +113,7 @@ export default {
       this.subscribeCustomRoomCreated();
       if (!this.inGameView) this.subscribeStartGame();
       this.socketioGame.send('createCustomRoom', this.customGameDatas);
+      this.$emit('custom-room-created');
     },
     subscribeStartGame() {
       this.socketioGame.subscribe('startGame', (payload) => {

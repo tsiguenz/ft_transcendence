@@ -73,7 +73,6 @@ import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from './ProfilePrintAvatar.vue';
-import ProfileLadderPoints from './ProfileLadderPoints.vue';
 import ProfileGameStats from './ProfileGameStats.vue';
 import ProfileHistoryGames from './ProfileHistoryGames.vue';
 import ProfileLastConnection from './ProfileLastConnection.vue';
@@ -82,12 +81,12 @@ import IsFriend from '../components/IsFriend.vue';
 export default {
   components: {
     ProfilePrintAvatar,
-    ProfileLadderPoints,
     ProfileGameStats,
     ProfileHistoryGames,
     IsFriend,
     ProfileLastConnection
   },
+  inject: ['friendStore'],
   props: ['nickname'],
   data() {
     return {
@@ -95,7 +94,7 @@ export default {
       users: [],
       userIsMounted: false,
       gameStats: {},
-      friends: []
+      friends: this.friendStore.friends
     };
   },
   watch: {
@@ -103,22 +102,23 @@ export default {
       handler() {
         this.nickname != this.user.nickname;
         this.getProfile();
-        this.getFriends();
       }
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
   computed: {
     ...mapStores(useSessionStore)
   },
-  watch: {
-    nickname() {
-      this.getProfile();
-      this.getFriends();
-    }
+  async created() {
+    await this.friendStore.setFriends(this.sessionStore.nickname);
   },
   async mounted() {
     await this.getProfile();
-    await this.getFriends();
   },
   methods: {
     async getProfile() {
@@ -144,24 +144,8 @@ export default {
         this.$router.push('/logout');
       }
     },
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data.map((friend) => friend.nickname);
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     isFriend(nickname) {
-      return this.friends.includes(nickname);
+      return this.friends.some((friend) => friend.nickname === nickname);
     }
   }
 };

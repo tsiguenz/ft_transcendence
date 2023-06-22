@@ -34,14 +34,25 @@ export default {
     }
   },
   methods: {
-    copyGameUrlToClipboard() {
-      navigator.clipboard.writeText(this.gameUrl);
-      swall({
-        title: 'Copied',
-        text: 'Game URL copied to clipboard',
-        icon: 'success',
-        button: 'OK'
-      });
+    async copyGameUrlToClipboard() {
+      try {
+        await navigator.clipboard.writeText(this.gameUrl);
+        swall({
+          title: 'Copied',
+          text: 'Game URL copied to clipboard',
+          icon: 'success',
+          button: 'OK'
+        });
+      } catch (err) {
+        swall({
+          title: 'Error',
+          text:
+            'Failed to copy game URL to clipboard, please copy it manually: ' +
+            this.gameUrl,
+          icon: 'error',
+          button: 'OK'
+        });
+      }
     }
   }
 };

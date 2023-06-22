@@ -14,7 +14,8 @@
               <SearchProfile @user-selected="setSelectedUser" />
             </v-col>
             <v-col cols="8">
-              Selected user: <span v-if="selectedUser">{{ selectedUser.nickname }}</span>
+              Selected user:
+              <span v-if="selectedUser">{{ selectedUser.nickname }}</span>
             </v-col>
           </v-row>
         </v-container>
@@ -30,7 +31,6 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
 </template>
 
 <script>
@@ -50,8 +50,7 @@ export default {
     };
   },
   props: ['id'],
-  computed: {
-  },
+  computed: {},
   methods: {
     setSelectedUser(user) {
       this.selectedUser = user;
