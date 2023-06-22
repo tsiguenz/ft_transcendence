@@ -1,15 +1,19 @@
 <template>
-  <p>
-    {{ winLose }}
-    <div v-if="differenceOfPoints != 0">[{{ getPreviousRating(game.winnerId, game.loserId, game) }}
+  {{ winLose }}
+  <div v-if="differenceOfPoints != 0">
+    [{{ getPreviousRating(game.winnerId, game.loserId, game) }}
     <v-icon
       v-if="differenceOfPoints > 0"
       icon="mdi-trending-up"
       color="green"
     ></v-icon>
-    <v-icon v-else-if="differenceOfPoints < 0" icon="mdi-trending-down" color="red"></v-icon>
-    {{ getNewRating(game.winnerId, game.loserId, game) }}]</div>
-  </p>
+    <v-icon
+      v-else-if="differenceOfPoints < 0"
+      icon="mdi-trending-down"
+      color="red"
+    ></v-icon>
+    {{ getNewRating(game.winnerId, game.loserId, game) }}]
+  </div>
 </template>
 
 <script>
@@ -52,8 +56,15 @@ export default {
           this.game
         );
       if (this.user.id == this.winner.id)
-        this.winLose = ((this.differenceOfPoints != 0) ? ('Won ' + this.differenceOfPoints + ' points') : 'Ranked game won (points don\'t change)');
-        else this.winLose = ((this.differenceOfPoints != 0) ? ('Lost ' + this.differenceOfPoints * -1 + ' points') : 'Ranked game lost (points don\'t change)');
+        this.winLose =
+          this.differenceOfPoints != 0
+            ? 'Won ' + this.differenceOfPoints + ' points'
+            : "Ranked game won (points don't change)";
+      else
+        this.winLose =
+          this.differenceOfPoints != 0
+            ? 'Lost ' + this.differenceOfPoints * -1 + ' points'
+            : "Ranked game lost (points don't change)";
     },
     getPreviousRating(winnerIndex, loserIndex, currentGame) {
       if (this.user.id == this.winner.id)
