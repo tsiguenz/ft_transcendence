@@ -1,6 +1,8 @@
 <template>
   <v-container>
-    <p>{{ winnerIsYou ? 'You won' : 'You lost' }}</p>
+		<v-btn @click="goToChooseMode()">Go to menu</v-btn>
+        <v-img max-height="70%" max-width="70%" v-if="winnerIsYou" src="/assets/icons/you-win.png" />
+				<p v-else>you lost</p>
   </v-container>
 </template>
 
@@ -17,6 +19,11 @@ export default {
     return {
       winnerIsYou: this.sessionStore.userId === this.winnerId
     };
-  }
+  },
+  methods: {
+		goToChooseMode() {
+			this.$parent.setStatusToInChooseMode();
+		}
+	}
 };
 </script>

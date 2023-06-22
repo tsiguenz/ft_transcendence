@@ -14,7 +14,7 @@
 
   <canvas v-show="isInGame()" id="canvas" height="525" width="858"></canvas>
 
-  <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId" />
+  <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId"/>
 </template>
 
 <script>
