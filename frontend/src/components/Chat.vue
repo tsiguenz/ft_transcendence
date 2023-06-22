@@ -71,9 +71,7 @@ export default {
       return this.sessionStore.userId;
     },
     currentUserIsOwner() {
-      const currentUser = this.chatStore.users.find(
-        (x) => x.id === this.currentUserId
-      );
+      const currentUser = this.chatStore.currentChatroomUser;
       if (!currentUser || currentUser.role !== 'OWNER') {
         return false;
       }

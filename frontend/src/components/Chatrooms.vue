@@ -102,7 +102,7 @@ export default {
     },
     async loadChatrooms() {
       const chatrooms = await this.getChatrooms();
-      this.chatStore.addRoom(...chatrooms);
+      if (chatrooms) { this.chatStore.addRoom(...chatrooms); }
       return chatrooms;
     },
     async getChatrooms() {

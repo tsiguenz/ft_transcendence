@@ -28,10 +28,14 @@ export const useChatStore = defineStore('chat', {
     },
 
     activeRoomUsers() {
-      if (this.users.hasOwnProperty(this.activeChatroom)) {
+      if (this.users && this.users.hasOwnProperty(this.activeChatroom)) {
         return this.users[this.activeChatroom];
       }
       return [];
+    },
+
+    currentChatroomUser() {
+      return this.users.find((x) => x.id === sessionStore.userId);
     },
 
     filteredMessages() {
@@ -120,7 +124,7 @@ export const useChatStore = defineStore('chat', {
     },
 
     isUserOnline(userId: string, chatroomId: string) {
-      if (this.users.hasOwnProperty(chatroomId)) {
+      if (this.users && this.users.hasOwnProperty(chatroomId)) {
         return this.users[chatroomId].find((user) => user.id === userId);
       }
       return false;
