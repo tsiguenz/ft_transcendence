@@ -20,7 +20,6 @@ import { PrivateMessageService } from '../private_message/private_message.servic
 import { UsersService } from '../users/users.service';
 import { RestrictionType, ChatRoom, RoomType } from '@prisma/client';
 import { ChatroomSocketService } from './services/chatroom.socket.service';
-import { CreateChatroomPayload } from '../chat/interfaces/createChatroom.interface';
 import * as events from './socketioEvents';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -148,7 +147,7 @@ export class ChatGateway
         if (socket) {
           socket.emit(events.CHATROOM_NEW, {
             chatroom: chatroom
-          }); 
+          });
         }
       }
 
@@ -268,11 +267,14 @@ export class ChatGateway
 
       const socket = await this.getUserSocket(payload.userId);
       if (socket) {
-        socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
+        socket.emit(events.CHATROOM_RESTRICTED_USER, {
+          restrictionType,
+          until
+        });
         if (restrictionType !== RestrictionType.MUTED) {
-         await this.kickUser(payload.userId, chatroom);
-       }
-     }
+          await this.kickUser(payload.userId, chatroom);
+        }
+      }
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -345,6 +347,44 @@ export class ChatGateway
         sentAt: messages[id].createdAt,
         data: messages[id].content
       });
+    }
+  }
+
+  @SubscribeMessage(events.GAME_INVITATION)
+  async handleGameInvitation(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { gameUrl: string; destId: string }
+  ) {
+    try {
+      if (!client['decoded'] || client['decoded'].sub === payload.destId)
+        client.disconnect();
+      const user = await this.users.getUserById(client['decoded'].sub);
+      const chatroom = await this.privateMessage.findOrCreate(
+        user.id,
+        payload.destId
+      );
+      if (
+        await this.chatroomRestriction.isUserRestricted(user.id, chatroom.id)
+      ) {
+        client.disconnect();
+      }
+      const message = await this.chat.saveMessage(
+        user.id,
+        chatroom.id,
+        payload.gameUrl
+      );
+      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
+        authorId: user.id,
+        authorNickname: user.nickname,
+        authorAvatarUrl: user.avatarPath,
+        chatroomId: chatroom.id,
+        sentAt: message.createdAt,
+        data: payload.gameUrl
+      });
+      client.disconnect();
+    } catch (e) {
+      client.disconnect();
+      throw new WsException((e as Error).message);
     }
   }
 
