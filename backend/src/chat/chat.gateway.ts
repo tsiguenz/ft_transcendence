@@ -373,7 +373,7 @@ export class ChatGateway
         chatroom.id,
         payload.gameUrl
       );
-      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
+      this.server.to(chatroom.id).emit(events.MESSAGE_TO_CLIENT, {
         authorId: user.id,
         authorNickname: user.nickname,
         authorAvatarUrl: user.avatarPath,
