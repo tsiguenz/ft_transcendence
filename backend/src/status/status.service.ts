@@ -18,13 +18,17 @@ export class StatusService {
     // use decode instead of verify because verify
     // return undefined if the token is expired
     // and we are sure the token was valid when the user connected
-    const payload = await this.jwt.decode(socket.handshake.auth.token);
-    if (!payload) return undefined;
-    const userId = payload.sub;
-    if (!userId) return undefined;
-    const index = connectedUsers.indexOf(userId);
-    if (index > -1) connectedUsers.splice(index, 1);
-    return userId;
+    try {
+      const payload = await this.jwt.decode(socket.handshake.auth.token);
+      if (!payload) return undefined;
+      const userId = payload.sub;
+      if (!userId) return undefined;
+      const index = connectedUsers.indexOf(userId);
+      if (index > -1) connectedUsers.splice(index, 1);
+      return userId;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   async getUserIdFromSocket(socket: Socket) {
