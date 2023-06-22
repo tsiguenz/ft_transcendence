@@ -145,10 +145,7 @@ export default {
       }
     },
     isFriend(nickname) {
-      const friend = this.friends.filter(
-        (friends) => friends.nickname == nickname
-      );
-      return friend.length > 0;
+      return this.friends.some((friend) => friend.nickname === nickname);
     }
   }
 };

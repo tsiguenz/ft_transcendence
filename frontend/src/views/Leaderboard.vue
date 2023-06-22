@@ -128,10 +128,7 @@ export default {
       return constants.AVATARS_URL + user.avatarPath;
     },
     isFriend(nickname) {
-      const friend = this.friends.filter(
-        (friends) => friends.nickname == nickname
-      );
-      return friend.length > 0;
+      return this.friends.some((friend) => friend.nickname === nickname);
     },
     isMyProfile(name) {
       return name === this.sessionStore.nickname;
