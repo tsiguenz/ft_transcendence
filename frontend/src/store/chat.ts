@@ -35,6 +35,9 @@ export const useChatStore = defineStore('chat', {
     },
 
     currentChatroomUser() {
+      if (!this.users) {
+        return;
+      }
       return this.users.find((x) => x.id === sessionStore.userId);
     },
 
