@@ -330,7 +330,6 @@ export class UsersService {
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true,
         users: {
           select: {

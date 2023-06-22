@@ -48,8 +48,7 @@ async function populateChatrooms() {
   await prisma.chatRoom.upsert({
     where: { name: 'general' },
     create: {
-      name: 'general',
-      slug: 'chatroom_general'
+      name: 'general'
     },
     update: {}
   });

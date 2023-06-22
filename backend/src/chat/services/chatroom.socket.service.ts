@@ -40,9 +40,9 @@ export class ChatroomSocketService {
     this.chatroom.remove(chatroom.id);
 
     server
-      .to(chatroom.slug)
+      .to(chatroom.id)
       .emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
-    server.in(chatroom.slug).socketsLeave(chatroom.slug);
+    server.in(chatroom.id).socketsLeave(chatroom.id);
   }
 
   async joinChatroom(
@@ -63,7 +63,7 @@ export class ChatroomSocketService {
     client.emit(events.CHATROOM_NEW, {
       chatroom: chatroom
     });
-    server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
+    server.to(chatroom.id).emit(events.CHATROOM_USER_CONNECT, {
       chatroomId: chatroom.id,
       chatroomUser: formattedUser
     });
@@ -81,8 +81,8 @@ export class ChatroomSocketService {
       await this.chatroom.leave(userId, payload.chatroomId);
     }
 
-    client.leave(chatroom.slug);
-    server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
+    client.leave(chatroom.id);
+    server.to(chatroom.id).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId
     });
@@ -127,10 +127,10 @@ export class ChatroomSocketService {
     );
     if (userSocket) {
       userSocket.emit(events.CHATROOM_NEW, {
-       chatroom: chatroom
+        chatroom: chatroom
       });
     }
-    server.to(chatroom.slug).emit(events.CHATROOM_USER_CONNECT, {
+    server.to(chatroom.id).emit(events.CHATROOM_USER_CONNECT, {
       chatroomId: chatroom.id,
       chatroomUser: formattedUser
     });
