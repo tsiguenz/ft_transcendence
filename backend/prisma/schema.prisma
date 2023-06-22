@@ -86,7 +86,6 @@ model ChatRoomUser {
 model ChatRoom {
   id            String      @id @default(uuid())
   name          String      @db.VarChar(255) @unique
-  slug          String      @db.VarChar(255) @unique
   messages      Message[]   @relation("chatRoom")
   users         ChatRoomUser[]
   restricted    ChatRoomRestriction[]
@@ -144,4 +143,3 @@ enum RestrictionType {
   MUTED
   BANNED
 }
-

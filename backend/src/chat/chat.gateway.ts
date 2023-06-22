@@ -62,7 +62,7 @@ export class ChatGateway
         payload.message
       );
 
-      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
+      this.server.to(chatroom.id).emit(events.MESSAGE_TO_CLIENT, {
         authorId: user.id,
         authorNickname: user.nickname,
         authorAvatarUrl: user.avatarPath,
@@ -96,7 +96,7 @@ export class ChatGateway
     }
 
     try {
-      client.join(chatroom.slug);
+      client.join(chatroom.id);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -148,7 +148,7 @@ export class ChatGateway
         if (socket) {
           socket.emit(events.CHATROOM_NEW, {
             chatroom: chatroom
-          }); 
+          });
         }
       }
 
@@ -268,11 +268,14 @@ export class ChatGateway
 
       const socket = await this.getUserSocket(payload.userId);
       if (socket) {
-        socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
+        socket.emit(events.CHATROOM_RESTRICTED_USER, {
+          restrictionType,
+          until
+        });
         if (restrictionType !== RestrictionType.MUTED) {
-         await this.kickUser(payload.userId, chatroom);
-       }
-     }
+          await this.kickUser(payload.userId, chatroom);
+        }
+      }
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -399,8 +402,8 @@ export class ChatGateway
     }
 
     socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
-    socket.leave(chatroom.slug);
-    this.server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
+    socket.leave(chatroom.id);
+    this.server.to(chatroom.id).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId
     });

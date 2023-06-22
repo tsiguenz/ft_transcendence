@@ -32,7 +32,6 @@ export class ChatroomService {
           name: dto.name,
           type: dto.type,
           hash: hash,
-          slug: `chatroom_${snakecaseName}`,
           users: {
             create: [
               {
@@ -45,7 +44,6 @@ export class ChatroomService {
         select: {
           id: true,
           name: true,
-          slug: true,
           type: true
         }
       });
@@ -172,7 +170,6 @@ export class ChatroomService {
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true
       }
     });
