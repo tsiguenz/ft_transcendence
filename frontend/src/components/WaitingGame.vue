@@ -84,6 +84,12 @@ export default {
       }
       const jwt = this.$cookie.getCookie('jwt');
       ChatService.sendGameInvitation(jwt, this.gameUrl, this.selectedUser.id);
+      swall({
+        title: 'Invitation sent',
+        text: 'Your friend will receive a notification',
+        icon: 'success',
+        button: 'OK'
+      });
     }
   }
 };
