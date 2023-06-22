@@ -131,7 +131,7 @@ export default {
       const friend = this.friends.filter(
         (friends) => friends.nickname == nickname
       );
-      return friend[0] && friend[0].nickname == nickname ? true : false;
+      return friend.length > 0;
     },
     isMyProfile(name) {
       return name === this.sessionStore.nickname;

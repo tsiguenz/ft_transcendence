@@ -73,7 +73,6 @@ import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from './ProfilePrintAvatar.vue';
-import ProfileLadderPoints from './ProfileLadderPoints.vue';
 import ProfileGameStats from './ProfileGameStats.vue';
 import ProfileHistoryGames from './ProfileHistoryGames.vue';
 import ProfileLastConnection from './ProfileLastConnection.vue';
@@ -82,7 +81,6 @@ import IsFriend from '../components/IsFriend.vue';
 export default {
   components: {
     ProfilePrintAvatar,
-    ProfileLadderPoints,
     ProfileGameStats,
     ProfileHistoryGames,
     IsFriend,
@@ -150,7 +148,7 @@ export default {
       const friend = this.friends.filter(
         (friends) => friends.nickname == nickname
       );
-      return friend[0] && friend[0].nickname == nickname ? true : false;
+      return friend.length > 0;
     }
   }
 };
