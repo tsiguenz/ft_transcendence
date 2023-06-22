@@ -1,6 +1,6 @@
 <template>
-   <v-row no-gutters>
-    <v-col cols="6"><h1>LET THE <br>PONG BEGIN !</h1>
+   <v-row class="row" no-gutters>
+    <v-col class="allcol textcol" cols="6"><h1>LET THE <br>PONG BEGIN !</h1>
     <p>Welcome to our game, an exciting new Pong game created by four students of 42 PARIS in full stack development.</p>
     <p>We’ve created a thriving community where you can connect with other players, make new friends, and compete against each other in real-time.
     </p> <br><p class="text">So why wait? Play our Pong game, chat with other players, and climb the leaderboard to become the ultimate Pong champion.</p>
@@ -11,7 +11,7 @@
       </div>
     <router-link v-else to="/game"><v-btn class="log play">Play</v-btn></router-link>
     </v-col>
-    <v-col cols="6" class="game">
+    <v-col cols="6" class="allcol game">
       <video width="600"  autoplay loop muted>
         <source src="../../assets/pong.mp4" type="video/mp4" />
       </video></v-col></v-row>
@@ -45,17 +45,17 @@ export default {
 
 <style>
 
-.v-row{
+.row{
   padding-left: 20px;
   padding-right: 20px;
 }
-.v-col{
+.allcol{
   height: auto;
   margin-top: auto;
   margin-bottom: auto;
 }
 
-.v-col h1{
+.textcol h1{
   font-size: 80px;
   line-height: 1em;
 }
