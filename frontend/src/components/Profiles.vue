@@ -88,6 +88,7 @@ export default {
     IsFriend,
     ProfileLastConnection
   },
+  inject: ['friendStore'],
   props: ['nickname'],
   data() {
     return {
@@ -95,7 +96,7 @@ export default {
       users: [],
       userIsMounted: false,
       gameStats: {},
-      friends: []
+      friends: this.friendStore.friends
     };
   },
   watch: {
@@ -103,22 +104,23 @@ export default {
       handler() {
         this.nickname != this.user.nickname;
         this.getProfile();
-        this.getFriends();
       }
+    },
+    friendStore: {
+      handler() {
+        this.friends = this.friendStore.friends;
+      },
+      deep: true
     }
   },
   computed: {
     ...mapStores(useSessionStore)
   },
-  watch: {
-    nickname() {
-      this.getProfile();
-      this.getFriends();
-    }
+  async created() {
+    await this.friendStore.setFriends(this.sessionStore.nickname);
   },
   async mounted() {
     await this.getProfile();
-    await this.getFriends();
   },
   methods: {
     async getProfile() {
@@ -144,24 +146,11 @@ export default {
         this.$router.push('/logout');
       }
     },
-    async getFriends() {
-      try {
-        const response = await axios.get(
-          constants.API_URL + `/users/${this.sessionStore.nickname}/friends`
-        );
-        this.friends = response.data.map((friend) => friend.nickname);
-      } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
-        this.$router.push('/logout');
-      }
-    },
     isFriend(nickname) {
-      return this.friends.includes(nickname);
+      const friend = this.friends.filter(
+        (friends) => friends.nickname == nickname
+      );
+      return friend[0] && friend[0].nickname == nickname ? true : false;
     }
   }
 };
