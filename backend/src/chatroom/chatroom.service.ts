@@ -19,7 +19,6 @@ export class ChatroomService {
     private chatroomRestriction: ChatroomRestrictionService
   ) {}
   async create(userId: string, dto: CreateChatroomDto) {
-    const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
 
     if (dto.type === RoomType.PROTECTED && dto.password) {
