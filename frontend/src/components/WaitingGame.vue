@@ -1,28 +1,45 @@
 <template>
   <v-container>
     <p>{{ message }}</p>
-    <v-btn v-if="!isRanked" class="log" @click="copyGameUrlToClipboard">
-      Copy game URL
-    </v-btn>
+    <span v-if="!isRanked && !userId">
+      <v-btn class="log" @click="copyGameUrlToClipboard"> Copy game URL </v-btn>
+      <p>Invite a friend to play with you:</p>
+      <SearchProfile @user-selected="setSelectedUser" />
+      <span v-if="selectedUser">
+        <v-btn @click="inviteUser()">Invite</v-btn>
+      </span>
+    </span>
   </v-container>
 </template>
 
 <script>
 import * as constants from '@/constants.ts';
 import swall from 'sweetalert';
+import SearchProfile from './SearchProfile.vue';
+import ChatService from '../services/chat.service';
+
 export default {
+  components: {
+    SearchProfile
+  },
+  inject: ['sessionStore'],
   props: {
     isRanked: Boolean,
     gameId: {
       type: String,
       default: ''
+    },
+    userId: {
+      type: String,
+      required: true
     }
   },
   emits: ['create-custom-room'],
   data() {
     return {
       message: '',
-      gameUrl: ''
+      gameUrl: '',
+      selectedUser: undefined
     };
   },
   mounted() {
@@ -31,6 +48,10 @@ export default {
     } else {
       this.message = 'Waiting for your opponent';
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
+      if (this.userId) {
+        const jwt = this.$cookie.getCookie('jwt');
+        ChatService.sendGameInvitation(jwt, this.gameUrl, this.userId);
+      }
     }
   },
   methods: {
@@ -53,6 +74,29 @@ export default {
           button: 'OK'
         });
       }
+    },
+    setSelectedUser(user) {
+      this.selectedUser = user;
+    },
+    inviteUser() {
+      if (this.selectedUser.id === this.sessionStore.userId) {
+        swall({
+          title: 'Error',
+          text: 'You cannot invite yourself',
+          icon: 'error',
+          button: 'OK'
+        });
+        this.selectedUser = undefined;
+        return;
+      }
+      const jwt = this.$cookie.getCookie('jwt');
+      ChatService.sendGameInvitation(jwt, this.gameUrl, this.selectedUser.id);
+      swall({
+        title: 'Invitation sent',
+        text: 'Your friend will receive a notification',
+        icon: 'success',
+        button: 'OK'
+      });
     }
   }
 };
