@@ -56,10 +56,11 @@
       max="10"
       :step="1"
     />
-    <v-btn class="log" @click="createCustomRoom()"
+    <v-btn class="log mt-5" @click="createCustomRoom()"
       ><span v-if="!isInChat">Create custom game</span
       ><span v-else>Invite to play</span></v-btn
     >
+    <v-btn class="log mt-5" @click="goToChooseMode()">Back to game menu</v-btn>
   </v-container>
   <WaitingGame v-if="isInQueue" :game-id="gameId" :user-id="userId" />
 </template>
@@ -139,6 +140,9 @@ export default {
         this.isInQueue = true;
         this.gameId = payload.gameId;
       });
+    },
+    goToChooseMode() {
+      this.$parent.setStatusToInChooseMode();
     }
   }
 };

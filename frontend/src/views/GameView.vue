@@ -197,6 +197,9 @@ export default {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
         this.socketioGame.send('movePad', { dy: constants.PAD_STOP });
     },
+    leaveRoom() {
+      this.socketioGame.send('leaveRoom');
+    },
     isInGame() {
       return this.gameStatus === constants.GAME_STATUS.IN_GAME;
     },

@@ -159,4 +159,17 @@ export class GameGateway {
     const data = this.rooms.get(roomId).datas;
     this.gameService.handleMovePad(client['decoded'].sub, data, dy);
   }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@ConnectedSocket() client: Socket) {
+    if (!client['decoded']) return;
+    const userId = client['decoded'].sub;
+    const roomId = this.gameService.getRoomIdByUserId(userId, this.rooms);
+    if (roomId) {
+      if (!this.rooms.get(roomId).isStarted) this.rooms.delete(roomId);
+      this.logger.log(`Client leave room: ${roomId}`);
+      client.leave(roomId);
+    }
+  }
+
 }

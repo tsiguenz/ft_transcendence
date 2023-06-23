@@ -1,14 +1,42 @@
 <template>
   <v-container>
-    <p>{{ message }}</p>
-    <span v-if="!isRanked && !userId">
-      <v-btn class="log" @click="copyGameUrlToClipboard"> Copy game URL </v-btn>
-      <p>Invite a friend to play with you:</p>
-      <SearchProfile @user-selected="setSelectedUser" />
-      <span v-if="selectedUser">
-        <v-btn @click="inviteUser()">Invite</v-btn>
-      </span>
-    </span>
+    <v-col cols="12">
+      <v-row justify="center">
+        <v-sheet
+          v-if="!isRanked && urlIsCopy"
+          width="90%"
+          class="sheet pa-5 my-5"
+        >
+          <p class="font">Game URL copied, give it to your opponent</p>
+        </v-sheet>
+        <v-sheet
+          v-if="isRanked || urlIsCopy"
+          width="90%"
+          class="sheet pa-5 my-5"
+        >
+          <h2 class="font">{{ message }}</h2>
+          <v-progress-linear color="white" indeterminate />
+        </v-sheet>
+      </v-row>
+      <v-row justify="center" width="100%">
+        <v-btn
+          v-if="!isRanked && !urlIsCopy"
+          class="btn pa-5 my-5"
+          width="90%"
+          @click="copyGameUrlToClipboard"
+        >
+          Copy game URL
+        </v-btn>
+        <p>Invite a friend to play with you:</p>
+        <SearchProfile @user-selected="setSelectedUser" />
+        <span v-if="selectedUser">
+          <v-btn @click="inviteUser()">Invite</v-btn>
+        </span>
+        <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
+          >Back to game menu</v-btn
+        >
+      </v-row>
+    </v-col>
   </v-container>
 </template>
 
@@ -39,6 +67,7 @@ export default {
     return {
       message: '',
       gameUrl: '',
+      urlIsCopy: false,
       selectedUser: undefined
     };
   },
@@ -57,13 +86,8 @@ export default {
   methods: {
     async copyGameUrlToClipboard() {
       try {
+        this.urlIsCopy = true;
         await navigator.clipboard.writeText(this.gameUrl);
-        swall({
-          title: 'Copied',
-          text: 'Game URL copied to clipboard',
-          icon: 'success',
-          button: 'OK'
-        });
       } catch (err) {
         swall({
           title: 'Error',
@@ -75,6 +99,11 @@ export default {
         });
       }
     },
+    goToChooseMode() {
+      const gameView = this.isRanked ? this.$parent : this.$parent.$parent;
+      gameView.setStatusToInChooseMode();
+      gameView.leaveRoom();
+		},
     setSelectedUser(user) {
       this.selectedUser = user;
     },
@@ -98,6 +127,36 @@ export default {
         button: 'OK'
       });
     }
-  }
+	}
 };
 </script>
+
+<style>
+.font {
+  font-family: 'Poppins', serif;
+  text-align: center;
+}
+.sheet {
+  background-color: var(--dark-purple);
+  border-style: solid;
+  border-radius: 2px;
+  box-shadow: 5px 5px 5px var(--light-purple) !important;
+  border-color: var(--light-purple) !important;
+}
+.btn {
+  background-image: linear-gradient(
+    to right,
+    var(--light) 0%,
+    var(--dark-purple) 51%,
+    var(--light) 100%
+  );
+  width: 250px;
+  bottom: 0;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  border-radius: 5px;
+  display: flex;
+}
+</style>
