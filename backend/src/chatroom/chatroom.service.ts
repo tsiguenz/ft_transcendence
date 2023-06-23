@@ -129,6 +129,17 @@ export class ChatroomService {
       throw new ForbiddenException('User not in room');
     }
 
+    if (chatroom.type == RoomType.ONE_TO_ONE) {
+      return await this.prisma.chatRoomUser.updateMany({
+        where: {
+          userId,
+          chatRoomId: chatroomId
+        },
+        data: {
+          hidden: true
+        }
+      });
+    }
     return await this.chatroomUser.remove(userId, chatroomId);
   }
 

@@ -323,7 +323,8 @@ export class UsersService {
       where: {
         users: {
           some: {
-            user: { id: userId }
+            userId,
+            hidden: false
           }
         }
       },
