@@ -14,7 +14,7 @@
 
   <canvas v-show="isInGame()" id="canvas" height="525" width="858"></canvas>
 
-  <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId"/>
+  <ScoreScreen v-if="isInScoreScreen()" :winner-id="winnerId" />
 </template>
 
 <script>
@@ -197,6 +197,9 @@ export default {
     handleKeyUp(e) {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
         this.socketioGame.send('movePad', { dy: constants.PAD_STOP });
+    },
+    leaveRoom() {
+      this.socketioGame.send('leaveRoom');
     },
     isInGame() {
       return this.gameStatus === constants.GAME_STATUS.IN_GAME;

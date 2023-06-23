@@ -1,8 +1,16 @@
 <template>
   <v-container>
-		<v-btn @click="goToChooseMode()">Go to menu</v-btn>
-        <v-img max-height="70%" max-width="70%" v-if="winnerIsYou" src="/assets/icons/you-win.png" />
-				<p v-else>you lost</p>
+    <v-col cols="12">
+      <v-img
+        class="center"
+        v-if="winnerIsYou"
+        src="/assets/icons/you-win.png"
+      />
+      <v-img class="center" v-else src="/assets/icons/you-lose.png" />
+      <v-btn class="log center my-8" @click="goToChooseMode()"
+        >Play another game</v-btn
+      >
+    </v-col>
   </v-container>
 </template>
 
@@ -21,9 +29,18 @@ export default {
     };
   },
   methods: {
-		goToChooseMode() {
-			this.$parent.setStatusToInChooseMode();
-		}
-	}
+    goToChooseMode() {
+      this.$parent.setStatusToInChooseMode();
+      this.$parent.leaveRoom();
+    }
+  }
 };
 </script>
+
+<style>
+.center {
+  margin: auto;
+  max-height: 50%;
+  max-width: 50%;
+}
+</style>
