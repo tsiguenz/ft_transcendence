@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { RoomType, ChatRoom } from '@prisma/client';
+import { RoomType, ChatRoom, ChatRoomUser } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -51,6 +51,7 @@ export class PrivateMessageService {
   async findOrCreate(firstUserId: string, secondUserId: string) {
     const chatroom = await this.findOne(firstUserId, secondUserId);
     if (chatroom.length > 0) {
+      await this.makeRoomVisible(chatroom[0].id, firstUserId);
       return chatroom[0];
     }
     return await this.create(firstUserId, secondUserId);
@@ -103,6 +104,18 @@ export class PrivateMessageService {
     return await this.prisma.chatRoom.deleteMany({
       where: {
         id: chatroomId
+      }
+    });
+  }
+
+  private async makeRoomVisible(chatroomId: string, userId: string) {
+    await this.prisma.chatRoomUser.updateMany({
+      where: {
+        userId,
+        chatRoomId: chatroomId
+      },
+      data: {
+        hidden: false
       }
     });
   }
