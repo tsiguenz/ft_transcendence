@@ -24,3 +24,6 @@ yarn-error.log
 log
 dist/
 *.nfs*
+
+*.sublime-project
+*.sublime-workspace

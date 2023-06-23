@@ -60,14 +60,13 @@ axios.interceptors.response.use(
     const isRefreshUrl =
       error.config.url === constants.API_URL + '/auth/refresh';
     if (!isUnauthorized || isRefreshUrl) return Promise.reject(error);
-    const jwt = VueCookieNext.getCookie('jwt');
-    if (!jwt) return Promise.reject(error);
-    const expirationTimestamp = VueJwtDecode.decode(jwt).exp;
-    const now = Math.floor(Date.now() / 1000);
-    if (now < expirationTimestamp) return Promise.reject(error);
-    // refresh the expired access_token
-    const refreshToken = VueCookieNext.getCookie('refresh_token');
     try {
+      const jwt = VueCookieNext.getCookie('jwt');
+      const expirationTimestamp = VueJwtDecode.decode(jwt).exp;
+      const now = Math.floor(Date.now() / 1000);
+      if (now < expirationTimestamp) return Promise.reject(error);
+      // refresh the expired access_token
+      const refreshToken = VueCookieNext.getCookie('refresh_token');
       const response = await axios.post(
         constants.API_URL + '/auth/refresh',
         {},
@@ -84,6 +83,7 @@ axios.interceptors.response.use(
       return axios.request(error.config);
     } catch (e) {
       window.location.href = '/logout';
+      return Promise.reject(error);
     }
   }
 );
