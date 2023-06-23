@@ -95,7 +95,7 @@ export default {
         padHeight: 70,
         padWidth: 8,
         padSpeed: 5,
-        maxScore: 5
+        maxScore: 3
       }
     };
   },

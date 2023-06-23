@@ -381,6 +381,16 @@ export class ChatGateway
         sentAt: message.createdAt,
         data: payload.gameUrl
       });
+      client.emit(events.CHATROOM_NEW, {
+        chatroom: chatroom
+      });
+      const dest = await this.users.getUserById(payload.destId);
+      const destSocket = await this.getUserSocket(dest.id);
+      if (destSocket) {
+        destSocket.emit(events.CHATROOM_NEW, {
+          chatroom: chatroom
+        });
+      }
       client.disconnect();
     } catch (e) {
       client.disconnect();
