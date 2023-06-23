@@ -2,7 +2,7 @@
   <v-btn v-if="!isLog()" class="log">
     <div v-if="toSignin">Sign In</div>
     <div v-else>Sign up</div>
-    <v-dialog persistent v-model="dialog" activator="parent">
+    <v-dialog v-model="dialog" persistent activator="parent">
       <v-container>
         <v-row align="center" justify="center">
           <v-card class="card" height="100%" width="400px">
@@ -21,7 +21,7 @@
                 <v-icon icon="mdi-alert-box"></v-icon>
                 {{ message }}
               </div>
-              <v-form ref="form" v-if="toSignin">
+              <v-form v-if="toSignin" ref="form">
                 <v-text-field
                   v-model="nickname"
                   autocomplete="username"
@@ -39,7 +39,7 @@
                   @keydown.enter.prevent="signin"
                 ></v-text-field>
               </v-form>
-              <v-form ref="form" v-else v-model="isFormValid">
+              <v-form v-else ref="form" v-model="isFormValid">
                 <v-text-field
                   v-model="nickname"
                   autocomplete="username"

@@ -34,7 +34,6 @@ export default {
     WaitingGame,
     ScoreScreen
   },
-  inject: ['sessionStore'],
   data() {
     return {
       socketioGame: new SocketioService(GAME_SOCKET_URL),

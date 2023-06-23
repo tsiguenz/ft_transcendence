@@ -27,6 +27,11 @@
         >
           Copy game URL
         </v-btn>
+        <p>Invite a friend to play with you:</p>
+        <SearchProfile @user-selected="setSelectedUser" />
+        <span v-if="selectedUser">
+          <v-btn @click="inviteUser()">Invite</v-btn>
+        </span>
         <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
           >Back to game menu</v-btn
         >
@@ -38,12 +43,23 @@
 <script>
 import * as constants from '@/constants.ts';
 import swall from 'sweetalert';
+import SearchProfile from './SearchProfile.vue';
+import ChatService from '../services/chat.service';
+
 export default {
+  components: {
+    SearchProfile
+  },
+  inject: ['sessionStore'],
   props: {
     isRanked: Boolean,
     gameId: {
       type: String,
       default: ''
+    },
+    userId: {
+      type: String,
+      required: true
     }
   },
   emits: ['create-custom-room'],
@@ -51,7 +67,8 @@ export default {
     return {
       message: '',
       gameUrl: '',
-      urlIsCopy: false
+      urlIsCopy: false,
+      selectedUser: undefined
     };
   },
   mounted() {
@@ -60,6 +77,10 @@ export default {
     } else {
       this.message = 'Waiting for your opponent';
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
+      if (this.userId) {
+        const jwt = this.$cookie.getCookie('jwt');
+        ChatService.sendGameInvitation(jwt, this.gameUrl, this.userId);
+      }
     }
   },
   methods: {
@@ -82,8 +103,31 @@ export default {
       const gameView = this.isRanked ? this.$parent : this.$parent.$parent;
       gameView.setStatusToInChooseMode();
       gameView.leaveRoom();
+		},
+    setSelectedUser(user) {
+      this.selectedUser = user;
+    },
+    inviteUser() {
+      if (this.selectedUser.id === this.sessionStore.userId) {
+        swall({
+          title: 'Error',
+          text: 'You cannot invite yourself',
+          icon: 'error',
+          button: 'OK'
+        });
+        this.selectedUser = undefined;
+        return;
+      }
+      const jwt = this.$cookie.getCookie('jwt');
+      ChatService.sendGameInvitation(jwt, this.gameUrl, this.selectedUser.id);
+      swall({
+        title: 'Invitation sent',
+        text: 'Your friend will receive a notification',
+        icon: 'success',
+        button: 'OK'
+      });
     }
-  }
+	}
 };
 </script>
 

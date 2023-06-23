@@ -13,6 +13,8 @@ class ChatService {
     private sessionStore: useSessionStore = useSessionStore()
   ) {}
 
+  isSetup: boolean = false;
+
   setup(jwt: string, callback: Function) {
     this.socketService.setupSocketConnection(jwt);
     this.socketService.subscribe(events.EXCEPTION, callback);
@@ -39,11 +41,13 @@ class ChatService {
         );
       }
     );
+    this.isSetup = true;
     // this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
   disconnect() {
     this.socketService.disconnect();
+    this.isSetup = false;
   }
 
   sendMessage(message: string) {
@@ -153,6 +157,19 @@ class ChatService {
       chatroomId,
       userId
     });
+  }
+
+  sendGameInvitation(jwt: string, gameUrl: string, destId: string) {
+    const setupAtBegining = this.isSetup;
+    if (!this.isSetup) {
+      this.socketService.setupSocketConnection(jwt);
+      this.isSetup = true;
+    }
+    this.socketService.send(events.GAME_INVITATION, { gameUrl, destId });
+    if (!setupAtBegining) {
+      this.socketService.disconnect();
+      this.isSetup = false;
+    }
   }
 }
 

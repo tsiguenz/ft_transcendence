@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn class="addbtn" v-bind="props" block> Invite users </v-btn>
     </template>
     <v-card class="window">
@@ -35,8 +35,6 @@
 
 <script>
 import SearchProfile from './SearchProfile.vue';
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
 import ChatService from '../services/chat.service';
 
 export default {
@@ -50,7 +48,6 @@ export default {
     };
   },
   props: ['id'],
-  computed: {},
   methods: {
     setSelectedUser(user) {
       this.selectedUser = user;

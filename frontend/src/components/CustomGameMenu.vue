@@ -57,11 +57,12 @@
       :step="1"
     />
     <v-btn class="log mt-5" @click="createCustomRoom()"
-      >Create custom game</v-btn
+      ><span v-if="!isInChat">Create custom game</span
+      ><span v-else>Invite to play</span></v-btn
     >
     <v-btn class="log mt-5" @click="goToChooseMode()">Back to game menu</v-btn>
   </v-container>
-  <WaitingGame v-if="isInQueue" :game-id="gameId" />
+  <WaitingGame v-if="isInQueue" :game-id="gameId" :user-id="userId" />
 </template>
 
 <script>
@@ -73,6 +74,12 @@ import WaitingGame from '../components/WaitingGame.vue';
 export default {
   components: {
     WaitingGame
+  },
+  props: {
+    userId: {
+      type: String,
+      default: ''
+    }
   },
   emits: ['custom-room-created'],
   data() {
@@ -89,9 +96,14 @@ export default {
         padHeight: 70,
         padWidth: 8,
         padSpeed: 5,
-        maxScore: 5
+        maxScore: 3
       }
     };
+  },
+  computed: {
+    isInChat() {
+      return !!this.userId;
+    }
   },
   mounted() {
     if (this.$parent.socketioGame) {

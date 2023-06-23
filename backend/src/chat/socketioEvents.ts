@@ -16,4 +16,5 @@ export const CHATROOM_RESTRICTED_USER = 'chatroom.restricted_user';
 export const CHATROOM_KICK = 'chatroom.kick';
 export const MESSAGE_TO_CLIENT = 'in_message';
 export const MESSAGE_TO_SERVER = 'out_message';
+export const GAME_INVITATION = 'game_invitation';
 export const EXCEPTION = 'exception';

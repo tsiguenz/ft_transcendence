@@ -25,7 +25,8 @@
         ></v-list-item>
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
-        <v-btn @click="privateMessage(user.id)" block>Private message</v-btn>
+        <InviteUserToPlay :user-id="user.id" />
+        <v-btn block @click="privateMessage(user.id)">Private message</v-btn>
         <div v-if="currentUserIsOwner">
           <v-btn v-if="user.role === 'USER'" block @click="promote(user.id)"
             >Make admin</v-btn
@@ -88,11 +89,13 @@ import { useChatStore } from '@/store/chat';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
 import RestrictUserDialog from '../components/RestrictUserDialog.vue';
 import InviteUserDialog from '../components/InviteUserDialog.vue';
+import InviteUserToPlay from '../components/InviteUserToPlay.vue';
 
 export default {
   components: {
     RestrictUserDialog,
-    InviteUserDialog
+    InviteUserDialog,
+    InviteUserToPlay
   },
   props: ['id'],
   data() {
