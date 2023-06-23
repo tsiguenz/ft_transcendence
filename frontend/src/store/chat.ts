@@ -69,7 +69,9 @@ export const useChatStore = defineStore('chat', {
         (e) => e.user.nickname !== sessionStore.nickname
       );
 
-      room.name = `PM [${otherUser.user.nickname}]`;
+      if (otherUser) {
+        room.name = `PM [${otherUser.user.nickname}]`;
+      }
       return room;
     },
     removeRoom(roomId) {
