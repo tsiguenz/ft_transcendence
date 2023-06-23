@@ -65,8 +65,8 @@ export default {
   methods: {
     async copyGameUrlToClipboard() {
       try {
-        await navigator.clipboard.writeText(this.gameUrl);
         this.urlIsCopy = true;
+        await navigator.clipboard.writeText(this.gameUrl);
       } catch (err) {
         swall({
           title: 'Error',

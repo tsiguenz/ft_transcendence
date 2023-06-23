@@ -31,7 +31,6 @@ export default {
   methods: {
     goToChooseMode() {
       this.$parent.setStatusToInChooseMode();
-      this.$parent.leaveRoom();
     }
   }
 };
