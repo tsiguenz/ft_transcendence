@@ -1,12 +1,11 @@
 <template>
   <v-container>
     <p>{{ message }}</p>
-    <span v-if="!isRanked">
+    <span v-if="!isRanked && !userId">
       <v-btn class="log" @click="copyGameUrlToClipboard"> Copy game URL </v-btn>
       <p>Invite a friend to play with you:</p>
       <SearchProfile @user-selected="setSelectedUser" />
       <span v-if="selectedUser">
-        <p>Friend is: {{ selectedUser }}</p>
         <v-btn @click="inviteUser()">Invite</v-btn>
       </span>
     </span>
@@ -29,6 +28,10 @@ export default {
     gameId: {
       type: String,
       default: ''
+    },
+    userId: {
+      type: String,
+      required: true
     }
   },
   emits: ['create-custom-room'],
@@ -45,6 +48,10 @@ export default {
     } else {
       this.message = 'Waiting for your opponent';
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
+      if (this.userId) {
+        const jwt = this.$cookie.getCookie('jwt');
+        ChatService.sendGameInvitation(jwt, this.gameUrl, this.userId);
+      }
     }
   },
   methods: {
