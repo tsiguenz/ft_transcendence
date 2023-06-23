@@ -272,9 +272,9 @@ export class ChatGateway
           restrictionType,
           until
         });
-        if (restrictionType !== RestrictionType.MUTED) {
-          await this.kickUser(payload.userId, chatroom);
-        }
+      }
+      if (restrictionType !== RestrictionType.MUTED) {
+        await this.kickUser(payload.userId, chatroom);
       }
     } catch (e) {
       throw new WsException((e as Error).message);
@@ -397,12 +397,10 @@ export class ChatGateway
 
   private async kickUser(userId: string, chatroom: ChatRoom) {
     const socket = await this.getUserSocket(userId);
-    if (!socket) {
-      return;
+    if (socket) {
+      socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
+      socket.leave(chatroom.id);
     }
-
-    socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
-    socket.leave(chatroom.id);
     this.server.to(chatroom.id).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId

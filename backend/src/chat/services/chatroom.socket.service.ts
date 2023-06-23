@@ -77,9 +77,7 @@ export class ChatroomSocketService {
     const userId = client['decoded'].sub;
     const chatroom = await this.chatroom.findOne(payload.chatroomId);
 
-    if (chatroom.type !== RoomType.ONE_TO_ONE) {
-      await this.chatroom.leave(userId, payload.chatroomId);
-    }
+    await this.chatroom.leave(userId, payload.chatroomId);
 
     client.leave(chatroom.id);
     server.to(chatroom.id).emit(events.CHATROOM_USER_DISCONNECT, {
