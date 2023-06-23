@@ -21,10 +21,7 @@ export class PrivateMessageService {
     });
   }
 
-  async findOne(
-    firstUserId: string,
-    secondUserId: string
-  ) {
+  async findOne(firstUserId: string, secondUserId: string) {
     return await this.prisma.chatRoom.findMany({
       where: {
         AND: [
@@ -36,7 +33,6 @@ export class PrivateMessageService {
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true,
         users: {
           select: {
@@ -52,10 +48,7 @@ export class PrivateMessageService {
     });
   }
 
-  async findOrCreate(
-    firstUserId: string,
-    secondUserId: string
-  ) {
+  async findOrCreate(firstUserId: string, secondUserId: string) {
     const chatroom = await this.findOne(firstUserId, secondUserId);
     if (chatroom.length > 0) {
       return chatroom[0];
@@ -77,7 +70,6 @@ export class PrivateMessageService {
         name: roomName,
         type: RoomType.ONE_TO_ONE,
         hash: null,
-        slug: `chatroom_${firstUserId}_${secondUserId}`,
         users: {
           create: [
             {
@@ -92,7 +84,6 @@ export class PrivateMessageService {
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true,
         users: {
           select: {

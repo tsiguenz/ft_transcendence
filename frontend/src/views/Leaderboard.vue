@@ -94,7 +94,7 @@ export default {
   },
   async created() {
     await this.getUsers();
-    this.friendStore.setFriends(this.sessionStore.nickname)
+    await this.friendStore.setFriends(this.sessionStore.nickname);
   },
   methods: {
     async getUsers() {
@@ -128,7 +128,7 @@ export default {
       return constants.AVATARS_URL + user.avatarPath;
     },
     isFriend(nickname) {
-      return this.friends.includes(nickname);
+      return this.friends.some((friend) => friend.nickname === nickname);
     },
     isMyProfile(name) {
       return name === this.sessionStore.nickname;

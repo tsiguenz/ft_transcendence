@@ -75,7 +75,9 @@ export default {
     }
   },
   created() {
-    this.friendStore.setFriends(this.sessionStore.nickname).then(this.getConnectedFriends());
+    this.friendStore
+      .setFriends(this.sessionStore.nickname)
+      .then(this.getConnectedFriends());
   },
   methods: {
     userStatus(user) {

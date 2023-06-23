@@ -10,8 +10,7 @@ export const useFriendStore = defineStore('friend', {
       friends: []
     };
   },
-  getters: {
-  },
+  getters: {},
   actions: {
     async setFriends(username: string) {
       try {
