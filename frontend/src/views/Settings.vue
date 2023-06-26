@@ -270,6 +270,7 @@ export default {
       try {
         await axios.delete(constants.API_URL + '/users/' + this.user.nickname);
         this.$router.push('/logout');
+        lib.resetStores();
       } catch (error) {
         swal({
           icon: 'error',

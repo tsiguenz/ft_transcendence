@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
-import { useSessionStore } from '@/store/session';
+import { useSessionStore as sessionStore } from '@/store/session';
 
-const sessionStore = useSessionStore();
 export const useChatStore = defineStore('chat', {
   state() {
     return {
@@ -38,7 +37,7 @@ export const useChatStore = defineStore('chat', {
       if (!this.users) {
         return;
       }
-      return this.users.find((x) => x.id === sessionStore.userId);
+      return this.users.find((x) => x.id === sessionStore().userId);
     },
 
     filteredMessages() {
@@ -54,6 +53,13 @@ export const useChatStore = defineStore('chat', {
     }
   },
   actions: {
+    poormansReset() {
+      this.messages = {};
+      this.users = [];
+      this.chatrooms = [];
+      this.activeChatroom = undefined;
+      this.blockedUsers = [];
+    },
     addRoom(...rooms) {
       for (const room of rooms) {
         if (!this.chatrooms.some((e) => e.id === room.id)) {
@@ -66,7 +72,7 @@ export const useChatStore = defineStore('chat', {
         return room;
       }
       const otherUser = room.users.find(
-        (e) => e.user.nickname !== sessionStore.nickname
+        (e) => e.user.nickname !== sessionStore().nickname
       );
 
       if (otherUser) {

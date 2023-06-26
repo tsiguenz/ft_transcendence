@@ -47,7 +47,6 @@ import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
-import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
@@ -141,12 +140,6 @@ export default {
         return '';
       }
       return chatroom.name;
-    },
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
     }
   }
 };
