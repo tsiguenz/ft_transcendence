@@ -1,5 +1,5 @@
 <template>
-  <v-btn block
+  <v-btn class="button" block
     >INVITE TO PLAY
     <v-dialog v-model="dialog" persistent activator="parent">
       <v-container class="">
