@@ -1,5 +1,5 @@
 <template>
-  <v-row class="row" no-gutters>
+  <v-row class="row1" no-gutters>
     <v-col class="allcol textcol" cols="6"
       ><h1>LET THE <br />PONG BEGIN !</h1>
       <p>
@@ -56,8 +56,8 @@ export default {
 };
 </script>
 
-<style>
-.row {
+<style scoped>
+.row1 {
   padding-left: 20px;
   padding-right: 20px;
 }
