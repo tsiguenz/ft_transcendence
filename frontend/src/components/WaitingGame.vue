@@ -103,7 +103,7 @@ export default {
       const gameView = this.isRanked ? this.$parent : this.$parent.$parent;
       gameView.setStatusToInChooseMode();
       gameView.leaveRoom();
-		},
+    },
     setSelectedUser(user) {
       this.selectedUser = user;
     },
@@ -127,7 +127,7 @@ export default {
         button: 'OK'
       });
     }
-	}
+  }
 };
 </script>
 
