@@ -15,21 +15,21 @@
         <span class="text-right ma-2 msg">
           <ChatPrintNicknameAvatarMessage
             v-if="users.length != 0"
-            :userId="message.authorId"
+            :user-id="message.authorId"
             :users="users"
             :message="message.data"
-            :senderIsCurrentUser="true"
+            :sender-is-current-user="true"
           />
         </span>
       </div>
       <div v-if="message.authorId !== currentUserId" class="other">
-        <span class="text-left ma-2 msgOther">
+        <span class="text-left ma-2">
           <ChatPrintNicknameAvatarMessage
             v-if="users.length != 0"
-            :userId="message.authorId"
+            :user-id="message.authorId"
             :users="users"
             :message="message.data"
-            :senderIsCurrentUser="false"
+            :sender-is-current-user="false"
           />
         </span>
       </div>
@@ -51,14 +51,12 @@ import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
-import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
 import ChatPrintNicknameAvatarMessage from '../components/ChatPrintNicknameAvatarMessage.vue';
 import axios from 'axios';
 
 export default {
   components: {
     EditChatroomDialog,
-    ProfilePrintAvatar,
     ChatPrintNicknameAvatarMessage
   },
   props: ['id', 'messages'],
