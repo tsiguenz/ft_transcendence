@@ -20,8 +20,8 @@
           <v-progress-linear color="white" indeterminate />
         </v-sheet>
       </v-row>
-      <span v-if="!userId">
-        <v-row justify="center" width="100%">
+      <v-row justify="center" width="100%">
+        <span v-if="!isRanked && !userId">
           <v-btn
             v-if="!isRanked && !urlIsCopy"
             class="btn pa-5 my-5"
@@ -35,11 +35,15 @@
           <span v-if="selectedUser">
             <v-btn @click="inviteUser()">Invite</v-btn>
           </span>
-          <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
-            >Back to game menu</v-btn
-          >
-        </v-row>
-      </span>
+        </span>
+        <v-btn
+          v-if="!userId"
+          class="btn pa-5 my-5"
+          width="90%"
+          @click="goToChooseMode()"
+          >Back to game menu</v-btn
+        >
+      </v-row>
     </v-col>
   </v-container>
 </template>
