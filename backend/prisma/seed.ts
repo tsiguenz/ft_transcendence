@@ -7,11 +7,38 @@ const prisma = new PrismaClient();
 
 async function populateUsers() {
   await prisma.user.upsert({
+    where: { nickname: 'gmorange' },
+    create: {
+      nickname: 'gmorange',
+      ladderPoints: 2542,
+      hash: await argon.hash('gmetire')
+    },
+    update: {}
+  });
+  await prisma.user.upsert({
     where: { nickname: 'abourdar' },
     create: {
       nickname: 'abourdar',
       ladderPoints: 1914,
       hash: await argon.hash('pioupiou')
+    },
+    update: {}
+  });
+  await prisma.user.upsert({
+    where: { nickname: 'lpassera' },
+    create: {
+      nickname: 'lpassera',
+      ladderPoints: 2292,
+      hash: await argon.hash('dudududududuel')
+    },
+    update: {}
+  });
+  await prisma.user.upsert({
+    where: { nickname: 'tsiguenz' },
+    create: {
+      nickname: 'tsiguenz',
+      ladderPoints: 1639,
+      hash: await argon.hash('password')
     },
     update: {}
   });
