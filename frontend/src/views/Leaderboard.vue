@@ -1,8 +1,9 @@
 <template>
   <h1 class="title">Leaderboard</h1>
+  <p>{{ users.length }}</p>
   <br />
-  <div v-if="leaders && users.length >= 3">
-    <Ranking :users="leaders" />
+  <div v-if="leaders">
+    <Ranking :users="leaders" :user-length="users.length"/>
   </div>
   <v-table density="compact">
     <thead>
@@ -69,6 +70,7 @@ export default {
   computed: {
     leaders() {
       if (this.users.length > 0) {
+        console.log(this.users.length);
         return {
           first: this.users[0],
           second: this.users[1],

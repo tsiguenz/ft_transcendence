@@ -1,6 +1,7 @@
 <template>
   <div class="rank">
-    <figure class="ranking-2">
+  
+    <figure class="ranking-2" v-if="userLength >= 2">
       <v-avatar size="180px">
         <v-img class="same" src="/assets/icons/laurier2.png"
           ><ProfilePrintAvatar
@@ -14,7 +15,7 @@
         <p class="points">{{ users.second.ladderPoints }}</p>
       </figcaption>
     </figure>
-    <figure class="ranking-1">
+    <figure class="ranking-1" v-if="userLength >= 1">
       <v-avatar size="200px">
         <v-img class="same" src="/assets/icons/laurier.png"
           ><ProfilePrintAvatar
@@ -29,7 +30,7 @@
         <p class="points">{{ users.first.ladderPoints }}</p>
       </figcaption>
     </figure>
-    <figure class="ranking-3">
+    <figure class="ranking-3" v-if="userLength >= 3">
       <v-avatar class="ranking-3" size="160px">
         <v-img class="same" src="/assets/icons/laurier3.png"
           ><ProfilePrintAvatar
@@ -55,22 +56,24 @@ export default {
   components: {
     ProfilePrintAvatar
   },
-  props: ['users'],
+  props: ['users', 'userLength'],
   data() {
     return {
       avatarPath: []
     };
   },
   async mounted() {
+    console.log(this.userLength);
     await this.getUsersAvatarPath();
   },
   methods: {
     async getUsersAvatarPath() {
-      //Put the 3 users avatar path in an array
-
-      this.avatarPath[0] = constants.AVATARS_URL + this.users.first.avatarPath;
-      this.avatarPath[1] = constants.AVATARS_URL + this.users.second.avatarPath;
-      this.avatarPath[2] = constants.AVATARS_URL + this.users.third.avatarPath;
+      if (this.userLength >= 1)
+        this.avatarPath[0] = constants.AVATARS_URL + this.users.first.avatarPath;
+      if (this.userLength >= 2)
+        this.avatarPath[1] = constants.AVATARS_URL + this.users.second.avatarPath;
+      if (this.userLength >= 3)
+        this.avatarPath[2] = constants.AVATARS_URL + this.users.third.avatarPath;
     }
   }
 };
