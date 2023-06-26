@@ -2,7 +2,9 @@
   <div v-if="isMounted">
     <p class="nameOther">{{ currentUserNickname }}</p>
     <span class="text-left ma-2 msgOther">
-      <p v-if="isSender" class="bubble pa-1 bg-blue msg-content">{{ message }}</p>
+      <p v-if="isSender" class="bubble pa-1 bg-blue msg-content">
+        {{ message }}
+      </p>
       <ProfileClick
         :nickname="currentUserNickname"
         :status="false"
