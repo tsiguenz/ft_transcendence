@@ -1,7 +1,7 @@
 <template>
   <h1 class="title">Leaderboard</h1>
   <br />
-  <div v-if="leaders">
+  <div v-if="leaders && users.length >= 3">
     <Ranking :users="leaders" />
   </div>
   <v-table density="compact">
