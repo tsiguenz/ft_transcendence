@@ -1,13 +1,13 @@
 <template>
   <div v-if="isMounted">
-    <p class="nameOther">{{ currentUserNickname }}</p>
-    <span class="text-left ma-2 msgOther">
+    <p class="[ isSender ? nameMe : nameOther ]">{{ currentUserNickname }}</p>
+    <span class="text-right my-2 ml-2 msgOther">
       <p v-if="isSender" class="bubble pa-1 bg-blue msg-content">
         {{ message }}
       </p>
       <ProfileClick
         :nickname="currentUserNickname"
-        :status="false"
+        :status="userStatus(currentUser)"
         :width="40"
         :height="40"
         :url-avatar="currentUserAvatar"
@@ -28,6 +28,7 @@ export default {
     ProfileClick
   },
   props: ['userId', 'users', 'message', 'senderIsCurrentUser'],
+  inject: ['connectedUsersStore'],
   data() {
     return {
       currentUser: [],
@@ -35,6 +36,7 @@ export default {
       currentUserAvatar: '',
       currentMessage: '',
       isSender: false,
+      connectedUsers: this.connectedUsersStore.connectedUsers,
       isMounted: false
     };
   },
@@ -52,6 +54,12 @@ export default {
       this.currentMessage = this.message;
       this.isSender = this.senderIsCurrentUser;
       this.isMounted = true;
+    },
+    userStatus(user) {
+      if (this.connectedUsers.includes(user.id)) {
+        return true;
+      }
+      return false;
     }
   }
 };
@@ -69,6 +77,11 @@ export default {
 
 .nameOther {
   padding-left: 10px;
+  font-size: 10px;
+}
+
+.nameMe {
+  padding-right: 15px;
   font-size: 10px;
 }
 </style>

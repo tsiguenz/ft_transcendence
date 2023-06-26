@@ -11,8 +11,8 @@
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
     <div v-for="message in messages" :key="message.sentAt">
-      <div v-if="message.authorId === currentUserId" class="author">
-        <span class="text-right ma-2 msg">
+      <div v-if="message.authorId === currentUserId">
+        <span class="text-right my-2 msg">
           <ChatPrintNicknameAvatarMessage
             v-if="users.length != 0"
             :user-id="message.authorId"
@@ -22,8 +22,8 @@
           />
         </span>
       </div>
-      <div v-if="message.authorId !== currentUserId" class="other">
-        <span class="text-left ma-2">
+      <div v-if="message.authorId !== currentUserId">
+        <span class="text-left ma-4">
           <ChatPrintNicknameAvatarMessage
             v-if="users.length != 0"
             :user-id="message.authorId"
