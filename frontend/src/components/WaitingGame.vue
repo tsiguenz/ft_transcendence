@@ -49,6 +49,7 @@ import * as constants from '@/constants.ts';
 import swall from 'sweetalert';
 import SearchProfile from './SearchProfile.vue';
 import ChatService from '../services/chat.service';
+import * as lib from '@/utils/lib';
 
 export default {
   components: {
@@ -75,6 +76,10 @@ export default {
       selectedUser: undefined
     };
   },
+  created() {
+    if (!this.userId) return;
+    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
+  },
   mounted() {
     if (this.isRanked) {
       this.message = 'Waiting for an opponent';
@@ -83,11 +88,23 @@ export default {
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
       if (this.userId) {
         const jwt = this.$cookie.getCookie('jwt');
-        ChatService.sendGameInvitation(jwt, this.gameUrl, this.userId);
+        ChatService.sendGameInvitation(this.gameUrl, this.userId);
+      } else {
+        ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
       }
     }
   },
+  beforeUnmount() {
+    if (!this.userId) return;
+    this.ChatService.disconnect();
+  },
   methods: {
+    displayError(payload) {
+      swall({
+        icon: 'error',
+        text: lib.formatError(payload.message)
+      });
+    },
     async copyGameUrlToClipboard() {
       try {
         this.urlIsCopy = true;
@@ -122,8 +139,7 @@ export default {
         this.selectedUser = undefined;
         return;
       }
-      const jwt = this.$cookie.getCookie('jwt');
-      ChatService.sendGameInvitation(jwt, this.gameUrl, this.selectedUser.id);
+      ChatService.sendGameInvitation(this.gameUrl, this.selectedUser.id);
       swall({
         title: 'Invitation sent',
         text: 'Your friend will receive a notification',

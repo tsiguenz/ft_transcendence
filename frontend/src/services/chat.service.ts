@@ -160,19 +160,8 @@ class ChatService {
     });
   }
 
-  async sendGameInvitation(jwt: string, gameUrl: string, destId: string) {
-    const setupAtBegining = this.isSetup;
-    if (!this.isSetup) {
-      this.socketService.setupSocketConnection(jwt);
-      this.isSetup = true;
-    }
-    // hacky patch to wait for socket to be setup
-    await lib.sleep(100);
+  async sendGameInvitation(gameUrl: string, destId: string) {
     this.socketService.send(events.GAME_INVITATION, { gameUrl, destId });
-    if (!setupAtBegining) {
-      this.socketService.disconnect();
-      this.isSetup = false;
-    }
   }
 }
 

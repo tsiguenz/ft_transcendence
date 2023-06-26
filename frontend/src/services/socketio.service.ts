@@ -23,6 +23,7 @@ class SocketioService {
   }
 
   send(event: string, message: string) {
+    if (!this.socket) return;
     this.socket.emit(event, message);
   }
 
