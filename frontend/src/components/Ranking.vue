@@ -63,7 +63,6 @@ export default {
     };
   },
   async mounted() {
-    console.log(this.userLength);
     await this.getUsersAvatarPath();
   },
   methods: {
