@@ -20,8 +20,8 @@ import { PrivateMessageService } from '../private_message/private_message.servic
 import { UsersService } from '../users/users.service';
 import { RestrictionType, ChatRoom, RoomType } from '@prisma/client';
 import { ChatroomSocketService } from './services/chatroom.socket.service';
-import { CreateChatroomPayload } from '../chat/interfaces/createChatroom.interface';
 import * as events from './socketioEvents';
+import { User } from '@prisma/client';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
@@ -56,20 +56,7 @@ export class ChatGateway
         return;
       }
 
-      const message = await this.chat.saveMessage(
-        client['decoded'].sub,
-        payload.chatroomId,
-        payload.message
-      );
-
-      this.server.to(chatroom.slug).emit(events.MESSAGE_TO_CLIENT, {
-        authorId: user.id,
-        authorNickname: user.nickname,
-        authorAvatarUrl: user.avatarPath,
-        chatroomId: chatroom.id,
-        sentAt: message.createdAt,
-        data: payload.message
-      });
+      await this.saveAndEmitMessage(user, chatroom.id, payload.message);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -96,7 +83,7 @@ export class ChatGateway
     }
 
     try {
-      client.join(chatroom.slug);
+      client.join(chatroom.id);
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -148,7 +135,7 @@ export class ChatGateway
         if (socket) {
           socket.emit(events.CHATROOM_NEW, {
             chatroom: chatroom
-          }); 
+          });
         }
       }
 
@@ -268,11 +255,14 @@ export class ChatGateway
 
       const socket = await this.getUserSocket(payload.userId);
       if (socket) {
-        socket.emit(events.CHATROOM_RESTRICTED_USER, { restrictionType, until });
-        if (restrictionType !== RestrictionType.MUTED) {
-         await this.kickUser(payload.userId, chatroom);
-       }
-     }
+        socket.emit(events.CHATROOM_RESTRICTED_USER, {
+          restrictionType,
+          until
+        });
+      }
+      if (restrictionType !== RestrictionType.MUTED) {
+        await this.kickUser(payload.userId, chatroom);
+      }
     } catch (e) {
       throw new WsException((e as Error).message);
     }
@@ -348,6 +338,35 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.GAME_INVITATION)
+  async handleGameInvitation(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { gameUrl: string; destId: string }
+  ) {
+    try {
+      if (!client['decoded'] || client['decoded'].sub === payload.destId)
+        return;
+      const user = await this.users.getUserById(client['decoded'].sub);
+      const chatroom = await this.privateMessage.findOrCreate(
+        user.id,
+        payload.destId
+      );
+      await this.saveAndEmitMessage(user, chatroom.id, payload.gameUrl);
+      client.emit(events.CHATROOM_NEW, {
+        chatroom: chatroom
+      });
+      const dest = await this.users.getUserById(payload.destId);
+      const destSocket = await this.getUserSocket(dest.id);
+      if (destSocket) {
+        destSocket.emit(events.CHATROOM_NEW, {
+          chatroom: chatroom
+        });
+      }
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }
@@ -394,13 +413,11 @@ export class ChatGateway
 
   private async kickUser(userId: string, chatroom: ChatRoom) {
     const socket = await this.getUserSocket(userId);
-    if (!socket) {
-      return;
+    if (socket) {
+      socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
+      socket.leave(chatroom.id);
     }
-
-    socket.emit(events.CHATROOM_KICKED, { chatroomId: chatroom.id });
-    socket.leave(chatroom.slug);
-    this.server.to(chatroom.slug).emit(events.CHATROOM_USER_DISCONNECT, {
+    this.server.to(chatroom.id).emit(events.CHATROOM_USER_DISCONNECT, {
       chatroomId: chatroom.id,
       userId
     });
@@ -430,5 +447,21 @@ export class ChatGateway
       return false;
     }
     return true;
+  }
+
+  private async saveAndEmitMessage(
+    author: Partial<User>,
+    chatroomId: string,
+    content: string
+  ) {
+    const message = await this.chat.saveMessage(author.id, chatroomId, content);
+    this.server.to(chatroomId).emit(events.MESSAGE_TO_CLIENT, {
+      authorId: author.id,
+      authorNickname: author.nickname,
+      authorAvatarUrl: author.avatarPath,
+      chatroomId: chatroomId,
+      sentAt: message.createdAt,
+      data: content
+    });
   }
 }

@@ -323,14 +323,14 @@ export class UsersService {
       where: {
         users: {
           some: {
-            user: { id: userId }
+            userId,
+            hidden: false
           }
         }
       },
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true,
         users: {
           select: {

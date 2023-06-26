@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn class="addbtn" v-bind="props" block> Invite users </v-btn>
     </template>
     <v-card class="window">
@@ -14,7 +14,8 @@
               <SearchProfile @user-selected="setSelectedUser" />
             </v-col>
             <v-col cols="8">
-              Selected user: <span v-if="selectedUser">{{ selectedUser.nickname }}</span>
+              Selected user:
+              <span v-if="selectedUser">{{ selectedUser.nickname }}</span>
             </v-col>
           </v-row>
         </v-container>
@@ -30,13 +31,10 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
 </template>
 
 <script>
 import SearchProfile from './SearchProfile.vue';
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
 import ChatService from '../services/chat.service';
 
 export default {
@@ -50,8 +48,6 @@ export default {
     };
   },
   props: ['id'],
-  computed: {
-  },
   methods: {
     setSelectedUser(user) {
       this.selectedUser = user;

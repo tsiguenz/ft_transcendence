@@ -77,6 +77,7 @@ model ChatRoomUser {
   chatRoom    ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   chatRoomId  String
   role        Role      @default(USER)
+  hidden      Boolean   @default(false)
 
   createdAt DateTime    @default(now())
   @@id([userId, chatRoomId], name: "chatrooms_users_pkey")
@@ -86,7 +87,6 @@ model ChatRoomUser {
 model ChatRoom {
   id            String      @id @default(uuid())
   name          String      @db.VarChar(255) @unique
-  slug          String      @db.VarChar(255) @unique
   messages      Message[]   @relation("chatRoom")
   users         ChatRoomUser[]
   restricted    ChatRoomRestriction[]
@@ -144,4 +144,3 @@ enum RestrictionType {
   MUTED
   BANNED
 }
-

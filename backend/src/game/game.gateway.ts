@@ -42,6 +42,7 @@ export class GameGateway {
 
   @SubscribeMessage('disconnect')
   handleDisconnect(@ConnectedSocket() client: Socket) {
+    if (!client['decoded']) return;
     const userId = client['decoded'].sub;
     const roomId = this.gameService.getRoomIdByUserId(userId, this.rooms);
     if (roomId) {
@@ -78,7 +79,6 @@ export class GameGateway {
       room.interval = setInterval(
         // use arrow function to keep the context of this
         // https://developer.mozilla.org/en-US/docs/Web/API/setInterval
-        //(roomId: string) => this.gameLoop(roomId),
         (roomId: string, that: any) => this.gameService.gameLoop(roomId, that),
         10,
         joinableRoom,
@@ -159,4 +159,17 @@ export class GameGateway {
     const data = this.rooms.get(roomId).datas;
     this.gameService.handleMovePad(client['decoded'].sub, data, dy);
   }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@ConnectedSocket() client: Socket) {
+    if (!client['decoded']) return;
+    const userId = client['decoded'].sub;
+    const roomId = this.gameService.getRoomIdByUserId(userId, this.rooms);
+    if (roomId) {
+      if (!this.rooms.get(roomId).isStarted) this.rooms.delete(roomId);
+      this.logger.log(`Client leave room: ${roomId}`);
+      client.leave(roomId);
+    }
+  }
+
 }

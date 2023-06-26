@@ -53,7 +53,9 @@ export default {
     }
   },
   mounted() {
-    this.friendStore.setFriends(this.sessionStore.nickname).then(this.getConnectedFriends());
+    this.friendStore
+      .setFriends(this.sessionStore.nickname)
+      .then(this.getConnectedFriends());
   },
   methods: {
     getConnectedFriends() {

@@ -5,7 +5,10 @@
     @change-status-to-in-menu="setStatusToInMenu()"
   />
 
-  <CustomGameMenu v-if="isInMenu()" />
+  <CustomGameMenu
+    v-if="isInMenu()"
+    @custom-room-created="subscribeCustomRoomCreated()"
+  />
 
   <WaitingGame v-if="isInQueue()" :is-ranked="isRanked" />
 
@@ -31,7 +34,6 @@ export default {
     WaitingGame,
     ScoreScreen
   },
-  inject: ['sessionStore'],
   data() {
     return {
       socketioGame: new SocketioService(GAME_SOCKET_URL),
@@ -71,12 +73,6 @@ export default {
       this.subscribeGameLoop();
       this.subscribeStartGame();
       this.socketioGame.send('connectToRoom');
-      this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
-    },
-    createCustomRoom() {
-      this.isRanked = false;
-      this.subscribeGameLoop();
-      this.subscribeStartGame();
       this.gameStatus = constants.GAME_STATUS.IN_QUEUE;
     },
     joinCustomGame(gameId) {
@@ -125,6 +121,14 @@ export default {
         this.map = datas.map;
         this.score = datas.score;
         this.runGame();
+      });
+    },
+    subscribeCustomRoomCreated() {
+      this.socketioGame.subscribe('customRoomCreated', () => {
+        this.isRanked = false;
+        this.subscribeGameLoop();
+        this.subscribeStartGame();
+        this.gameStatus = constants.GAME_STATUS.IN_MENU;
       });
     },
     subscribeRoomNotFound() {
@@ -192,6 +196,9 @@ export default {
     handleKeyUp(e) {
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown')
         this.socketioGame.send('movePad', { dy: constants.PAD_STOP });
+    },
+    leaveRoom() {
+      this.socketioGame.send('leaveRoom');
     },
     isInGame() {
       return this.gameStatus === constants.GAME_STATUS.IN_GAME;

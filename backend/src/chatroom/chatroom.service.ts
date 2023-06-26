@@ -19,7 +19,6 @@ export class ChatroomService {
     private chatroomRestriction: ChatroomRestrictionService
   ) {}
   async create(userId: string, dto: CreateChatroomDto) {
-    const snakecaseName = dto.name.toLowerCase().replaceAll(' ', '_');
     let hash = null;
 
     if (dto.type === RoomType.PROTECTED && dto.password) {
@@ -32,7 +31,6 @@ export class ChatroomService {
           name: dto.name,
           type: dto.type,
           hash: hash,
-          slug: `chatroom_${snakecaseName}`,
           users: {
             create: [
               {
@@ -45,7 +43,6 @@ export class ChatroomService {
         select: {
           id: true,
           name: true,
-          slug: true,
           type: true
         }
       });
@@ -132,6 +129,17 @@ export class ChatroomService {
       throw new ForbiddenException('User not in room');
     }
 
+    if (chatroom.type == RoomType.ONE_TO_ONE) {
+      return await this.prisma.chatRoomUser.updateMany({
+        where: {
+          userId,
+          chatRoomId: chatroomId
+        },
+        data: {
+          hidden: true
+        }
+      });
+    }
     return await this.chatroomUser.remove(userId, chatroomId);
   }
 
@@ -172,7 +180,6 @@ export class ChatroomService {
       select: {
         id: true,
         name: true,
-        slug: true,
         type: true
       }
     });
