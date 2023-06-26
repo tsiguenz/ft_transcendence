@@ -2,15 +2,17 @@
   <v-container>
     <v-col cols="12">
       <v-row justify="center">
+        <span v-if="!userId">
+          <v-sheet
+            v-if="!isRanked && urlIsCopy"
+            width="90%"
+            class="sheet pa-5 my-5"
+          >
+            <p class="font">Game URL copied, give it to your opponent</p>
+          </v-sheet>
+        </span>
         <v-sheet
-          v-if="!isRanked && urlIsCopy"
-          width="90%"
-          class="sheet pa-5 my-5"
-        >
-          <p class="font">Game URL copied, give it to your opponent</p>
-        </v-sheet>
-        <v-sheet
-          v-if="isRanked || urlIsCopy"
+          v-if="isRanked || urlIsCopy || userId"
           width="90%"
           class="sheet pa-5 my-5"
         >
@@ -18,24 +20,26 @@
           <v-progress-linear color="white" indeterminate />
         </v-sheet>
       </v-row>
-      <v-row justify="center" width="100%">
-        <v-btn
-          v-if="!isRanked && !urlIsCopy"
-          class="btn pa-5 my-5"
-          width="90%"
-          @click="copyGameUrlToClipboard"
-        >
-          Copy game URL
-        </v-btn>
-        <p>Invite a friend to play with you:</p>
-        <SearchProfile @user-selected="setSelectedUser" />
-        <span v-if="selectedUser">
-          <v-btn @click="inviteUser()">Invite</v-btn>
-        </span>
-        <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
-          >Back to game menu</v-btn
-        >
-      </v-row>
+      <span v-if="!userId">
+        <v-row justify="center" width="100%">
+          <v-btn
+            v-if="!isRanked && !urlIsCopy"
+            class="btn pa-5 my-5"
+            width="90%"
+            @click="copyGameUrlToClipboard"
+          >
+            Copy game URL
+          </v-btn>
+          <p>Invite a friend to play with you:</p>
+          <SearchProfile @user-selected="setSelectedUser" />
+          <span v-if="selectedUser">
+            <v-btn @click="inviteUser()">Invite</v-btn>
+          </span>
+          <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
+            >Back to game menu</v-btn
+          >
+        </v-row>
+      </span>
     </v-col>
   </v-container>
 </template>
@@ -103,7 +107,7 @@ export default {
       const gameView = this.isRanked ? this.$parent : this.$parent.$parent;
       gameView.setStatusToInChooseMode();
       gameView.leaveRoom();
-		},
+    },
     setSelectedUser(user) {
       this.selectedUser = user;
     },
@@ -127,7 +131,7 @@ export default {
         button: 'OK'
       });
     }
-	}
+  }
 };
 </script>
 
