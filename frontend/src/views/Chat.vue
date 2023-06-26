@@ -25,7 +25,7 @@
         <JoinChatroom v-else-if="showPublicChannel" />
       </v-col>
       <v-col cols="3">
-        <ChatroomUsers :id="currentChatroomId" v-if="showPrivateChannel" />
+        <ChatroomUsers v-if="showPrivateChannel" :id="currentChatroomId" />
         <OnlineFriends v-else />
       </v-col>
     </v-row>
