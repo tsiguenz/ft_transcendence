@@ -78,7 +78,7 @@ export default {
   },
   created() {
     if (!this.userId) return;
-    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
+    ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
   },
   mounted() {
     if (this.isRanked) {
@@ -90,7 +90,7 @@ export default {
         const jwt = this.$cookie.getCookie('jwt');
         ChatService.sendGameInvitation(this.gameUrl, this.userId);
       } else {
-        ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
+        ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
       }
     }
   },
@@ -99,12 +99,6 @@ export default {
     this.ChatService.disconnect();
   },
   methods: {
-    displayError(payload) {
-      swall({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
-    },
     async copyGameUrlToClipboard() {
       try {
         this.urlIsCopy = true;

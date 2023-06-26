@@ -141,12 +141,6 @@ export default {
         return '';
       }
       return chatroom.name;
-    },
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
     }
   }
 };
