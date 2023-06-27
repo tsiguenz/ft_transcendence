@@ -146,12 +146,6 @@ export default {
       }
       return chatroom.name;
     },
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
-    },
     async getUsers() {
       try {
         const responseUsers = await axios.get(constants.API_URL + '/users');

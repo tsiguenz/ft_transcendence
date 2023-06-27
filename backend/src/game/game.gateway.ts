@@ -171,5 +171,4 @@ export class GameGateway {
       client.leave(roomId);
     }
   }
-
 }
