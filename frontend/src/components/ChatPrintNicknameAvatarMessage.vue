@@ -1,7 +1,7 @@
 <template>
   <div v-if="isMounted">
     <p class="[ isSender ? nameMe : nameOther ]">{{ currentUserNickname }}</p>
-    <span class="text-right my-2 ml-2 msgOther">
+    <span class="my-2 ml-2 msg">
       <p v-if="isSender" class="bubble pa-1 bg-blue msg-content">
         {{ message }}
       </p>
@@ -66,7 +66,7 @@ export default {
 </script>
 
 <style scoped>
-.msgOther {
+.msg {
   display: flex;
   gap: 10px;
 }
