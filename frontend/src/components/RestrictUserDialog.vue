@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
     <template #activator="{ props }">
-      <v-btn v-bind="props" block>{{ action }}</v-btn>
+      <v-btn class="button" v-bind="props" block>{{ action }}</v-btn>
     </template>
     <v-card>
       <v-card-title>
@@ -23,7 +23,12 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
+        <v-btn
+          class="button"
+          color="blue-darken-1"
+          variant="text"
+          @click="closeDialog"
+        >
           Close
         </v-btn>
         <v-btn
@@ -67,3 +72,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.button {
+  background: var(--medium-purple) !important;
+}
+</style>

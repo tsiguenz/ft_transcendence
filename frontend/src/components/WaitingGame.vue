@@ -12,34 +12,35 @@
           </v-sheet>
         </span>
         <v-sheet
-          v-if="isRanked || urlIsCopy || userId"
+          v-if="isRanked || urlIsCopy || userId || userIsInvited"
           width="90%"
-          class="sheet pa-5 my-5"
+          class="[userIs ? transparent : sheet] pa-5 my-5"
         >
           <h2 class="font">{{ message }}</h2>
           <v-progress-linear color="white" indeterminate />
         </v-sheet>
       </v-row>
       <v-row justify="center" width="100%">
-        <span v-if="!isRanked && !userId">
+        <span v-if="!isRanked && !userId && !userIsInvited">
           <v-btn
             v-if="!isRanked && !urlIsCopy"
             class="btn pa-5 my-5"
-            width="90%"
+            width="100%"
             @click="copyGameUrlToClipboard"
           >
             Copy game URL
           </v-btn>
-          <p>Invite a friend to play with you:</p>
           <SearchProfile @user-selected="setSelectedUser" />
           <span v-if="selectedUser">
-            <v-btn @click="inviteUser()">Invite</v-btn>
+            <v-btn class="btn" width="100%" @click="inviteUser()"
+              >Invite {{ selectedUser.nickname }}
+            </v-btn>
           </span>
         </span>
         <v-btn
           v-if="!userId"
           class="btn pa-5 my-5"
-          width="90%"
+          width="100%"
           @click="goToChooseMode()"
           >Back to game menu</v-btn
         >
@@ -77,7 +78,8 @@ export default {
       message: '',
       gameUrl: '',
       urlIsCopy: false,
-      selectedUser: undefined
+      selectedUser: undefined,
+      userIsInvited: false
     };
   },
   created() {
@@ -91,7 +93,6 @@ export default {
       this.message = 'Waiting for your opponent';
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
       if (this.userId) {
-        const jwt = this.$cookie.getCookie('jwt');
         ChatService.sendGameInvitation(this.gameUrl, this.userId);
       } else {
         ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
@@ -100,7 +101,7 @@ export default {
   },
   beforeUnmount() {
     if (!this.userId) return;
-    this.ChatService.disconnect();
+    ChatService.disconnect();
   },
   methods: {
     async copyGameUrlToClipboard() {
@@ -144,6 +145,7 @@ export default {
         icon: 'success',
         button: 'OK'
       });
+      this.userIsInvited = true;
     }
   }
 };
@@ -160,6 +162,9 @@ export default {
   border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple) !important;
   border-color: var(--light-purple) !important;
+}
+.transparent {
+  background-color: transparent;
 }
 .btn {
   background-image: linear-gradient(

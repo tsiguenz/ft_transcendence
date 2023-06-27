@@ -69,7 +69,6 @@ export default {
   computed: {
     leaders() {
       if (this.users.length > 0) {
-        console.log(this.users.length);
         return {
           first: this.users[0],
           second: this.users[1],

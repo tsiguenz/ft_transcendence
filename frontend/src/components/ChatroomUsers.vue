@@ -26,21 +26,32 @@
       </template>
       <div v-if="!isCurrentUser(user.id)" class="ma-0">
         <InviteUserToPlay :user-id="user.id" />
-        <v-btn block @click="privateMessage(user.id)">Private message</v-btn>
+        <v-btn class="button" block @click="privateMessage(user.id)"
+          >Private message</v-btn
+        >
         <div v-if="currentUserIsOwner">
-          <v-btn v-if="user.role === 'USER'" block @click="promote(user.id)"
+          <v-btn
+            v-if="user.role === 'USER'"
+            class="button"
+            block
+            @click="promote(user.id)"
             >Make admin</v-btn
           >
           <v-btn
             v-else-if="user.role === 'ADMIN'"
+            class="button"
             block
             @click="demote(user.id)"
             >Revoke admin</v-btn
           >
         </div>
         <div v-if="canBeAdministered(user.role)">
-          <v-btn block @click="kick(user.id)">Kick</v-btn>
-          <v-btn v-if="isUserMuted(user.id)" block @click="unmute(user.id)"
+          <v-btn class="button" block @click="kick(user.id)">Kick</v-btn>
+          <v-btn
+            v-if="isUserMuted(user.id)"
+            class="button"
+            block
+            @click="unmute(user.id)"
             >Unmute</v-btn
           >
           <RestrictUserDialog
@@ -50,7 +61,11 @@
             :user-id="user.id"
             @restrict="mute"
           />
-          <v-btn v-if="isUserBanned(user.id)" block @click="unban(user.id)"
+          <v-btn
+            v-if="isUserBanned(user.id)"
+            class="button"
+            block
+            @click="unban(user.id)"
             >Unban</v-btn
           >
           <RestrictUserDialog
@@ -63,12 +78,12 @@
         </div>
         <v-btn
           v-if="!isUserBlocked(user.id)"
-          class="bouton"
+          class="button"
           block
           @click="blockUser(user.nickname)"
           >Block</v-btn
         >
-        <v-btn v-else class="bouton" block @click="unblockUser(user.nickname)"
+        <v-btn v-else class="button" block @click="unblockUser(user.nickname)"
           >Unblock</v-btn
         >
       </div>
@@ -297,7 +312,7 @@ export default {
 .blue-border {
   background-color: var(--light-purple);
 }
-.bouton {
+.button {
   background: var(--medium-purple) !important;
 }
 </style>
