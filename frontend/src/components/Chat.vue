@@ -23,7 +23,7 @@
         </span>
       </div>
       <div v-if="message.authorId !== currentUserId">
-        <span class="text-left ma-4">
+        <span class="text-left my-2 msgOther">
           <ChatPrintNicknameAvatarMessage
             v-if="users.length != 0"
             :user-id="message.authorId"
@@ -169,14 +169,11 @@ export default {
 .chating {
   height: 70vh;
 }
-
 .msg {
   display: flex;
   justify-content: end;
-  gap: 10px;
 }
 .msgOther {
   display: flex;
-  gap: 10px;
 }
 </style>

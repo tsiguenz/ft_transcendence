@@ -15,9 +15,9 @@
       <table id="myTable" class="widthfor tablefor">
         <tbody class="widthfor">
           <tr
-            class="widthfor namefor"
             v-for="user in filteredUsers"
             :key="user.id"
+            class="widthfor namefor"
           >
             <div class="name" @click="userSelected(user)">
               {{ user.nickname }}
@@ -36,6 +36,7 @@ import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 
 export default {
+  emits: ['user-selected'],
   data() {
     return {
       users: [],
@@ -43,7 +44,6 @@ export default {
       is_expanded: true
     };
   },
-  emits: ['user-selected'],
   computed: {
     filteredUsers() {
       return this.users.filter((p) => {

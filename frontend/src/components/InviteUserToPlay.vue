@@ -1,13 +1,23 @@
 <template>
-  <v-btn block
+  <v-btn class="button" block
     >INVITE TO PLAY
     <v-dialog v-model="dialog" persistent activator="parent">
-      <v-container class="">
+      <v-row align="center" justify="center">
         <v-card class="card">
-          <p>here is the dialog</p>
-          <CustomGameMenu :user-id="userId" />
+          <v-card-title>
+            <v-row class="ma-2" justify="space-between">
+              <h2>Custom Game</h2>
+              <v-btn color="transparent" @click="reset"
+                ><v-icon icon="mdi-close"></v-icon
+              ></v-btn>
+            </v-row>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <CustomGameMenu :user-id="userId" />
+          </v-card-text>
         </v-card>
-      </v-container>
+      </v-row>
     </v-dialog>
   </v-btn>
 </template>
@@ -30,7 +40,11 @@ export default {
       dialog: false
     };
   },
-  methods: {}
+  methods: {
+    reset() {
+      this.dialog = false;
+    }
+  }
 };
 </script>
 

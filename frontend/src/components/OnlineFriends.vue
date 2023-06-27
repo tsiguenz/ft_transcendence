@@ -20,10 +20,6 @@
   </v-list>
 </template>
 <script>
-import * as constants from '@/constants.ts';
-import axios from 'axios';
-import swall from 'sweetalert';
-import * as lib from '@/utils/lib';
 import ProfileClick from '../components/ProfileClick.vue';
 
 export default {
