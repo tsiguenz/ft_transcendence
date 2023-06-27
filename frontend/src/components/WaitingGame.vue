@@ -91,7 +91,6 @@ export default {
       this.message = 'Waiting for your opponent';
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
       if (this.userId) {
-        const jwt = this.$cookie.getCookie('jwt');
         ChatService.sendGameInvitation(this.gameUrl, this.userId);
       } else {
         ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
@@ -100,7 +99,7 @@ export default {
   },
   beforeUnmount() {
     if (!this.userId) return;
-    this.ChatService.disconnect();
+    ChatService.disconnect();
   },
   methods: {
     async copyGameUrlToClipboard() {
