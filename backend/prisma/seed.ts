@@ -56,7 +56,7 @@ async function populateChatrooms() {
 
 async function populateGames() {
   const users = await prisma.user.findMany();
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 20; i++) {
     const winner = users[Math.floor(Math.random() * users.length)];
     const loser = users[Math.floor(Math.random() * users.length)];
     const randomBoolean = Math.random() >= 0.5;
