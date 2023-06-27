@@ -7,7 +7,6 @@ import {
   Delete,
   Param,
   UseGuards,
-  Req,
   UnauthorizedException
 } from '@nestjs/common';
 import {
@@ -17,12 +16,11 @@ import {
   ApiBody,
   ApiParam
 } from '@nestjs/swagger';
-import { Request } from 'express';
 import { AccessTokenGuard } from '../auth/guard';
 import { ChatroomService } from './chatroom.service';
 import { ChatroomUserService } from '../chatroom_user/chatroom_user.service';
 import { ChatroomRestrictionService } from '../chatroom_restriction/chatroom_restriction.service';
-import { CreateChatroomDto, UpdateChatroomDto } from './dto';
+import { UpdateChatroomDto } from './dto';
 import { User } from '../decorator/user.decorator';
 
 @Controller('api/chatrooms')
@@ -126,5 +124,24 @@ export class ChatroomController {
       throw new UnauthorizedException('Unauthorized to join room');
     }
     return await this.chatroomService.join(user['id'], id, password);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+    description: 'Chatroom id'
+  })
+  @Get(':id/restrictions')
+  async getRestrictions(@Param('id') id: string, @User() user: object) {
+    if (
+      !(await this.chatroomUserService.isUserOwner(user['id'], id)) &&
+      !(await this.chatroomUserService.isUserAdmin(user['id'], id))
+    ) {
+      throw new UnauthorizedException('Unauthorized to view restrictions');
+    }
+    return await this.chatroomRestrictionService.findAll(id);
   }
 }
