@@ -14,7 +14,7 @@
         <v-sheet
           v-if="isRanked || urlIsCopy || userId"
           width="90%"
-          class="sheet pa-5 my-5"
+          class="[userIs ? transparent : sheet] pa-5 my-5"
         >
           <h2 class="font">{{ message }}</h2>
           <v-progress-linear color="white" indeterminate />
@@ -160,6 +160,9 @@ export default {
   border-radius: 2px;
   box-shadow: 5px 5px 5px var(--light-purple) !important;
   border-color: var(--light-purple) !important;
+}
+.transparent {
+  background-color: transparent;
 }
 .btn {
   background-image: linear-gradient(
