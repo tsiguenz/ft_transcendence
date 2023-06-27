@@ -2,7 +2,7 @@
   <v-sheet class="ma-5 font" color="transparent">
     <h2>History Games</h2>
     <v-sheet color="transparent">
-      <div v-for="index in games">
+      <div v-for="index in games" :key="index.id">
         <v-divider />
         <v-sheet class="my-3 py-5" color="transparent">
           <v-row class="align-center justify-space-between">
@@ -34,21 +34,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import VariationPoints from './ProfileVariationPoints.vue';
-import ProfileClick from './ProfileClick.vue';
 import ProfileOpponent from './ProfileOpponent.vue';
 
 export default {
-  props: ['games', 'users', 'user'],
   components: {
-    ProfileClick,
     VariationPoints,
     ProfileOpponent
   },
   inject: ['connectedUsersStore'],
+  props: ['games', 'users', 'user'],
   data() {
     return {
       connectedUsers: this.connectedUsersStore.connectedUsers

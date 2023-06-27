@@ -4,6 +4,7 @@
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import * as lib from '@/utils/lib';
 
 export default {
   data() {
@@ -25,7 +26,7 @@ export default {
         this.$cookie.removeCookie('refresh_token');
       this.$root.unsubscribeAndDisconnectStatusSocket();
       this.sessionStore.logout();
-      this.connectedUsersStore.reset();
+      lib.resetStores();
     }
   }
 };

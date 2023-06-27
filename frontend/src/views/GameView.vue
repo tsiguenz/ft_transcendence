@@ -10,7 +10,7 @@
     @custom-room-created="subscribeCustomRoomCreated()"
   />
 
-  <WaitingGame v-if="isInQueue()" :is-ranked="isRanked" />
+  <WaitingGame v-if="isInQueue()" :is-ranked="isRanked" user-id="" />
 
   <canvas v-show="isInGame()" id="canvas" height="525" width="858"></canvas>
 

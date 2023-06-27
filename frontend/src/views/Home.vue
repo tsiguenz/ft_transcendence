@@ -1,6 +1,6 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="6"
+  <v-row class="row" no-gutters>
+    <v-col class="allcol textcol" cols="6"
       ><h1>LET THE <br />PONG BEGIN !</h1>
       <p>
         Welcome to our game, an exciting new Pong game created by four students
@@ -24,7 +24,7 @@
         ><v-btn class="log play">Play</v-btn></router-link
       >
     </v-col>
-    <v-col cols="6" class="game">
+    <v-col cols="6" class="allcol game">
       <video width="600" autoplay loop muted>
         <source src="../../assets/pong.mp4" type="video/mp4" /></video></v-col
   ></v-row>
@@ -56,18 +56,18 @@ export default {
 };
 </script>
 
-<style>
-.v-row {
+<style scoped>
+.row {
   padding-left: 20px;
   padding-right: 20px;
 }
-.v-col {
+.allcol {
   height: auto;
   margin-top: auto;
   margin-bottom: auto;
 }
 
-.v-col h1 {
+.textcol h1 {
   font-size: 80px;
   line-height: 1em;
 }

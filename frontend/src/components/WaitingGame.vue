@@ -2,15 +2,17 @@
   <v-container>
     <v-col cols="12">
       <v-row justify="center">
+        <span v-if="!userId">
+          <v-sheet
+            v-if="!isRanked && urlIsCopy"
+            width="90%"
+            class="sheet pa-5 my-5"
+          >
+            <p class="font">Game URL copied, give it to your opponent</p>
+          </v-sheet>
+        </span>
         <v-sheet
-          v-if="!isRanked && urlIsCopy"
-          width="90%"
-          class="sheet pa-5 my-5"
-        >
-          <p class="font">Game URL copied, give it to your opponent</p>
-        </v-sheet>
-        <v-sheet
-          v-if="isRanked || urlIsCopy"
+          v-if="isRanked || urlIsCopy || userId"
           width="90%"
           class="sheet pa-5 my-5"
         >
@@ -19,20 +21,26 @@
         </v-sheet>
       </v-row>
       <v-row justify="center" width="100%">
+        <span v-if="!isRanked && !userId">
+          <v-btn
+            v-if="!isRanked && !urlIsCopy"
+            class="btn pa-5 my-5"
+            width="90%"
+            @click="copyGameUrlToClipboard"
+          >
+            Copy game URL
+          </v-btn>
+          <p>Invite a friend to play with you:</p>
+          <SearchProfile @user-selected="setSelectedUser" />
+          <span v-if="selectedUser">
+            <v-btn @click="inviteUser()">Invite</v-btn>
+          </span>
+        </span>
         <v-btn
-          v-if="!isRanked && !urlIsCopy"
+          v-if="!userId"
           class="btn pa-5 my-5"
           width="90%"
-          @click="copyGameUrlToClipboard"
-        >
-          Copy game URL
-        </v-btn>
-        <p>Invite a friend to play with you:</p>
-        <SearchProfile @user-selected="setSelectedUser" />
-        <span v-if="selectedUser">
-          <v-btn @click="inviteUser()">Invite</v-btn>
-        </span>
-        <v-btn class="btn pa-5 my-5" width="90%" @click="goToChooseMode()"
+          @click="goToChooseMode()"
           >Back to game menu</v-btn
         >
       </v-row>
@@ -45,6 +53,7 @@ import * as constants from '@/constants.ts';
 import swall from 'sweetalert';
 import SearchProfile from './SearchProfile.vue';
 import ChatService from '../services/chat.service';
+import * as lib from '@/utils/lib';
 
 export default {
   components: {
@@ -71,6 +80,10 @@ export default {
       selectedUser: undefined
     };
   },
+  created() {
+    if (!this.userId) return;
+    ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
+  },
   mounted() {
     if (this.isRanked) {
       this.message = 'Waiting for an opponent';
@@ -79,9 +92,15 @@ export default {
       this.gameUrl = constants.GAME_CUSTOM_URL + this.gameId;
       if (this.userId) {
         const jwt = this.$cookie.getCookie('jwt');
-        ChatService.sendGameInvitation(jwt, this.gameUrl, this.userId);
+        ChatService.sendGameInvitation(this.gameUrl, this.userId);
+      } else {
+        ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
       }
     }
+  },
+  beforeUnmount() {
+    if (!this.userId) return;
+    this.ChatService.disconnect();
   },
   methods: {
     async copyGameUrlToClipboard() {
@@ -103,7 +122,7 @@ export default {
       const gameView = this.isRanked ? this.$parent : this.$parent.$parent;
       gameView.setStatusToInChooseMode();
       gameView.leaveRoom();
-		},
+    },
     setSelectedUser(user) {
       this.selectedUser = user;
     },
@@ -118,8 +137,7 @@ export default {
         this.selectedUser = undefined;
         return;
       }
-      const jwt = this.$cookie.getCookie('jwt');
-      ChatService.sendGameInvitation(jwt, this.gameUrl, this.selectedUser.id);
+      ChatService.sendGameInvitation(this.gameUrl, this.selectedUser.id);
       swall({
         title: 'Invitation sent',
         text: 'Your friend will receive a notification',
@@ -127,7 +145,7 @@ export default {
         button: 'OK'
       });
     }
-	}
+  }
 };
 </script>
 

@@ -108,7 +108,7 @@ export class UsersService {
 
   async deleteUser(user: object) {
     this.deleteAvatar(user['avatarPath']);
-    this.deletePrivateMessages(user as User);
+    this.deletePrivateChatrooms(user as User);
     const deleteUser = await this.prisma.user.delete({
       where: {
         nickname: user['nickname']
@@ -348,7 +348,7 @@ export class UsersService {
     });
   }
 
-  private async deletePrivateMessages(user: User) {
+  private async deletePrivateChatrooms(user: User) {
     return this.prisma.chatRoom.deleteMany({
       where: {
         type: RoomType.ONE_TO_ONE,
