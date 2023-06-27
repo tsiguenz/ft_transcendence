@@ -12,7 +12,7 @@
           </v-sheet>
         </span>
         <v-sheet
-          v-if="isRanked || urlIsCopy || userId"
+          v-if="isRanked || urlIsCopy || userId || userIsInvited"
           width="90%"
           class="[userIs ? transparent : sheet] pa-5 my-5"
         >
@@ -21,7 +21,7 @@
         </v-sheet>
       </v-row>
       <v-row justify="center" width="100%">
-        <span v-if="!isRanked && !userId">
+        <span v-if="!isRanked && !userId && !userIsInvited">
           <v-btn
             v-if="!isRanked && !urlIsCopy"
             class="btn pa-5 my-5"
@@ -78,7 +78,8 @@ export default {
       message: '',
       gameUrl: '',
       urlIsCopy: false,
-      selectedUser: undefined
+      selectedUser: undefined,
+      userIsInvited: false
     };
   },
   created() {
@@ -144,6 +145,7 @@ export default {
         icon: 'success',
         button: 'OK'
       });
+      this.userIsInvited = true;
     }
   }
 };
