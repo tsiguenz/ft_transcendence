@@ -25,21 +25,22 @@
           <v-btn
             v-if="!isRanked && !urlIsCopy"
             class="btn pa-5 my-5"
-            width="90%"
+            width="100%"
             @click="copyGameUrlToClipboard"
           >
             Copy game URL
           </v-btn>
-          <p>Invite a friend to play with you:</p>
           <SearchProfile @user-selected="setSelectedUser" />
           <span v-if="selectedUser">
-            <v-btn @click="inviteUser()">Invite</v-btn>
+            <v-btn class="btn" width="100%" @click="inviteUser()"
+              >Invite {{ selectedUser.nickname }}
+            </v-btn>
           </span>
         </span>
         <v-btn
           v-if="!userId"
           class="btn pa-5 my-5"
-          width="90%"
+          width="100%"
           @click="goToChooseMode()"
           >Back to game menu</v-btn
         >
