@@ -11,6 +11,7 @@ import { EditProfileDto } from './dto/profile-user.dto';
 import { TwoFaService } from '../2fa/2fa.service';
 import * as fs from 'fs';
 import { extname } from 'path';
+import { RoomType, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -107,6 +108,7 @@ export class UsersService {
 
   async deleteUser(user: object) {
     this.deleteAvatar(user['avatarPath']);
+    this.deleteOneToOneChatrooms(user as User);
     const deleteUser = await this.prisma.user.delete({
       where: {
         nickname: user['nickname']
@@ -340,6 +342,19 @@ export class UsersService {
                 nickname: true
               }
             }
+          }
+        }
+      }
+    });
+  }
+
+  private async deleteOneToOneChatrooms(user: User) {
+    return this.prisma.chatRoom.deleteMany({
+      where: {
+        type: RoomType.ONE_TO_ONE,
+        users: {
+          some: {
+            userId: user.id
           }
         }
       }

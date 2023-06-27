@@ -367,6 +367,22 @@ export class ChatGateway
     }
   }
 
+  @SubscribeMessage(events.KICK_EVERYONE_FROM_ONE_TO_ONE)
+  async handleOneToOneKick(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { userId: string }
+  ) {
+    try {
+      const chatrooms = await this.privateMessage.findAll(payload.userId);
+      for (const chatroom of chatrooms) {
+        const user = chatroom.users.find((u) => u.userId != payload.userId);
+        this.kickUser(user.userId, chatroom);
+      }
+    } catch (e) {
+      throw new WsException((e as Error).message);
+    }
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }

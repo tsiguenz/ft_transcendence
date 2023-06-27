@@ -47,12 +47,12 @@ import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
-import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ChatPrintNicknameAvatarMessage from '../components/ChatPrintNicknameAvatarMessage.vue';
 import axios from 'axios';
+import swal from 'sweetalert';
 
 export default {
   components: {

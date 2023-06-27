@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import * as constants from '@/constants.ts';
 import IsFriend from '../components/IsFriend.vue';
 import ProfileClick from '../components/ProfileClick.vue';
 
