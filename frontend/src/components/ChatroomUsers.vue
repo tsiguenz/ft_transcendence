@@ -74,6 +74,29 @@
       </div>
     </v-list-group>
   </v-list>
+  <v-list class="window">
+    <v-list-subheader>Banned users</v-list-subheader>
+    <v-list-group v-for="user in users" :key="user.id">
+      <template #activator="{ props }">
+        <p>{{ user.nickname }}</p>
+        <v-list-item
+        v-if="isUserBanned(user.id)"
+          v-bind="props"
+          :title="user.nickname"
+        ></v-list-item>
+          <v-btn v-if="isUserBanned(user.id)" block @click="unban(user.id)"
+            >Unban</v-btn
+          >
+          <RestrictUserDialog
+            v-else
+            action="Ban"
+            :nickname="user.nickname"
+            :user-id="user.id"
+            @restrict="ban"
+          />
+      </template>
+    </v-list-group>
+  </v-list>
 </template>
 
 <script>
@@ -192,6 +215,7 @@ export default {
         });
       }
     },
+   
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
