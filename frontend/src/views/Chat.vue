@@ -34,7 +34,6 @@
 
 <script>
 import ChatService from '../services/chat.service';
-import swal from 'sweetalert';
 import * as lib from '@/utils/lib';
 import BlockUserService from '../services/blockUser.service';
 import { mapStores } from 'pinia';
@@ -73,7 +72,7 @@ export default {
     }
   },
   created() {
-    ChatService.setup(this.$cookie.getCookie('jwt'), this.displayError);
+    ChatService.setup(this.$cookie.getCookie('jwt'), lib.displayError);
     BlockUserService.getBlockedUsers(this.sessionStore.nickname);
   },
   mounted() {
@@ -85,12 +84,6 @@ export default {
     ChatService.disconnect();
   },
   methods: {
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
-    },
     joinChatroom(id) {
       this.chatStore.joinRoom(id);
       this.showFriends = false;
