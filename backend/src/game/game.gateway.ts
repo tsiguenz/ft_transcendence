@@ -156,8 +156,9 @@ export class GameGateway {
       client['decoded'].sub,
       this.rooms
     );
-    const data = this.rooms.get(roomId).datas;
-    this.gameService.handleMovePad(client['decoded'].sub, data, dy);
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    this.gameService.handleMovePad(client['decoded'].sub, room.datas, dy);
   }
 
   @SubscribeMessage('leaveRoom')
