@@ -106,9 +106,7 @@ export class GameGateway {
     const roomId = this.gameService.createRoom(this.rooms, userId);
     const room = this.rooms.get(roomId);
     this.gameService.initDefaultDatas(room);
-    console.log('first', room.datas);
     this.gameService.initDatasCustomGame(room, data, userId);
-    console.log('second', room.datas);
     client.join(roomId);
     client.emit('customRoomCreated', { gameId: roomId });
     this.logger.log(`Client created room for custom game: ${roomId}`);
