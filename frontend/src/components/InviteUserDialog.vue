@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
     <template #activator="{ props }">
-      <v-btn class="addbtn" v-bind="props" block> Invite users </v-btn>
+      <v-btn v-if="boolChatroomInvite()" class="addbtn" v-bind="props" block
+        >Invite users</v-btn
+      >
     </template>
     <v-card class="window">
       <v-card-title>
@@ -36,6 +38,9 @@
 <script>
 import SearchProfile from './SearchProfile.vue';
 import ChatService from '../services/chat.service';
+import { mapStores } from 'pinia';
+import { useChatStore } from '@/store/chat';
+import { useSessionStore } from '@/store/session';
 
 export default {
   components: {
@@ -47,8 +52,31 @@ export default {
       dialog: false
     };
   },
+  computed: {
+    ...mapStores(useChatStore, useSessionStore),
+    chatrooms() {
+      return this.chatStore.chatrooms;
+    },
+    users() {
+      return this.chatStore.users;
+    }
+  },
   props: ['id'],
   methods: {
+    boolChatroomInvite() {
+      const chatroom = this.chatrooms.filter((item) => item.id === this.id);
+      const currentUser = this.users.filter(
+        (user) => user.id === this.sessionStore.userId
+      );
+      if (chatroom[0] === undefined || currentUser[0] === undefined)
+        return false;
+      const chatroomType = chatroom[0].type;
+      const currentUserRole = currentUser[0].role;
+      return (
+        (chatroomType === 'PRIVATE' || chatroomType === 'PROTECTED') &&
+        (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN')
+      );
+    },
     setSelectedUser(user) {
       this.selectedUser = user;
     },
