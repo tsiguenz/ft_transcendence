@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { RoomType, ChatRoom, ChatRoomUser } from '@prisma/client';
+import { RoomType } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

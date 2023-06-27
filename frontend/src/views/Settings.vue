@@ -269,8 +269,10 @@ export default {
     },
     async deleteAccount() {
       try {
-        ChatService.kickEveryoneFromOneToOne(this.sessionStore.userId, this.$cookie.getCookie('jwt'));
-        sleep(1);  // Need to wait a bit before deleting the ccount, if not we cannot find the associated chatrooms as they are deleted
+        await ChatService.kickEveryoneFromOneToOne(
+          this.sessionStore.userId,
+          this.$cookie.getCookie('jwt')
+        );
         await axios.delete(constants.API_URL + '/users/' + this.user.nickname);
         this.$router.push('/logout');
       } catch (error) {

@@ -149,9 +149,11 @@ class ChatService {
     });
   }
 
-  kickEveryoneFromOneToOne(userId: string, jwt: string) {
+  async kickEveryoneFromOneToOne(userId: string, jwt: string) {
     this.socketService.setupSocketConnection(jwt);
+    await lib.sleep(1000);
     this.socketService.send(events.KICK_EVERYONE_FROM_ONE_TO_ONE, { userId });
+    await lib.sleep(1000); // Need to wait a bit before deleting the ccount, if not we cannot find the associated chatrooms as they are deleted
   }
 
   inviteUser(chatroomId: string, userId: string) {
