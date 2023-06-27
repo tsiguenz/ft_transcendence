@@ -60,7 +60,9 @@
       ><span v-if="!isInChat">Create custom game</span
       ><span v-else>Invite to play</span></v-btn
     >
-    <v-btn class="log mt-5" @click="goToChooseMode()">Back to game menu</v-btn>
+    <v-btn v-if="!isInChat" class="log mt-5" @click="goToChooseMode()"
+      >Back to game menu</v-btn
+    >
   </v-container>
   <WaitingGame v-if="isInQueue" :game-id="gameId" :user-id="userId" />
 </template>

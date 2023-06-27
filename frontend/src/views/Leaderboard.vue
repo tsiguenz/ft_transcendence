@@ -2,7 +2,7 @@
   <h1 class="title">Leaderboard</h1>
   <br />
   <div v-if="leaders">
-    <Ranking :users="leaders" :user-length="users.length"/>
+    <Ranking :users="leaders" :user-length="users.length" />
   </div>
   <v-table density="compact">
     <thead>

@@ -11,26 +11,26 @@
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
     <div v-for="message in messages" :key="message.sentAt">
-      <div v-if="message.authorId === currentUserId" class="author">
-        <p class="name">{{ message.authorNickname }}</p>
-        <span class="text-right ma-2 msg">
-          <p class="bubble pa-1 bg-blue msg-content">{{ message.data }}</p>
-          <ProfilePrintAvatar
-            :wdt="40"
-            :hgt="40"
-            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
-          ></ProfilePrintAvatar>
+      <div v-if="message.authorId === currentUserId">
+        <span class="text-right my-2 msg">
+          <ChatPrintNicknameAvatarMessage
+            v-if="users.length != 0"
+            :user-id="message.authorId"
+            :users="users"
+            :message="message.data"
+            :sender-is-current-user="true"
+          />
         </span>
       </div>
-      <div v-if="message.authorId !== currentUserId" class="other">
-        <p class="nameOther">{{ message.authorNickname }}</p>
-        <span class="text-left ma-2 msgOther">
-          <ProfilePrintAvatar
-            :wdt="40"
-            :hgt="40"
-            :url-avatar="getAvatarUrlComputed(message.authorAvatarUrl)"
-          ></ProfilePrintAvatar>
-          <p class="bubble pa-1 bg-green msg-content">{{ message.data }}</p>
+      <div v-if="message.authorId !== currentUserId">
+        <span class="text-left ma-4">
+          <ChatPrintNicknameAvatarMessage
+            v-if="users.length != 0"
+            :user-id="message.authorId"
+            :users="users"
+            :message="message.data"
+            :sender-is-current-user="false"
+          />
         </span>
       </div>
     </div>
@@ -49,20 +49,23 @@ import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
+import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
-import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
+import ChatPrintNicknameAvatarMessage from '../components/ChatPrintNicknameAvatarMessage.vue';
+import axios from 'axios';
 
 export default {
   components: {
     EditChatroomDialog,
-    ProfilePrintAvatar
+    ChatPrintNicknameAvatarMessage
   },
   props: ['id', 'messages'],
   emits: ['leave', 'delete'],
   data() {
     return {
       newMessage: '',
-      chatroom: []
+      chatroom: [],
+      users: []
     };
   },
   computed: {
@@ -102,11 +105,12 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     this.connectRoom();
     ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
+    await this.getUsers();
   },
   methods: {
     connectRoom() {
@@ -142,11 +146,17 @@ export default {
       }
       return chatroom.name;
     },
-    displayError(payload) {
-      swal({
-        icon: 'error',
-        text: lib.formatError(payload.message)
-      });
+    async getUsers() {
+      try {
+        const responseUsers = await axios.get(constants.API_URL + '/users');
+        this.users = responseUsers.data;
+      } catch (error) {
+        swal({
+          icon: 'error',
+          text: lib.formatError(error.response.data.message)
+        });
+        this.$router.push('/logout');
+      }
     }
   }
 };
@@ -168,26 +178,5 @@ export default {
 .msgOther {
   display: flex;
   gap: 10px;
-}
-
-.bubble {
-  border-radius: 5px;
-}
-
-.name {
-  text-align: end;
-  padding-right: 10px;
-  font-size: 10px;
-}
-
-.nameOther {
-  padding-left: 10px;
-  font-size: 10px;
-}
-
-.msg-content {
-  max-width: 300px;
-  word-wrap: break-word;
-  text-align: left;
 }
 </style>

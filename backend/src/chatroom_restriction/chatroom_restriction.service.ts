@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RestrictionType, ChatRoomRestriction } from '@prisma/client';
-import * as argon from 'argon2';
 
 @Injectable()
 export class ChatroomRestrictionService {
@@ -10,7 +9,10 @@ export class ChatroomRestrictionService {
   async findAll(chatroomId: string) {
     return await this.prisma.chatRoomRestriction.findMany({
       where: {
-        chatRoom: { id: chatroomId }
+        chatRoom: { id: chatroomId },
+        restrictedUntil: {
+          gte: new Date()
+        }
       },
       select: {
         userId: true,
