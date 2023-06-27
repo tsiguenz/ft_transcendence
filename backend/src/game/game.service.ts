@@ -373,6 +373,7 @@ export class GameService {
     if (this.checkCustomDatas(customDatas)) return;
     const roomDatas = room.datas;
     roomDatas.ball.defaultSpeed = customDatas.ballSpeed;
+    roomDatas.ball.speed = customDatas.ballSpeed;
     roomDatas.ball.acceleration = customDatas.ballAcceleration;
     roomDatas.ball.radius = customDatas.ballRadius;
     roomDatas.padInfos.height = customDatas.padHeight;
