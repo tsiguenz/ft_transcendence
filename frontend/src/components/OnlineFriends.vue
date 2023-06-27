@@ -44,6 +44,7 @@ export default {
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
+        this.getConnectedFriends();
       },
       deep: true
     }

@@ -10,7 +10,7 @@
     <v-btn v-if="id" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
-    <div v-for="message in messages" :key="message.sentAt">
+    <div v-for="message in messages" :key="message.id">
       <div v-if="message.authorId === currentUserId">
         <span class="text-right my-2 msg">
           <ChatPrintNicknameAvatarMessage
