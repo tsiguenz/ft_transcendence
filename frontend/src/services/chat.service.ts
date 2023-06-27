@@ -14,8 +14,6 @@ class ChatService {
     private sessionStore: useSessionStore = useSessionStore()
   ) {}
 
-  isSetup: boolean = false;
-
   setup(jwt: string, callback: Function) {
     this.socketService.setupSocketConnection(jwt);
     this.socketService.subscribe(events.EXCEPTION, callback);
@@ -42,13 +40,11 @@ class ChatService {
         );
       }
     );
-    this.isSetup = true;
     // this.socketService.subscribe(events.EXCEPTION, callback);
   }
 
   disconnect() {
     this.socketService.disconnect();
-    this.isSetup = false;
   }
 
   sendMessage(message: string) {
@@ -151,6 +147,11 @@ class ChatService {
       roomType: 'ONE_TO_ONE',
       userIds: [firstUserId, secondUserId]
     });
+  }
+
+  kickEveryoneFromOneToOne(userId: string, jwt: string) {
+    this.socketService.setupSocketConnection(jwt);
+    this.socketService.send(events.KICK_EVERYONE_FROM_ONE_TO_ONE, { userId });
   }
 
   inviteUser(chatroomId: string, userId: string) {

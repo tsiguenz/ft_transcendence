@@ -23,6 +23,8 @@ class SocketioService {
   }
 
   send(event: string, message: string) {
+    console.log('=== SOCKET IO SERVICE SEND');
+    console.log('=== Socket: ' + !!this.socket);
     if (!this.socket) return;
     this.socket.emit(event, message);
   }
