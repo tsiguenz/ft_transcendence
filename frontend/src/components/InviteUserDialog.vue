@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" width="1024">
     <template #activator="{ props }">
-      <v-btn v-if="boolChatroomInvite()" class="addbtn" v-bind="props" block
+      <v-btn v-if="displayInvite()" class="addbtn" v-bind="props" block
         >Invite users</v-btn
       >
     </template>
@@ -63,13 +63,12 @@ export default {
   },
   props: ['id'],
   methods: {
-    boolChatroomInvite() {
+    displayInvite() {
       const chatroom = this.chatrooms.filter((item) => item.id === this.id);
       const currentUser = this.users.filter(
         (user) => user.id === this.sessionStore.userId
       );
-      if (chatroom[0] === undefined || currentUser[0] === undefined)
-        return false;
+      if (!chatroom.length || !currentUser.length) return false;
       const chatroomType = chatroom[0].type;
       const currentUserRole = currentUser[0].role;
       return (
