@@ -1,11 +1,10 @@
 <template>
-  <v-container flex>
+  <v-container v-if="user" flex>
     <v-row justify="space-between">
       <v-col cols="3">
         <div class="position">
           <v-row justify="center">
             <ProfilePrintAvatar
-              v-if="userIsMounted"
               :wdt="100"
               :hgt="100"
               :url-avatar="user.avatarPath"
@@ -30,7 +29,7 @@
           >
             <p>
               <ProfileLastConnection
-                v-if="userIsMounted && nickname !== sessionStore.nickname"
+                v-if="nickname !== sessionStore.nickname"
                 :user="user"
               />
             </p>
@@ -44,20 +43,11 @@
         </div>
       </v-col>
       <v-col cols="6">
-        <ProfileHistoryGames
-          v-if="userIsMounted"
-          :games="gameStats"
-          :users="users"
-          :user="user"
-        />
+        <ProfileHistoryGames :games="gameStats" :users="users" :user="user" />
       </v-col>
       <v-col cols="3">
         <v-sheet class="position sheet pa-3">
-          <ProfileGameStats
-            v-if="userIsMounted"
-            :user="user"
-            :games="gameStats"
-          />
+          <ProfileGameStats :user="user" :games="gameStats" />
         </v-sheet>
       </v-col>
     </v-row>
@@ -90,12 +80,14 @@ export default {
   props: ['nickname'],
   data() {
     return {
-      user: {},
+      user: undefined,
       users: [],
-      userIsMounted: false,
       gameStats: {},
       friends: this.friendStore.friends
     };
+  },
+  computed: {
+    ...mapStores(useSessionStore)
   },
   watch: {
     nickname: {
@@ -111,14 +103,9 @@ export default {
       deep: true
     }
   },
-  computed: {
-    ...mapStores(useSessionStore)
-  },
-  async created() {
-    await this.friendStore.setFriends(this.sessionStore.nickname);
-  },
-  async mounted() {
-    await this.getProfile();
+  created() {
+    this.friendStore.setFriends(this.sessionStore.nickname);
+    this.getProfile();
   },
   methods: {
     async getProfile() {
@@ -129,13 +116,11 @@ export default {
         const responseGame = await axios.get(
           constants.API_URL + `/users/${this.nickname}/games`
         );
-
         const responseUsers = await axios.get(constants.API_URL + '/users');
         this.users = responseUsers.data;
         this.user = responseUser.data;
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
         this.gameStats = responseGame.data;
-        this.userIsMounted = true;
       } catch (error) {
         swal({
           icon: 'error',

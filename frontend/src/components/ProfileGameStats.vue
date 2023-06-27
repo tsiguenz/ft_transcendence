@@ -23,12 +23,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants.ts';
-import swal from 'sweetalert';
-import { mapStores } from 'pinia';
-import { useSessionStore } from '@/store/session';
-
 export default {
   props: ['user', 'games'],
   data() {

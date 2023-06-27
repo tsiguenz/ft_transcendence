@@ -11,14 +11,12 @@
 </template>
 
 <script>
-import axios from 'axios';
-import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 export default {
-  props: ['user'],
   inject: ['connectedUsersStore'],
+  props: ['user'],
   data() {
     return {
       isLog: false,

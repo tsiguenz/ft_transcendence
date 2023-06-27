@@ -56,7 +56,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .row {
   padding-left: 20px;
   padding-right: 20px;
