@@ -53,6 +53,7 @@
                                 variant="outlined"
                                 type="password"
                                 label="Password"
+                                @keydown.enter.prevent="joinRoom(chatroom)"
                                 required
                               >
                               </v-text-field>
