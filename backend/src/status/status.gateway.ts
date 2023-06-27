@@ -15,6 +15,7 @@ export class StatusGateway {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('StatusGateway');
   connectedUsers: string[] = [];
+  inGameUsers: string[] = [];
 
   @SubscribeMessage('connect')
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -25,6 +26,29 @@ export class StatusGateway {
     if (!userId) client.disconnect();
     this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
+    this.server.emit('inGameUsers', this.inGameUsers);
+  }
+
+  @SubscribeMessage('inGame')
+  async handleInGame(@ConnectedSocket() client: Socket) {
+    console.log('inGame');
+    const userId = await this.statusService.addNewUser(
+      client,
+      this.inGameUsers
+    );
+    if (!userId) client.disconnect();
+    this.server.emit('inGameUsers', this.inGameUsers);
+  }
+
+  @SubscribeMessage('outGame')
+  async handleOutGame(@ConnectedSocket() client: Socket) {
+    console.log('outGame');
+    const userId = await this.statusService.removeUser(
+      client,
+      this.inGameUsers
+    );
+    if (!userId) client.disconnect();
+    this.server.emit('inGameUsers', this.inGameUsers);
   }
 
   @SubscribeMessage('disconnect')
