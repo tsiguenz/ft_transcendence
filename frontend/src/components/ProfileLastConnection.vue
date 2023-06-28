@@ -28,6 +28,12 @@ export default {
     ...mapStores(useSessionStore)
   },
   watch: {
+    connectedUsersStore: {
+      handler() {
+        this.isLog = this.connectedUsersStore.isConnected(this.user.id);
+      },
+      deep: true
+    },
     user() {
       if (this.currentUser != this.user) this.calculateDifference();
     }
