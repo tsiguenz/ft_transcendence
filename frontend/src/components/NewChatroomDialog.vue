@@ -9,7 +9,7 @@
       </v-card-title>
       <v-card-text>
         <v-container>
-          <v-row >
+          <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="newChatroomObject.name"
@@ -18,7 +18,7 @@
               ></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-select 
+              <v-select
                 v-model="newChatroomObject.type"
                 :items="roomTypes"
                 label="Room type*"

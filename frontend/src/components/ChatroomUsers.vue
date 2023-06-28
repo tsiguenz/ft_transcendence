@@ -1,6 +1,6 @@
 <template>
   <v-list class="window">
-    <InviteUserDialog  :id="id" />
+    <InviteUserDialog :id="id" />
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template #activator="{ props }">
@@ -82,18 +82,15 @@
     </v-list-group>
   </v-list>
   <v-list v-if="bannedUsers.length" class="window">
-  <v-list-subheader  >Banned users</v-list-subheader>
-  <v-list-group v-for="bannedUser in bannedNames" :key="bannedUser.id">
-    <template #activator="{ props }">
-      <v-list-item
-        v-bind="props"
-        :title="bannedUser.nickname"
-      ></v-list-item>
-    </template>
-    <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
-  </v-list-group>
-</v-list>
-</template> 
+    <v-list-subheader>Banned users</v-list-subheader>
+    <v-list-group v-for="bannedUser in bannedNames" :key="bannedUser.id">
+      <template #activator="{ props }">
+        <v-list-item v-bind="props" :title="bannedUser.nickname"></v-list-item>
+      </template>
+      <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
+    </v-list-group>
+  </v-list>
+</template>
 
 <script>
 import axios from 'axios';
@@ -161,17 +158,22 @@ export default {
     users: {
       immediate: true,
       handler(newValue) {
-        this.currentRole = newValue.find((user) => user.id == this.currentUserId);
-        if (this.currentRole && (this.currentRole.role === 'OWNER' || this.currentRole.role === 'ADMIN')) {
+        this.currentRole = newValue.find(
+          (user) => user.id == this.currentUserId
+        );
+        if (
+          this.currentRole &&
+          (this.currentRole.role === 'OWNER' ||
+            this.currentRole.role === 'ADMIN')
+        ) {
           this.getBanned(this.id);
         }
-
       }
-    },
+    }
   },
   mounted() {
     this.setRoomUsers();
-    },
+  },
   methods: {
     async promote(userId) {
       try {
@@ -229,9 +231,9 @@ export default {
         const response = await axios.get(
           constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
         );
-        
-        for(let i = 0; i < response.data.length; i++){
-          if (response.data[i].type === 'BANNED'){
+
+        for (let i = 0; i < response.data.length; i++) {
+          if (response.data[i].type === 'BANNED') {
             this.bannedUsers.push(response.data[i]);
           }
         }
@@ -239,14 +241,16 @@ export default {
         return response.data;
       }
     },
-    async getUserBannedName(bannedUsers){
+    async getUserBannedName(bannedUsers) {
       this.bannedNames = [];
       for (let i = 0; i < bannedUsers.length; i++) {
         const response = await axios.get(constants.API_URL + `/users/`);
-        this.bannedNames.push( response.data.find((user) => user.id == bannedUsers[i].userId));
+        this.bannedNames.push(
+          response.data.find((user) => user.id == bannedUsers[i].userId)
+        );
       }
     },
-   
+
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
@@ -256,7 +260,7 @@ export default {
         this.chatStore.users = users;
       });
     },
-    
+
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
     },
@@ -333,6 +337,4 @@ export default {
 .button {
   background: var(--medium-purple) !important;
 }
-
-
 </style>
