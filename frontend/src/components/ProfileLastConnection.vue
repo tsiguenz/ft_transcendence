@@ -15,6 +15,7 @@ import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 export default {
+  inject: ['connectedUsersStore'],
   props: ['user'],
   data() {
     return {
@@ -38,7 +39,7 @@ export default {
     calculateDifference() {
       this.currentUser = this.user;
       this.disconnectSince = lib.convertDate(this.user.lastConnection);
-      this.isLog = this.connectedUsers.includes(this.user.id);
+      this.isLog = this.connectedUsersStore.isConnected(this.user.id);
     }
   }
 };
