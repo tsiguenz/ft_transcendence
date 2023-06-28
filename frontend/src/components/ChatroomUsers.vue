@@ -229,7 +229,12 @@ export default {
         const response = await axios.get(
           constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
         );
-        this.bannedUsers = response.data;
+        
+        for(let i = 0; i < response.data.length; i++){
+          if (response.data[i].type === 'BANNED'){
+            this.bannedUsers.push(response.data[i]);
+          }
+        }
         this.getUserBannedName(this.bannedUsers);
         return response.data;
       }
