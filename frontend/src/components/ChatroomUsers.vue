@@ -91,13 +91,13 @@
   </v-list>
   <v-list class="window">
   <v-list-subheader>Banned users</v-list-subheader>
-  <v-list-group v-for="bannedUser in bannedUsers" :key="bannedUser.id">
+  <v-list-group v-for="bannedUser in bannedNames" :key="bannedUser.id">
     <template #activator="{ props }">
       <v-list-item
         v-bind="props"
-        :title="getUserBannedName(bannedUser.usierId)"
+        :title="bannedUser.nickname"
       ></v-list-item>
-      <v-btn block @click="unban(bannedUser.id)">Unban</v-btn>
+      <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
     </template>
   </v-list-group>
 </v-list>
@@ -128,6 +128,7 @@ export default {
   data() {
     return {
       bannedUsers: [],
+      bannedNames: [],
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -167,11 +168,11 @@ export default {
     users: {
       immediate: true,
       handler(newValue) {
-        // Check if the current user is an owner
         const currentUser = newValue.find((user) => user.id == this.currentUserId);
         if (currentUser && currentUser.role === 'OWNER') {
           this.getBanned(this.id);
         }
+
       }
     }
   },
@@ -235,20 +236,17 @@ export default {
         const response = await axios.get(
           constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
         );
-       
-        this.bannedUsers = response.data; // <- store the banned users here
-        console.log(this.bannedUsers);
+        this.bannedUsers = response.data;
+        this.getUserBannedName(this.bannedUsers);
         return response.data;
-      } else {
-        console.log('Error: Only the owner can view banned users.');
       }
     },
-    async getUserBannedName(id){
-      const response = await axios.get(
-        constants.API_URL + '/users/' + id
-      );
-      console.log(response.data)
-      return response.data.nickname;
+    async getUserBannedName(bannedUsers){
+
+      for (let i = 0; i < bannedUsers.length; i++) {
+        const response = await axios.get(constants.API_URL + `/users/`);
+        this.bannedNames.push( response.data.find((user) => user.id == bannedUsers[i].userId));
+      }
     },
     setRoomUsers() {
       if (!this.id) {
