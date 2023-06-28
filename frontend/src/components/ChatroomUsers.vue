@@ -90,28 +90,17 @@
     </v-list-group>
   </v-list>
   <v-list class="window">
-    <v-list-subheader>Banned users</v-list-subheader>
-    <v-list-group v-for="user in users" :key="user.id">
-      <template #activator="{ props }">
-        <p>{{ user.nickname }}</p>
-        <v-list-item
-        v-if="isUserBanned(user.id)"
-          v-bind="props"
-          :title="user.nickname"
-        ></v-list-item>
-          <v-btn v-if="isUserBanned(user.id)" block @click="unban(user.id)"
-            >Unban</v-btn
-          >
-          <RestrictUserDialog
-            v-else
-            action="Ban"
-            :nickname="user.nickname"
-            :user-id="user.id"
-            @restrict="ban"
-          />
-      </template>
-    </v-list-group>
-  </v-list>
+  <v-list-subheader>Banned users</v-list-subheader>
+  <v-list-group v-for="bannedUser in bannedUsers" :key="bannedUser.id">
+    <template #activator="{ props }">
+      <v-list-item
+        v-bind="props"
+        :title="getUserBannedName(bannedUser.usierId)"
+      ></v-list-item>
+      <v-btn block @click="unban(bannedUser.id)">Unban</v-btn>
+    </template>
+  </v-list-group>
+</v-list>
 </template>
 
 <script>
@@ -138,6 +127,7 @@ export default {
   props: ['id'],
   data() {
     return {
+      bannedUsers: [],
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -173,11 +163,21 @@ export default {
       handler() {
         this.setRoomUsers();
       }
+    },
+    users: {
+      immediate: true,
+      handler(newValue) {
+        // Check if the current user is an owner
+        const currentUser = newValue.find((user) => user.id == this.currentUserId);
+        if (currentUser && currentUser.role === 'OWNER') {
+          this.getBanned(this.id);
+        }
+      }
     }
   },
   mounted() {
     this.setRoomUsers();
-  },
+    },
   methods: {
     async promote(userId) {
       try {
@@ -230,7 +230,26 @@ export default {
         });
       }
     },
-   
+    async getBanned(chatroomId) {
+      if (this.currentUserIsOwner) {
+        const response = await axios.get(
+          constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
+        );
+       
+        this.bannedUsers = response.data; // <- store the banned users here
+        console.log(this.bannedUsers);
+        return response.data;
+      } else {
+        console.log('Error: Only the owner can view banned users.');
+      }
+    },
+    async getUserBannedName(id){
+      const response = await axios.get(
+        constants.API_URL + '/users/' + id
+      );
+      console.log(response.data)
+      return response.data.nickname;
+    },
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
