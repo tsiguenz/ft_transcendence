@@ -46,6 +46,7 @@ export default {
   components: {
     SearchProfile
   },
+  props: ['id'],
   data() {
     return {
       selectedUser: undefined,
@@ -61,9 +62,9 @@ export default {
       return this.chatStore.users;
     }
   },
-  props: ['id'],
   methods: {
     displayInvite() {
+      if (!this.users || !this.chatrooms) return false;
       const chatroom = this.chatrooms.filter((item) => item.id === this.id);
       const currentUser = this.users.filter(
         (user) => user.id === this.sessionStore.userId

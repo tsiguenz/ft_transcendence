@@ -6,11 +6,15 @@ class BlockUserService {
   constructor(private chatStore: useChatStore = useChatStore()) {}
 
   async getBlockedUsers(username) {
-    const response = await axios.get(
-      constants.API_URL + '/users/' + username + '/blocked',
-      {}
-    );
-    this.chatStore.addBlockedUser(...response.data.blockedUsers);
+    try {
+      const response = await axios.get(
+        constants.API_URL + '/users/' + username + '/blocked',
+        {}
+      );
+      this.chatStore.addBlockedUser(...response.data.blockedUsers);
+    } catch (error) {
+      window.location.href = '/logout';
+    }
   }
 
   async blockUser(username) {

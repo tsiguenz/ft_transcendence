@@ -122,10 +122,6 @@ export default {
         this.user.avatarPath = constants.AVATARS_URL + this.user.avatarPath;
         this.gameStats = responseGame.data;
       } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
         this.$router.push('/logout');
       }
     },
