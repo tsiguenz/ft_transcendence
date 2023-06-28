@@ -1,7 +1,7 @@
 <template>
-  <v-sheet class="sheet pa-5 mt-5">
+  <v-sheet v-if="printForm" class="sheet pa-5 mt-5">
     <h4 class="font">Choose your nickname</h4>
-    <v-form v-if="printForm">
+    <v-form>
       <v-text-field
         v-model="nickname"
         class="mb-5"
@@ -11,7 +11,7 @@
         required
         @keydown.enter.prevent="signin42"
       ></v-text-field>
-      <v-btn @click="signin42" class="log">Create account</v-btn>
+      <v-btn class="log" @click="signin42">Create account</v-btn>
     </v-form>
   </v-sheet>
 </template>

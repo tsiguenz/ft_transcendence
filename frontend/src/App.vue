@@ -16,7 +16,7 @@ import AppHeader from './components/AppHeader.vue';
 import Navbar from './components/NavBar.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
-//import { useInGameUsersStore } from '@/store/inGameUsers';
+import { useInGameUsersStore } from '@/store/inGameUsers';
 import { useFriendStore } from '@/store/friend';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     ...mapStores(useConnectedUsersStore),
-    //    ...mapStores(useInGameUsersStore),
+    ...mapStores(useInGameUsersStore),
     ...mapStores(useSessionStore),
     ...mapStores(useFriendStore)
   },

@@ -10,7 +10,7 @@
               :width="40"
               :height="40"
               :url-avatar="user.avatarPath"
-              :status="userStatus(user)"
+              :user-id="user.id"
             ></ProfileClick>
           </td>
           <td>{{ user.nickname }}</td>
@@ -26,21 +26,14 @@ export default {
   components: {
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
+  inject: ['sessionStore', 'friendStore', 'connectedUsersStore'],
   data() {
     return {
       friends: this.friendStore.friends,
-      connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: []
     };
   },
   watch: {
-    connectedUsersStore: {
-      handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
-      },
-      deep: true
-    },
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
@@ -62,12 +55,6 @@ export default {
           this.connectedFriends.push(this.friends[i]);
         }
       }
-    },
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
     }
   }
 };

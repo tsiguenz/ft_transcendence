@@ -29,28 +29,6 @@ export class StatusGateway {
     this.server.emit('inGameUsers', this.inGameUsers);
   }
 
-  @SubscribeMessage('inGame')
-  async handleInGame(@ConnectedSocket() client: Socket) {
-    console.log('inGame');
-    const userId = await this.statusService.addNewUser(
-      client,
-      this.inGameUsers
-    );
-    if (!userId) client.disconnect();
-    this.server.emit('inGameUsers', this.inGameUsers);
-  }
-
-  @SubscribeMessage('outGame')
-  async handleOutGame(@ConnectedSocket() client: Socket) {
-    console.log('outGame');
-    const userId = await this.statusService.removeUser(
-      client,
-      this.inGameUsers
-    );
-    if (!userId) client.disconnect();
-    this.server.emit('inGameUsers', this.inGameUsers);
-  }
-
   @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     const sockets = await this.server.fetchSockets();
@@ -66,5 +44,25 @@ export class StatusGateway {
     await this.statusService.setLastConnection(client);
     this.logger.log(`Client disconnected: ${client.id}`);
     this.server.emit('connectedUsers', this.connectedUsers);
+  }
+
+  @SubscribeMessage('inGame')
+  async handleInGame(@ConnectedSocket() client: Socket) {
+    const userId = await this.statusService.addNewUser(
+      client,
+      this.inGameUsers
+    );
+    if (!userId) client.disconnect();
+    this.server.emit('inGameUsers', this.inGameUsers);
+  }
+
+  @SubscribeMessage('outGame')
+  async handleOutGame(@ConnectedSocket() client: Socket) {
+    const userId = await this.statusService.removeUser(
+      client,
+      this.inGameUsers
+    );
+    if (!userId) client.disconnect();
+    this.server.emit('inGameUsers', this.inGameUsers);
   }
 }

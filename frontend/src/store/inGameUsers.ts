@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const useInGameUsers = defineStore('inGameUsers', {
+export const useInGameUsersStore = defineStore('inGameUsers', {
   persist: true,
   state() {
     return {
@@ -14,7 +14,7 @@ export const useInGameUsers = defineStore('inGameUsers', {
     reset() {
       this.inGameUsers = [];
     },
-    isInGame(id: string) {
+    isInGame(id) {
       return this.inGameUsers.includes(id);
     }
   }

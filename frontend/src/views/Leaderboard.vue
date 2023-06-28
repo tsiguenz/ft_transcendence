@@ -24,7 +24,7 @@
           <td class="cust-td hgt-td">
             <ProfileClick
               :nickname="user.nickname"
-              :status="userStatus(user)"
+              :user-id="user.id"
               :width="40"
               :height="40"
               :url-avatar="getAvatarPath(user)"
@@ -60,12 +60,11 @@ export default {
     IsFriend,
     Ranking
   },
-  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
+  inject: ['sessionStore', 'friendStore'],
   data() {
     return {
       friends: this.friendStore.friends,
-      users: [],
-      connectedUsers: this.connectedUsersStore.connectedUsers
+      users: []
     };
   },
   computed: {
@@ -81,12 +80,6 @@ export default {
     }
   },
   watch: {
-    connectedUsersStore: {
-      handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
-      },
-      deep: true
-    },
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
@@ -112,12 +105,6 @@ export default {
         });
         this.$router.push('/logout');
       }
-    },
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
     },
     getLeaders() {
       return {

@@ -21,7 +21,7 @@
         <td class="cust-td hgt-td">
           <ProfileClick
             :nickname="friend.nickname"
-            :status="userStatus(friend)"
+            :user-id="friend.id"
             :width="40"
             :height="40"
             :url-avatar="getAvatarPath(friend)"
@@ -49,23 +49,16 @@ export default {
     IsFriend,
     ProfileClick
   },
-  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
+  inject: ['sessionStore', 'friendStore'],
 
   data() {
     return {
       newFriend: '',
-      connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: [],
       friends: this.friendStore.friends
     };
   },
   watch: {
-    connectedUsersStore: {
-      handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
-      },
-      deep: true
-    },
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
@@ -79,12 +72,6 @@ export default {
       .then(this.getConnectedFriends());
   },
   methods: {
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
-    },
     getConnectedFriends() {
       this.connectedFriends = [];
       for (let i = 0; i < this.friends.length; i++) {
