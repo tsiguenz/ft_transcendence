@@ -64,7 +64,10 @@ axios.interceptors.response.use(
       const jwt = VueCookieNext.getCookie('jwt');
       const expirationTimestamp = VueJwtDecode.decode(jwt).exp;
       const now = Math.floor(Date.now() / 1000);
-      if (now < expirationTimestamp) return Promise.reject(error);
+      if (now < expirationTimestamp) {
+        window.location.href = '/logout';
+        return Promise.reject(error);
+      }
       // refresh the expired access_token
       const refreshToken = VueCookieNext.getCookie('refresh_token');
       const response = await axios.post(

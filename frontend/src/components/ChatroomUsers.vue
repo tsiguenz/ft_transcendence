@@ -171,7 +171,7 @@ export default {
       } catch (error) {
         swal({
           icon: 'error',
-          text: lib.formatError(error.response.data.message)
+          text: error.response.data.message
         });
       }
     },
@@ -201,10 +201,7 @@ export default {
         );
         return response.data;
       } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
+        this.$router.push('/logout');
       }
     },
     setRoomUsers() {

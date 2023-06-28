@@ -22,12 +22,7 @@ export const useFriendStore = defineStore('friend', {
           friend.avatarPath = constants.AVATARS_URL + friend.avatarPath;
         });
       } catch (error) {
-        swall({
-          title: 'Error',
-          text: lib.formatError(error.response.data.message),
-          icon: 'error',
-          button: 'OK'
-        });
+        window.location.href = '/logout';
       }
     }
   }
