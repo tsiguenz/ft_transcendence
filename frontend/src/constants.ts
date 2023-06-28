@@ -20,3 +20,8 @@ export const GAME_STATUS = Object.freeze({
   IN_GAME: 'game',
   IN_SCORE_SCREEN: 'score_screen'
 });
+export const USER_STATUS = Object.freeze({
+  OFFLINE: 'offline',
+  ONLINE: 'online',
+  IN_GAME: 'in_game'
+});

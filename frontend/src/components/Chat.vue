@@ -10,7 +10,7 @@
     <v-btn v-if="id" icon="mdi-exit-to-app" @click="leaveRoom"></v-btn>
   </v-toolbar>
   <v-list ref="chat" class="overflow-y-auto window chating">
-    <div v-for="message in messages" :key="message.sentAt">
+    <div v-for="message in messages" :key="message.id">
       <div v-if="message.authorId === currentUserId">
         <span class="text-right my-2 msg">
           <ChatPrintNicknameAvatarMessage
@@ -47,12 +47,12 @@ import ChatService from '../services/chat.service';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
-import swal from 'sweetalert';
 import * as constants from '@/constants.ts';
 import * as lib from '@/utils/lib';
 import EditChatroomDialog from '../components/EditChatroomDialog.vue';
 import ChatPrintNicknameAvatarMessage from '../components/ChatPrintNicknameAvatarMessage.vue';
 import axios from 'axios';
+import swal from 'sweetalert';
 
 export default {
   components: {

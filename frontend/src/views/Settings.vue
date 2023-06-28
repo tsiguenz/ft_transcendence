@@ -128,6 +128,7 @@ import * as lib from '@/utils/lib';
 import { mapStores } from 'pinia';
 import { useSessionStore } from '@/store/session';
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
+import ChatService from '../services/chat.service';
 
 export default {
   components: {
@@ -268,6 +269,10 @@ export default {
     },
     async deleteAccount() {
       try {
+        await ChatService.kickEveryoneFromOneToOne(
+          this.sessionStore.userId,
+          this.$cookie.getCookie('jwt')
+        );
         await axios.delete(constants.API_URL + '/users/' + this.user.nickname);
         this.$router.push('/logout');
       } catch (error) {

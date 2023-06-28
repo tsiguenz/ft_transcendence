@@ -16,7 +16,7 @@
           width="90%"
           class="[userIs ? transparent : sheet] pa-5 my-5"
         >
-          <h2 class="font">{{ message }}</h2>
+          <h2 class="font mb-2">{{ message }}</h2>
           <v-progress-linear color="white" indeterminate />
         </v-sheet>
       </v-row>

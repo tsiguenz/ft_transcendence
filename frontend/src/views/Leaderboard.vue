@@ -1,46 +1,48 @@
 <template>
-  <h1 class="title">Leaderboard</h1>
-  <br />
-  <div v-if="leaders">
-    <Ranking :users="leaders" :user-length="users.length" />
-  </div>
-  <v-table density="compact">
-    <thead>
-      <tr class="cust-tr">
-        <th class="cust-th"></th>
-        <th class="cust-th">Nickname</th>
-        <th class="cust-th">Ladder points</th>
-        <th class="cust-th"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(user, index) in users"
-        :key="user.id"
-        :class="{ isprofile: isMyProfile(user.nickname) }"
-      >
-        <td class="indexRank">{{ index + 1 }}</td>
-        <td class="cust-td hgt-td">
-          <ProfileClick
-            :nickname="user.nickname"
-            :status="userStatus(user)"
-            :width="40"
-            :height="40"
-            :url-avatar="getAvatarPath(user)"
-          ></ProfileClick>
-          <p>{{ user.nickname }}</p>
-        </td>
-        <td class="hgt-td">{{ user.ladderPoints }}</td>
-        <td class="hgt-td">
-          <IsFriend
-            v-if="!isMyProfile(user.nickname)"
-            :friendname="user.nickname"
-            :is-friend-at-begining="isFriend(user.nickname)"
-          ></IsFriend>
-        </td>
-      </tr>
-    </tbody>
-  </v-table>
+  <span v-if="users.length">
+    <h1 class="title">Leaderboard</h1>
+    <br />
+    <div v-if="leaders">
+      <Ranking :users="leaders" :user-length="users.length" />
+    </div>
+    <v-table density="compact">
+      <thead>
+        <tr class="cust-tr">
+          <th class="cust-th"></th>
+          <th class="cust-th">Nickname</th>
+          <th class="cust-th">Ladder points</th>
+          <th class="cust-th"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(user, index) in users"
+          :key="user.id"
+          :class="{ isprofile: isMyProfile(user.nickname) }"
+        >
+          <td class="indexRank">{{ index + 1 }}</td>
+          <td class="cust-td hgt-td">
+            <ProfileClick
+              :nickname="user.nickname"
+              :user-id="user.id"
+              :width="40"
+              :height="40"
+              :url-avatar="getAvatarPath(user)"
+            ></ProfileClick>
+            <p>{{ user.nickname }}</p>
+          </td>
+          <td class="hgt-td">{{ user.ladderPoints }}</td>
+          <td class="hgt-td">
+            <IsFriend
+              v-if="!isMyProfile(user.nickname)"
+              :friendname="user.nickname"
+              :is-friend-at-begining="isFriend(user.nickname)"
+            ></IsFriend>
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
+  </span>
 </template>
 
 <script>
@@ -58,12 +60,11 @@ export default {
     IsFriend,
     Ranking
   },
-  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
+  inject: ['sessionStore', 'friendStore'],
   data() {
     return {
       friends: this.friendStore.friends,
-      users: [],
-      connectedUsers: this.connectedUsersStore.connectedUsers
+      users: []
     };
   },
   computed: {
@@ -79,12 +80,6 @@ export default {
     }
   },
   watch: {
-    connectedUsersStore: {
-      handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
-      },
-      deep: true
-    },
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
@@ -110,12 +105,6 @@ export default {
         });
         this.$router.push('/logout');
       }
-    },
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
     },
     getLeaders() {
       return {

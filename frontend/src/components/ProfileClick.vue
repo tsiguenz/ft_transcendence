@@ -12,7 +12,7 @@
               ></ProfilePrintAvatar>
             </v-avatar>
             <v-icon
-              :class="status ? 'co' : 'unco'"
+              :class="statusStyle"
               class="statusUser"
               size="15px"
               icon="mdi-circle"
@@ -31,7 +31,7 @@
               </v-avatar>
               <h3>{{ nickname }}</h3>
               <p class="text-caption mt-1">
-                {{ printStatusConnection(status) }}
+                {{ printStatusConnection() }}
               </p>
               <v-divider class="my-3"></v-divider>
               <router-link class="button" :to="'/profile/' + nickname"
@@ -47,38 +47,56 @@
 
 <script>
 import ProfilePrintAvatar from '../components/ProfilePrintAvatar.vue';
+import * as constants from '@/constants.ts';
 
 export default {
   components: {
     ProfilePrintAvatar
   },
-  inject: ['connectedUsersStore', 'sessionStore'],
-  props: ['nickname', 'status', 'width', 'height', 'urlAvatar'],
+  inject: ['connectedUsersStore', 'inGameUsersStore', 'sessionStore'],
+  props: ['nickname', 'userId', 'width', 'height', 'urlAvatar'],
   data() {
     return {
-      connectedUsers: this.connectedUsersStore.connectedUsers,
+      status: constants.USER_STATUS.OFFLINE,
       connected: false
     };
+  },
+  computed: {
+    statusStyle() {
+      if (this.status === constants.USER_STATUS.IN_GAME) return 'in-game';
+      if (this.status === constants.USER_STATUS.ONLINE) return 'co';
+      return 'unco';
+    }
   },
   watch: {
     connectedUsersStore: {
       handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+        this.status = this.userStatus(this.userId);
+      },
+      deep: true
+    },
+    inGameUsersStore: {
+      handler() {
+        this.status = this.userStatus(this.userId);
       },
       deep: true
     }
   },
+  mounted() {
+    this.status = this.userStatus(this.userId);
+  },
   methods: {
-    userStatus(user) {
-      if (this.connectedUsers.includes(user)) {
-        return true;
-      } else {
-        return false;
-      }
+    userStatus(userId) {
+      if (this.inGameUsersStore.isInGame(userId))
+        return constants.USER_STATUS.IN_GAME;
+      if (this.connectedUsersStore.isConnected(userId))
+        return constants.USER_STATUS.ONLINE;
+      return constants.USER_STATUS.OFFLINE;
     },
-    printStatusConnection(status) {
-      if (status === true) return 'Online';
-      else return 'Offline';
+    printStatusConnection() {
+      if (this.status === constants.USER_STATUS.ONLINE) return 'Online';
+      if (this.status === constants.USER_STATUS.OFFLINE) return 'Offline';
+      if (this.status === constants.USER_STATUS.IN_GAME) return 'In Game';
     }
   }
 };
@@ -107,5 +125,9 @@ export default {
 
 .unco {
   color: #757575;
+}
+
+.in-game {
+  color: #ff9800;
 }
 </style>

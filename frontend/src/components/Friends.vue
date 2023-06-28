@@ -21,7 +21,7 @@
         <td class="cust-td hgt-td">
           <ProfileClick
             :nickname="friend.nickname"
-            :status="userStatus(friend)"
+            :user-id="friend.id"
             :width="40"
             :height="40"
             :url-avatar="getAvatarPath(friend)"
@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import * as constants from '@/constants.ts';
 import IsFriend from '../components/IsFriend.vue';
 import ProfileClick from '../components/ProfileClick.vue';
 
@@ -55,7 +54,6 @@ export default {
   data() {
     return {
       newFriend: '',
-      connectedUsers: this.connectedUsersStore.connectedUsers,
       connectedFriends: [],
       friends: this.friendStore.friends
     };
@@ -63,7 +61,7 @@ export default {
   watch: {
     connectedUsersStore: {
       handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+        this.getConnectedFriends();
       },
       deep: true
     },
@@ -80,16 +78,10 @@ export default {
       .then(this.getConnectedFriends());
   },
   methods: {
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
-    },
     getConnectedFriends() {
       this.connectedFriends = [];
       for (let i = 0; i < this.friends.length; i++) {
-        if (this.connectedUsers.includes(this.friends[i].id)) {
+        if (this.connectedUsersStore.isConnected(this.friends[i].id)) {
           this.connectedFriends.push(this.friends[i]);
         }
       }

@@ -14,7 +14,7 @@ export const useConnectedUsersStore = defineStore('connectedUsers', {
     reset() {
       this.connectedUsers = [];
     },
-    isConnected(id: string) {
+    isConnected(id) {
       return this.connectedUsers.includes(id);
     }
   }

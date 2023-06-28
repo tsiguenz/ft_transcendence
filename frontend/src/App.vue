@@ -16,6 +16,7 @@ import AppHeader from './components/AppHeader.vue';
 import Navbar from './components/NavBar.vue';
 import { mapStores } from 'pinia';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import { useInGameUsersStore } from '@/store/inGameUsers';
 import { useFriendStore } from '@/store/friend';
 import { useSessionStore } from '@/store/session';
 import SocketioService from '@/services/socketio.service';
@@ -31,6 +32,7 @@ export default {
   provide() {
     return {
       connectedUsersStore: this.connectedUsersStore,
+      inGameUsersStore: this.inGameUsersStore,
       sessionStore: this.sessionStore,
       friendStore: this.friendStore
     };
@@ -42,6 +44,7 @@ export default {
   },
   computed: {
     ...mapStores(useConnectedUsersStore),
+    ...mapStores(useInGameUsersStore),
     ...mapStores(useSessionStore),
     ...mapStores(useFriendStore)
   },
@@ -62,9 +65,13 @@ export default {
       this.socketioStatus.subscribe('connectedUsers', (connectedUsers) => {
         this.connectedUsersStore.setConnectedUsers(connectedUsers);
       });
+      this.socketioStatus.subscribe('inGameUsers', (inGameUsers) => {
+        this.inGameUsersStore.setInGameUsers(inGameUsers);
+      });
     },
     unsubscribeStatusSocket() {
       this.socketioStatus.unsubscribe('connectedUsers');
+      this.socketioStatus.unsubscribe('inGameUsers');
     },
     disconnectStatusSocket() {
       this.socketioStatus.disconnect();

@@ -43,12 +43,9 @@ export default {
     VariationPoints,
     ProfileOpponent
   },
-  inject: ['connectedUsersStore'],
   props: ['games', 'users', 'user'],
   data() {
-    return {
-      connectedUsers: this.connectedUsersStore.connectedUsers
-    };
+    return {};
   },
   methods: {
     setDuration(dateToConvert) {
