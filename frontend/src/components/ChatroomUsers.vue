@@ -61,15 +61,7 @@
             :user-id="user.id"
             @restrict="mute"
           />
-          <v-btn
-            v-if="isUserBanned(user.id)"
-            class="button"
-            block
-            @click="unban(user.id)"
-            >Unban</v-btn
-          >
           <RestrictUserDialog
-            v-else
             action="Ban"
             :nickname="user.nickname"
             :user-id="user.id"
@@ -87,6 +79,15 @@
           >Unblock</v-btn
         >
       </div>
+    </v-list-group>
+  </v-list>
+  <v-list v-if="bannedUsers.length" class="window">
+    <v-list-subheader>Banned users</v-list-subheader>
+    <v-list-group v-for="bannedUser in bannedNames" :key="bannedUser.id">
+      <template #activator="{ props }">
+        <v-list-item v-bind="props" :title="bannedUser.nickname"></v-list-item>
+      </template>
+      <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
     </v-list-group>
   </v-list>
 </template>
@@ -115,6 +116,9 @@ export default {
   props: ['id'],
   data() {
     return {
+      bannedUsers: [],
+      bannedNames: [],
+      currentRole: '',
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -134,14 +138,12 @@ export default {
       const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
-
       return currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
     },
     currentUserIsOwner() {
       const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
-
       return currentUser.role === 'OWNER';
     }
   },
@@ -149,6 +151,21 @@ export default {
     id: {
       handler() {
         this.setRoomUsers();
+      }
+    },
+    users: {
+      immediate: true,
+      handler(newValue) {
+        this.currentRole = newValue.find(
+          (user) => user.id == this.currentUserId
+        );
+        if (
+          this.currentRole &&
+          (this.currentRole.role === 'OWNER' ||
+            this.currentRole.role === 'ADMIN')
+        ) {
+          this.getBanned(this.id);
+        }
       }
     }
   },
@@ -204,6 +221,34 @@ export default {
         this.$router.push('/logout');
       }
     },
+    async getBanned(chatroomId) {
+      try {
+        if (this.currentUserIsOwner || this.currentUserIsAdmin) {
+          const response = await axios.get(
+            constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
+          );
+
+          for (let i = 0; i < response.data.length; i++) {
+            if (response.data[i].type === 'BANNED') {
+              this.bannedUsers.push(response.data[i]);
+            }
+          }
+          this.getUserBannedName(this.bannedUsers);
+          return response.data;
+        }
+      } catch (error) {
+        this.$router.push('/logout');
+      }
+    },
+    async getUserBannedName(bannedUsers) {
+      this.bannedNames = [];
+      for (let i = 0; i < bannedUsers.length; i++) {
+        const response = await axios.get(constants.API_URL + `/users/`);
+        this.bannedNames.push(
+          response.data.find((user) => user.id == bannedUsers[i].userId)
+        );
+      }
+    },
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
@@ -256,6 +301,7 @@ export default {
     unban(userId) {
       ChatService.unbanUser(userId, this.id);
       this.chatStore.removeUserRestriction(userId, 'BANNED');
+      this.bannedNames = this.bannedNames.filter((user) => user.id !== userId);
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);

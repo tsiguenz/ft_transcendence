@@ -3,7 +3,7 @@
     <template #activator="{ props }">
       <v-btn class="button" v-bind="props" block>{{ action }}</v-btn>
     </template>
-    <v-card>
+    <v-card class="window">
       <v-card-title>
         <span class="text-h5">{{ action }} {{ nickname }}</span>
       </v-card-title>
