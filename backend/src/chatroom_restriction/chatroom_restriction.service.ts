@@ -72,12 +72,14 @@ export class ChatroomRestrictionService {
     chatroomId: string,
     type: RestrictionType
   ) {
-    const restriction = await this.findOne(userId, chatroomId);
-
-    if (!restriction || restriction.type !== type) {
-      return false;
-    }
-    return true;
+    const restrictions = await this.findAll(chatroomId);
+    const restrictionsUser = restrictions.filter(
+      (restriction) => restriction.userId === userId
+    );
+    const userHasRestriction = restrictionsUser.some(
+      (restriction) => restriction.type === type
+    );
+    return userHasRestriction;
   }
 
   async isUserMuted(userId: string, chatroomId: string) {

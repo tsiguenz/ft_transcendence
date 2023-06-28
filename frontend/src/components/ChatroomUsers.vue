@@ -138,14 +138,12 @@ export default {
       const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
-
       return currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
     },
     currentUserIsOwner() {
       const currentUser = this.chatStore.users.find(
         (user) => user.id == this.currentUserId
       );
-
       return currentUser.role === 'OWNER';
     }
   },
@@ -227,18 +225,22 @@ export default {
       }
     },
     async getBanned(chatroomId) {
-      if (this.currentUserIsOwner || this.currentUserIsAdmin) {
-        const response = await axios.get(
-          constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
-        );
+      try {
+        if (this.currentUserIsOwner || this.currentUserIsAdmin) {
+          const response = await axios.get(
+            constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
+          );
 
-        for (let i = 0; i < response.data.length; i++) {
-          if (response.data[i].type === 'BANNED') {
-            this.bannedUsers.push(response.data[i]);
+          for (let i = 0; i < response.data.length; i++) {
+            if (response.data[i].type === 'BANNED') {
+              this.bannedUsers.push(response.data[i]);
+            }
           }
+          this.getUserBannedName(this.bannedUsers);
+          return response.data;
         }
-        this.getUserBannedName(this.bannedUsers);
-        return response.data;
+      } catch (error) {
+        this.$router.push('/logout');
       }
     },
     async getUserBannedName(bannedUsers) {
@@ -250,7 +252,6 @@ export default {
         );
       }
     },
-
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
@@ -260,7 +261,6 @@ export default {
         this.chatStore.users = users;
       });
     },
-
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
     },
