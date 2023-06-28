@@ -1,6 +1,6 @@
 <template>
   <v-list class="window">
-    <InviteUserDialog :id="id" />
+    <InviteUserDialog v-if="" :id="id" />
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template #activator="{ props }">
@@ -61,15 +61,7 @@
             :user-id="user.id"
             @restrict="mute"
           />
-          <v-btn
-            v-if="isUserBanned(user.id)"
-            class="button"
-            block
-            @click="unban(user.id)"
-            >Unban</v-btn
-          >
           <RestrictUserDialog
-            v-else
             action="Ban"
             :nickname="user.nickname"
             :user-id="user.id"
@@ -97,8 +89,8 @@
         v-bind="props"
         :title="bannedUser.nickname"
       ></v-list-item>
-      <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
     </template>
+    <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
   </v-list-group>
 </v-list>
 </template>
@@ -242,11 +234,12 @@ export default {
       }
     },
     async getUserBannedName(bannedUsers){
-
+      this.bannedNames = [];
       for (let i = 0; i < bannedUsers.length; i++) {
         const response = await axios.get(constants.API_URL + `/users/`);
         this.bannedNames.push( response.data.find((user) => user.id == bannedUsers[i].userId));
       }
+      console.log(this.bannedNames);
     },
     setRoomUsers() {
       if (!this.id) {
