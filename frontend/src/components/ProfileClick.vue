@@ -58,28 +58,26 @@ export default {
   data() {
     return {
       status: constants.USER_STATUS.OFFLINE,
-      connectedUsers: this.connectedUsersStore.connectedUsers,
-      inGameUsers: this.inGameUsersStore.inGameUsers,
       connected: false
     };
   },
   computed: {
     statusStyle() {
-      if (this.status === constants.USER_STATUS.ONLINE) return 'co';
-      if (this.status === constants.USER_STATUS.OFFLINE) return 'unco';
       if (this.status === constants.USER_STATUS.IN_GAME) return 'in-game';
+      if (this.status === constants.USER_STATUS.ONLINE) return 'co';
+      return 'unco';
     }
   },
   watch: {
     connectedUsersStore: {
       handler() {
-        this.connectedUsers = this.connectedUsersStore.connectedUsers;
+        this.status = this.userStatus(this.userId);
       },
       deep: true
     },
     inGameUsersStore: {
       handler() {
-        this.inGameUsers = this.inGameUsersStore.inGameUsers;
+        this.status = this.userStatus(this.userId);
       },
       deep: true
     }
