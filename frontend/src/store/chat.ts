@@ -122,11 +122,13 @@ export const useChatStore = defineStore('chat', {
 
     removeUserRestriction(userId, type) {
       const i = this.users.findIndex((e) => e.id == userId);
-      this.users[i].restrictions = this.users[i].restrictions.filter(
-        (restriction) => restriction.type !== type
-      );
-    },
 
+      if (i > -1) {
+        this.users[i].restrictions = this.users[i].restrictions.filter(
+          (restriction) => restriction.type !== type
+        );
+      }
+    },
     getUserRestrictions(userId) {
       const i = this.users.findIndex((e) => e.id == userId);
       return this.users[i].restrictions.filter(

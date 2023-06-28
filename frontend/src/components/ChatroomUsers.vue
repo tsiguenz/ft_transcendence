@@ -1,6 +1,6 @@
 <template>
   <v-list class="window">
-    <InviteUserDialog v-if="" :id="id" />
+    <InviteUserDialog  :id="id" />
     <v-list-subheader>Users</v-list-subheader>
     <v-list-group v-for="user in users" :key="user.id">
       <template #activator="{ props }">
@@ -81,8 +81,8 @@
       </div>
     </v-list-group>
   </v-list>
-  <v-list class="window">
-  <v-list-subheader>Banned users</v-list-subheader>
+  <v-list v-if="bannedUsers.length" class="window">
+  <v-list-subheader  >Banned users</v-list-subheader>
   <v-list-group v-for="bannedUser in bannedNames" :key="bannedUser.id">
     <template #activator="{ props }">
       <v-list-item
@@ -93,7 +93,7 @@
     <v-btn class="button" block @click="unban(bannedUser.id)">Unban</v-btn>
   </v-list-group>
 </v-list>
-</template>
+</template> 
 
 <script>
 import axios from 'axios';
@@ -121,6 +121,7 @@ export default {
     return {
       bannedUsers: [],
       bannedNames: [],
+      currentRole: '',
       userRoleIcon: {
         OWNER: 'mdi-crown-circle',
         ADMIN: 'mdi-alpha-a-circle',
@@ -160,13 +161,13 @@ export default {
     users: {
       immediate: true,
       handler(newValue) {
-        const currentUser = newValue.find((user) => user.id == this.currentUserId);
-        if (currentUser && currentUser.role === 'OWNER') {
+        this.currentRole = newValue.find((user) => user.id == this.currentUserId);
+        if (this.currentRole && (this.currentRole.role === 'OWNER' || this.currentRole.role === 'ADMIN')) {
           this.getBanned(this.id);
         }
 
       }
-    }
+    },
   },
   mounted() {
     this.setRoomUsers();
@@ -224,7 +225,7 @@ export default {
       }
     },
     async getBanned(chatroomId) {
-      if (this.currentUserIsOwner) {
+      if (this.currentUserIsOwner || this.currentUserIsAdmin) {
         const response = await axios.get(
           constants.API_URL + '/chatrooms/' + chatroomId + '/restrictions'
         );
@@ -239,8 +240,8 @@ export default {
         const response = await axios.get(constants.API_URL + `/users/`);
         this.bannedNames.push( response.data.find((user) => user.id == bannedUsers[i].userId));
       }
-      console.log(this.bannedNames);
     },
+   
     setRoomUsers() {
       if (!this.id) {
         this.chatStore.users = [];
@@ -249,6 +250,16 @@ export default {
       this.getChatroomUsers(this.id).then((users) => {
         this.chatStore.users = users;
       });
+    },
+    getCurrentRole(){
+      const currentUser = this.users.filter(
+        (user) => user.id === this.sessionStore.userId
+      );
+      if (!currentUser.length) return false;
+      const currentUserRole = currentUser[0].role;
+      return (
+        (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN')
+      );
     },
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
@@ -293,6 +304,7 @@ export default {
     unban(userId) {
       ChatService.unbanUser(userId, this.id);
       this.chatStore.removeUserRestriction(userId, 'BANNED');
+      this.bannedNames = this.bannedNames.filter((user) => user.id !== userId);
     },
     kick(userId) {
       ChatService.kickUser(userId, this.id);
@@ -325,4 +337,6 @@ export default {
 .button {
   background: var(--medium-purple) !important;
 }
+
+
 </style>
