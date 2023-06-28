@@ -251,16 +251,7 @@ export default {
         this.chatStore.users = users;
       });
     },
-    getCurrentRole(){
-      const currentUser = this.users.filter(
-        (user) => user.id === this.sessionStore.userId
-      );
-      if (!currentUser.length) return false;
-      const currentUserRole = currentUser[0].role;
-      return (
-        (currentUserRole === 'OWNER' || currentUserRole === 'ADMIN')
-      );
-    },
+    
     canBeAdministered(userRole) {
       return this.currentUserIsAdmin && userRole !== 'OWNER';
     },
