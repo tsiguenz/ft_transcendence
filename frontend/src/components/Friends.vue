@@ -49,7 +49,7 @@ export default {
     IsFriend,
     ProfileClick
   },
-  inject: ['sessionStore', 'friendStore'],
+  inject: ['connectedUsersStore', 'sessionStore', 'friendStore'],
 
   data() {
     return {
@@ -59,6 +59,12 @@ export default {
     };
   },
   watch: {
+    connectedUsersStore: {
+      handler() {
+        this.getConnectedFriends();
+      },
+      deep: true
+    },
     friendStore: {
       handler() {
         this.friends = this.friendStore.friends;
@@ -75,7 +81,7 @@ export default {
     getConnectedFriends() {
       this.connectedFriends = [];
       for (let i = 0; i < this.friends.length; i++) {
-        if (this.connectedUsers.includes(this.friends[i].id)) {
+        if (this.connectedUsersStore.isConnected(this.friends[i].id)) {
           this.connectedFriends.push(this.friends[i]);
         }
       }
