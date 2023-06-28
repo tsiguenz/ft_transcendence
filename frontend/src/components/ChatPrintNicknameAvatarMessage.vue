@@ -7,7 +7,7 @@
       </p>
       <ProfileClick
         :nickname="currentUserNickname"
-        :status="userStatus(currentUser)"
+        :user-id="userId"
         :width="40"
         :height="40"
         :url-avatar="currentUserAvatar"
@@ -28,7 +28,6 @@ export default {
     ProfileClick
   },
   props: ['userId', 'users', 'message', 'senderIsCurrentUser'],
-  inject: ['connectedUsersStore'],
   data() {
     return {
       currentUser: [],
@@ -36,7 +35,6 @@ export default {
       currentUserAvatar: '',
       currentMessage: '',
       isSender: false,
-      connectedUsers: this.connectedUsersStore.connectedUsers,
       isMounted: false
     };
   },
@@ -54,12 +52,6 @@ export default {
       this.currentMessage = this.message;
       this.isSender = this.senderIsCurrentUser;
       this.isMounted = true;
-    },
-    userStatus(user) {
-      if (this.connectedUsers.includes(user.id)) {
-        return true;
-      }
-      return false;
     }
   }
 };

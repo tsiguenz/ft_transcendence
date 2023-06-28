@@ -36,6 +36,7 @@ export default {
   },
   data() {
     return {
+      statusSocket: null,
       socketioGame: new SocketioService(GAME_SOCKET_URL),
       canvas: null,
       ctx: null,
@@ -50,6 +51,7 @@ export default {
     };
   },
   mounted() {
+    this.statusSocket = this.$root.$data.socketioStatus;
     this.socketioGame.setupSocketConnection(this.$cookie.getCookie('jwt'));
     this.socketioGame.subscribe('alreadyInGame', () => {
       this.gameStatus = constants.GAME_STATUS.IN_GAME;
@@ -63,6 +65,7 @@ export default {
     } else this.gameStatus = constants.GAME_STATUS.IN_CHOOSE_MODE;
   },
   beforeUnmount() {
+    this.statusSocket.send('outGame');
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
     this.socketioGame.disconnect();
@@ -82,7 +85,9 @@ export default {
       this.socketioGame.send('joinCustomRoom', gameId);
     },
     runGame() {
+      this.statusSocket.send('inGame');
       this.socketioGame.subscribe('gameOver', (res) => {
+        this.statusSocket.send('outGame');
         this.gameStatus = constants.GAME_STATUS.IN_SCORE_SCREEN;
         document.removeEventListener('keydown', this.handleKeyDown);
         document.removeEventListener('keyup', this.handleKeyUp);

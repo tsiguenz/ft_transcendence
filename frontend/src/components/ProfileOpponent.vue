@@ -3,7 +3,7 @@
     <div class="mt-3">
       <ProfileClick
         :nickname="opponent.nickname"
-        :status="userStatus(opponent)"
+        :user-id="opponent.id"
         :width="40"
         :height="40"
         :url-avatar="getAvatarPath(opponent)"
@@ -16,26 +16,18 @@
 </template>
 
 <script>
-import axios from 'axios';
 import * as constants from '@/constants.ts';
-import * as lib from '@/utils/lib';
 import ProfileClick from './ProfileClick.vue';
 
 export default {
-  props: ['opponent'],
   components: {
     ProfileClick
   },
-  inject: ['connectedUsersStore'],
+  props: ['opponent'],
   data() {
-    return {
-      connectedUsers: this.connectedUsersStore.connectedUsers
-    };
+    return {};
   },
   methods: {
-    userStatus(user) {
-      return this.connectedUsers.includes(user.id);
-    },
     getAvatarPath(user) {
       return constants.AVATARS_URL + user.avatarPath;
     }

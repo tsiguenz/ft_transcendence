@@ -2,6 +2,7 @@ import { useSessionStore } from '@/store/session';
 import { useChatStore } from '@/store/chat';
 import { useFriendStore } from '@/store/friend';
 import { useConnectedUsersStore } from '@/store/connectedUsers';
+import { useInGameUsersStore } from '@/store/inGameUsers';
 import swal from 'sweetalert';
 
 export function formatError(message) {
@@ -18,7 +19,8 @@ export function resetStores() {
     useSessionStore(),
     useChatStore(),
     useFriendStore(),
-    useConnectedUsersStore()
+    useConnectedUsersStore(),
+    useInGameUsersStore()
   ];
 
   for (const store of stores) {
