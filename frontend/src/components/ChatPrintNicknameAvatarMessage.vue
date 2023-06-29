@@ -76,4 +76,10 @@ export default {
   padding-right: 15px;
   font-size: 10px;
 }
+
+.msg-content {
+  max-width: 300px;
+  word-wrap: break-word;
+  text-align: left;
+}
 </style>
