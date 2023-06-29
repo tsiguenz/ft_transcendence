@@ -22,12 +22,14 @@
 <script>
 import * as constants from '@/constants.ts';
 import ProfileClick from '../components/ProfileClick.vue';
+import * as lib from '@/utils/lib';
+import axios from 'axios';
 
 export default {
   components: {
     ProfileClick
   },
-  props: ['userId', 'users', 'message', 'senderIsCurrentUser'],
+  props: ['userId', 'message', 'senderIsCurrentUser'],
   data() {
     return {
       currentUser: [],
@@ -42,7 +44,14 @@ export default {
     this.getCurrentUser();
   },
   methods: {
-    getCurrentUser() {
+    async getCurrentUser() {
+      try {
+        const responseUsers = await axios.get(constants.API_URL + '/users');
+        this.users = responseUsers.data;
+      } catch (error) {
+        this.$router.push('/logout');
+        return;
+      }
       this.currentUser = this.users.filter(
         (currentUser) => currentUser.id == this.userId
       )[0];
@@ -75,5 +84,11 @@ export default {
 .nameMe {
   padding-right: 15px;
   font-size: 10px;
+}
+
+.msg-content {
+  max-width: 300px;
+  word-wrap: break-word;
+  text-align: left;
 }
 </style>
