@@ -11,14 +11,16 @@
       </v-card-title>
       <v-card-text>
         <v-container>
-          <v-row>
-            <v-col cols="4">
-              <SearchProfile @user-selected="setSelectedUser" />
-            </v-col>
-            <v-col cols="8">
-              Selected user:
-              <span v-if="selectedUser">{{ selectedUser.nickname }}</span>
-            </v-col>
+          <v-row justify="space-around">
+            <SearchProfile @user-selected="setSelectedUser" />
+            <v-btn
+              v-if="selectedUser"
+              class="btn pa-7"
+              variant="text"
+              @click="inviteUser"
+            >
+              Invite {{ selectedUser.nickname }}
+            </v-btn>
           </v-row>
         </v-container>
       </v-card-text>
@@ -26,9 +28,6 @@
         <v-spacer></v-spacer>
         <v-btn color="blue-darken-1" variant="text" @click="closeDialog">
           Close
-        </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="inviteUser">
-          Invite
         </v-btn>
       </v-card-actions>
     </v-card>
