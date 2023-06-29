@@ -85,7 +85,4 @@ export default {
   height: 100%;
   justify-content: flex-start;
 }
-.online-btn:hover {
-  background-color: var(--light-purple);
-}
 </style>
