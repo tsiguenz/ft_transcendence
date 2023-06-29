@@ -156,6 +156,7 @@ export default {
     users: {
       immediate: true,
       handler(newValue) {
+        if (!newValue) { return; }
         this.currentRole = newValue.find(
           (user) => user.id == this.currentUserId
         );
