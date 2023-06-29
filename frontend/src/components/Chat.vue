@@ -14,9 +14,7 @@
       <div v-if="message.authorId === currentUserId">
         <span class="text-right my-2 msg">
           <ChatPrintNicknameAvatarMessage
-            v-if="users.length != 0"
             :user-id="message.authorId"
-            :users="users"
             :message="message.data"
             :sender-is-current-user="true"
           />
@@ -25,9 +23,7 @@
       <div v-if="message.authorId !== currentUserId">
         <span class="text-left my-2 msgOther">
           <ChatPrintNicknameAvatarMessage
-            v-if="users.length != 0"
             :user-id="message.authorId"
-            :users="users"
             :message="message.data"
             :sender-is-current-user="false"
           />
@@ -64,8 +60,7 @@ export default {
   data() {
     return {
       newMessage: '',
-      chatroom: [],
-      users: []
+      chatroom: []
     };
   },
   computed: {
@@ -110,7 +105,6 @@ export default {
     ChatService.subscribeToKick((payload) => {
       this.$emit('leave', payload.chatroomId);
     });
-    await this.getUsers();
   },
   methods: {
     connectRoom() {
@@ -145,18 +139,6 @@ export default {
         return '';
       }
       return chatroom.name;
-    },
-    async getUsers() {
-      try {
-        const responseUsers = await axios.get(constants.API_URL + '/users');
-        this.users = responseUsers.data;
-      } catch (error) {
-        swal({
-          icon: 'error',
-          text: lib.formatError(error.response.data.message)
-        });
-        this.$router.push('/logout');
-      }
     }
   }
 };
