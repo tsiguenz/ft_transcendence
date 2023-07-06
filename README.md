@@ -1,7 +1,7 @@
 # ft_transcendence (42 project)
 
-This project is about create a website where we can play [pong](https://en.wikipedia.org/wiki/Pong) with some friends. We used [nestjs](https://nestjs.com/), [vuejs](https://vuejs.org/), [postgresql](https://www.postgresql.org/), [nginx](https://www.nginx.com/) and [docker](https://www.docker.com/).
-To run the project you need to modify the sample.env and rename it to '.env'.
+This project is about to create a website where we can play [pong](https://en.wikipedia.org/wiki/Pong) with some friends. We used [nestjs](https://nestjs.com/), [vuejs](https://vuejs.org/), [postgresql](https://www.postgresql.org/) and [docker](https://www.docker.com/).
+To run the project you need to create .env file (can be created with set_env_file.sh script).
 
 ---
 
@@ -25,11 +25,8 @@ Delete all the dockers elements (volumes/network/containers/images/cache):
 Rebuilt (<=> make down + make):
 ```$ make re```
 
-(add testing rule)
-
 ---
 
-<!-- TODO: remove in progress -->
 ## Architecture (in progress)
 
 ```mermaid
